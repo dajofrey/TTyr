@@ -1,0 +1,26 @@
+// LICENSE NOTICE ==================================================================================
+
+/**
+ * TTýr - Terminal Emulator
+ * Copyright (C) 2022  Dajo Frey
+ * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
+ */
+
+// INCLUDES ========================================================================================
+
+#include "Terminate.h"
+#include "Macros.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+// DEBUG ===========================================================================================
+
+TTYR_TERMINAL_RESULT ttyr_terminal_terminate()
+{
+TTYR_TERMINAL_BEGIN()
+
+TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+}
+

@@ -1,0 +1,3 @@
+[submodule "external/Netzhaut"]
+	path = external/Netzhaut
+	url = https://github.com/dajofrey/Netzhaut
