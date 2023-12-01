@@ -372,17 +372,6 @@ TTYR_TTY_BEGIN()
     }
     nh_core_freeList(&MacroTiles, NH_FALSE);
 
-    // Forward boxes: Sidebar.
-    for (int i = 0; Config.Sidebar.state && i < Config.windows; ++i) {
-        ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
-        memset(Box_p, 0, sizeof(ttyr_terminal_Box));
-        Box_p->accent = NH_TRUE;
-        Box_p->UpperLeft.x = -1;
-        Box_p->UpperLeft.y = i;
-        Box_p->LowerRight.x = -1;
-        Box_p->LowerRight.y = i;
-    }
- 
 TTYR_TTY_END(TTYR_TTY_SUCCESS)
 }
 

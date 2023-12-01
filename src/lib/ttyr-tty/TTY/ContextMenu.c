@@ -371,8 +371,7 @@ ttyr_tty_ContextMenu *ttyr_tty_isContextMenuHit(
 {
 TTYR_TTY_BEGIN()
 
-    ttyr_tty_Config Config = ttyr_tty_getConfig();
-    int x2 = Config.Sidebar.state == TTYR_TTY_SIDEBAR_STATE_LEFT ? x + 2 : x;
+    int x2 = x;
     int y2 = Menu_p->Position.y;
 
     int width = 0;
@@ -480,7 +479,9 @@ TTYR_TTY_BEGIN()
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
     ttyr_tty_Config Config = ttyr_tty_getConfig();
 
-    if (Config.Menu.program && TTY_p->Prototypes.size > 0) {
+    bool border = false;
+
+    if (Config.Menu.program && TTY_p->Prototypes.size > 1) {
         ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
         NH_ENCODING_UTF32 apps_p[] = {PROGRAM_NAME '{'};
         nh_encoding_appendUTF32(&Menu, apps_p, sizeof(apps_p)/sizeof(apps_p[0]));
@@ -502,72 +503,89 @@ TTYR_TTY_BEGIN()
         }
         nh_encoding_appendUTF32Codepoint(&Menu, '}');
         nh_encoding_appendUTF32Codepoint(&Menu, ',');
+        border = true;
     }
 
     if (Config.Menu.split) {
+        if (border) {
+            nh_encoding_appendUTF32Codepoint(&Menu, ',');
+        } 
         NH_ENCODING_UTF32 tiling_p[] = {
-            ',', 'S', 'p', 'l', 'i', 't', '{',
+            'S', 'p', 'l', 'i', 't', '{',
                  'W', 'i', 'n', 'd', 'o', 'w', ',',
                  'T', 'a', 'b',
             '}', ',',
         };
         nh_encoding_appendUTF32(&Menu, tiling_p, sizeof(tiling_p)/sizeof(tiling_p[0]));
+        border = true;
     }
 
     if (Config.Menu.append) {
+        if (border && !Config.Menu.split) {
+            nh_encoding_appendUTF32Codepoint(&Menu, ',');
+        } 
         NH_ENCODING_UTF32 tiling_p[] = {
-            ',', 'A', 'p', 'p', 'e', 'n', 'd', '{',
+            'A', 'p', 'p', 'e', 'n', 'd', '{',
                  'W', 'i', 'n', 'd', 'o', 'w', ',',
                  'T', 'a', 'b',
             '}', ',',
         };
-        nh_encoding_appendUTF32(&Menu, Config.Menu.split ? tiling_p+1 : tiling_p, Config.Menu.split ? sizeof(tiling_p)/sizeof(tiling_p[0])-1 : sizeof(tiling_p)/sizeof(tiling_p[0]));
+        nh_encoding_appendUTF32(&Menu, tiling_p, sizeof(tiling_p)/sizeof(tiling_p[0]));
+        border = true;
     }
 
-    if (Config.Menu.window) {
-        NH_ENCODING_UTF32 tmp1_p[] = {',', 'W', 'i', 'n', 'd', 'o', 'w', '{'};
-        nh_encoding_appendUTF32(&Menu, tmp1_p, 7);
-        for (int i = 0; i < Config.windows; ++i) {
-            NH_ENCODING_UTF32 tmp2_p[] = {i + '1', 1, ' '};
-            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i) {
-                tmp2_p[2] = 0x2022;
-            }
-            nh_encoding_appendUTF32(&Menu, tmp2_p, 3);
-            if (i < (Config.windows-1)) {
-                nh_encoding_appendUTF32Codepoint(&Menu, ',');
-            } else {
-                nh_encoding_appendUTF32Codepoint(&Menu, '}');
-                nh_encoding_appendUTF32Codepoint(&Menu, ',');
-            }
-        }
-    }
-
-    if (Config.Menu.tab) {
-        NH_ENCODING_UTF32 tmp3_p[] = {',', 'T', 'a', 'b', '{'};
-        nh_encoding_appendUTF32(&Menu, Config.Menu.window ? tmp3_p+1 : tmp3_p , Config.Menu.window ? 3 : 4);
-        for (int i = 0; i < Config.tabs; ++i) {
-            NH_ENCODING_UTF32 tmp2_p[] = {i + '1', 1, ' '};
-            if (((ttyr_tty_MacroTile*)TTY_p->Window_p->Tile_p->p)->current == i) {
-                tmp2_p[2] = 0x2022;
-            }
-            nh_encoding_appendUTF32(&Menu, tmp2_p, 3);
-            if (i < (Config.tabs-1)) {
-                nh_encoding_appendUTF32Codepoint(&Menu, ',');
-            } else {
-                nh_encoding_appendUTF32Codepoint(&Menu, '}');
-                nh_encoding_appendUTF32Codepoint(&Menu, ',');
-            }
-        }
-    }
+//    if (Config.Menu.window) {
+//        NH_ENCODING_UTF32 tmp1_p[] = {',', 'W', 'i', 'n', 'd', 'o', 'w', '{'};
+//        nh_encoding_appendUTF32(&Menu, tmp1_p, 7);
+//        for (int i = 0; i < Config.windows; ++i) {
+//            NH_ENCODING_UTF32 tmp2_p[] = {i + '1', 1, ' '};
+//            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i) {
+//                tmp2_p[2] = 0x2022;
+//            }
+//            nh_encoding_appendUTF32(&Menu, tmp2_p, 3);
+//            if (i < (Config.windows-1)) {
+//                nh_encoding_appendUTF32Codepoint(&Menu, ',');
+//            } else {
+//                nh_encoding_appendUTF32Codepoint(&Menu, '}');
+//                nh_encoding_appendUTF32Codepoint(&Menu, ',');
+//            }
+//        }
+//    }
+//
+//    if (Config.Menu.tab) {
+//        NH_ENCODING_UTF32 tmp3_p[] = {',', 'T', 'a', 'b', '{'};
+//        nh_encoding_appendUTF32(&Menu, Config.Menu.window ? tmp3_p+1 : tmp3_p , Config.Menu.window ? 3 : 4);
+//        for (int i = 0; i < Config.tabs; ++i) {
+//            NH_ENCODING_UTF32 tmp2_p[] = {i + '1', 1, ' '};
+//            if (((ttyr_tty_MacroTile*)TTY_p->Window_p->Tile_p->p)->current == i) {
+//                tmp2_p[2] = 0x2022;
+//            }
+//            nh_encoding_appendUTF32(&Menu, tmp2_p, 3);
+//            if (i < (Config.tabs-1)) {
+//                nh_encoding_appendUTF32Codepoint(&Menu, ',');
+//            } else {
+//                nh_encoding_appendUTF32Codepoint(&Menu, '}');
+//                nh_encoding_appendUTF32Codepoint(&Menu, ',');
+//            }
+//        }
+//    }
 
     if (Config.Menu.close) {
-        NH_ENCODING_UTF32 close_p[] = {',', 'C', 'l', 'o', 's', 'e', ',', 0};
-        nh_encoding_appendUTF32(&Menu, close_p, 7);
+        if (border) {
+            nh_encoding_appendUTF32Codepoint(&Menu, ',');
+        } 
+        NH_ENCODING_UTF32 close_p[] = {'C', 'l', 'o', 's', 'e', ','};
+        nh_encoding_appendUTF32(&Menu, close_p, sizeof(close_p)/sizeof(close_p[0]));
+        border = true;
     }
 
     if (Config.Menu.debug) {
-        NH_ENCODING_UTF32 debug_p[] = {',', 'D', 'e', 'b', 'u', 'g', '{', 0};
-        nh_encoding_appendUTF32(&Menu, debug_p, 7);
+        if (border) {
+            nh_encoding_appendUTF32Codepoint(&Menu, ',');
+        } 
+ 
+        NH_ENCODING_UTF32 debug_p[] = {'D', 'e', 'b', 'u', 'g', '{', 0};
+        nh_encoding_appendUTF32(&Menu, debug_p, sizeof(debug_p)/sizeof(debug_p[0]));
      
         NH_ENCODING_UTF32 x_p[16];
         NH_ENCODING_UTF32 y_p[16];
@@ -603,7 +621,6 @@ TTYR_TTY_BEGIN()
         nh_encoding_appendUTF8ToUTF32(&Menu, Glyph.Attributes.wide ? "Attr.wide:1}" : "Attr.wide:0}", 12);
      
         nh_encoding_appendUTF32Codepoint(&Menu, '}');
-        nh_encoding_appendUTF32Codepoint(&Menu, ',');
     }
 
     NH_ENCODING_UTF32 *p = Menu.p;

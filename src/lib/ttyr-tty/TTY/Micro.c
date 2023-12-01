@@ -182,7 +182,7 @@ TTYR_TTY_BEGIN()
     nh_List Tiles = ttyr_tty_getTiles(RootTile_p);
 
     TTYR_TTY_CHECK(ttyr_tty_updateView(Window_p->View_p, NULL, NH_FALSE))
-    TTYR_TTY_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, Window_p->View_p, row, NH_FALSE))
+    TTYR_TTY_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, Window_p->View_p, row))
 
     memcpy(Glyphs_p, Window_p->View_p->Grid1_p[row].Glyphs_p, sizeof(ttyr_tty_Glyph)*cols);
     nh_core_freeList(&Tiles, NH_FALSE);

@@ -19,14 +19,7 @@
  *  @{
  */
 
-    typedef enum TTYR_TTY_SIDEBAR_STATE_E {
-        TTYR_TTY_SIDEBAR_STATE_OFF,
-        TTYR_TTY_SIDEBAR_STATE_LEFT,
-        TTYR_TTY_SIDEBAR_STATE_RIGHT,
-    } TTYR_TTY_SIDEBAR_STATE_E;
-
     typedef enum TTYR_TTY_SETTING_E {
-        TTYR_TTY_SETTING_SIDEBAR_TYPE,
         TTYR_TTY_SETTING_SHELL_MAX_SCROLL,
         TTYR_TTY_SETTING_WINDOWS,
         TTYR_TTY_SETTING_TABS,
@@ -56,10 +49,6 @@
         NH_BOOL debug;
     } ttyr_tty_MenuConfig;
 
-    typedef struct ttyr_tty_SidebarConfig {
-        TTYR_TTY_SIDEBAR_STATE_E state;
-    } ttyr_tty_SidebarConfig;
-
     typedef struct ttyr_tty_TitlebarConfig {
         NH_BOOL on;
     } ttyr_tty_TitlebarConfig;
@@ -70,7 +59,6 @@
 
     typedef struct ttyr_tty_Config {
         NH_BYTE *name_p;
-        ttyr_tty_SidebarConfig Sidebar;
         ttyr_tty_TitlebarConfig Titlebar;
         ttyr_tty_ShellConfig Shell;
         ttyr_tty_MenuConfig Menu;

@@ -65,9 +65,6 @@ TTYR_TTY_BEGIN()
         *y_p += MacroTile_p->rowPosition;
     }
 
-    ttyr_tty_Config Config = ttyr_tty_getConfig();
-    *x_p += Config.Sidebar.state != TTYR_TTY_SIDEBAR_STATE_OFF && !standardIO ? 2 : 0;
-
 TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 }
 
@@ -226,14 +223,12 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 }
 
 TTYR_TTY_RESULT ttyr_tty_refreshGrid1Row(
-    nh_List *Tiles_p, ttyr_tty_View *View_p, int row, NH_BOOL sidebar)
+    nh_List *Tiles_p, ttyr_tty_View *View_p, int row)
 {
 TTYR_TTY_BEGIN()
 
-    sidebar = sidebar && !View_p->standardIO;
-
     memset(View_p->Row.Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
-    int offset = sidebar ? 2 : 0;
+    int offset = 0;
 
     for (int col = offset; col < View_p->cols;) {
         for (int tile = 0; tile < Tiles_p->size; ++tile) {
@@ -265,12 +260,6 @@ TTYR_TTY_BEGIN()
         }
     }
 
-    if (sidebar) {
-        TTYR_TTY_CHECK(ttyr_tty_drawSideBarRow(View_p->Grid1_p[row].Glyphs_p, row, View_p->rows))
-        View_p->Grid1_p[row].update_p[0] = NH_TRUE;
-        View_p->Grid1_p[row].update_p[1] = NH_TRUE;
-    }
-
     TTYR_TTY_CHECK(ttyr_tty_postProcessRow(View_p, row))
 
 TTYR_TTY_END(TTYR_TTY_SUCCESS)
@@ -283,13 +272,13 @@ TTYR_TTY_BEGIN()
 
     ttyr_tty_View *View_p = TTY_p->Views.pp[0];
     ttyr_tty_Config Config = ttyr_tty_getConfig();
-    int offset = Config.Sidebar.state != TTYR_TTY_SIDEBAR_STATE_OFF && !View_p->standardIO ? 2 : 0;
+    int offset = 0;
 
     ttyr_tty_updateTiling(TTY_p->Window_p->RootTile_p, View_p->rows, View_p->cols-offset);
     nh_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
 
     for (int row = 0; row < View_p->rows; ++row) {
-        TTYR_TTY_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, View_p, row, Config.Sidebar.state != TTYR_TTY_SIDEBAR_STATE_OFF))
+        TTYR_TTY_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, View_p, row))
     }
 
     nh_core_freeList(&Tiles, NH_FALSE);
@@ -311,12 +300,6 @@ TTYR_TTY_BEGIN()
     }
  
     TTYR_TTY_CHECK(ttyr_tty_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
-
-    ttyr_tty_Config Config = ttyr_tty_getConfig();
-    if (Config.Sidebar.state && View_p->cols > 0) {
-        View_p->Grid2_p[nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p)].Glyphs_p[0].Attributes.reverse = 1;
-    }
-
     TTYR_TTY_CHECK(ttyr_tty_forwardGrid2(View_p))
 
 TTYR_TTY_END(TTYR_TTY_SUCCESS)

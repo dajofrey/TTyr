@@ -24,7 +24,6 @@
 // NAMES ===========================================================================================
 
 const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
-    "ttyr.tty.sidebar.state",
     "ttyr.tty.shell.maxScroll",
     "ttyr.tty.windows",
     "ttyr.tty.tabs",
@@ -64,49 +63,45 @@ TTYR_TTY_BEGIN()
     switch (*index_p) {
         case 0 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Sidebar.state = atoi(Values_p->pp[0]);
+            Config_p->Shell.maxScroll = atoi(Values_p->pp[0]);
             break;
         case 1 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Shell.maxScroll = atoi(Values_p->pp[0]);
+            Config_p->windows = atoi(Values_p->pp[0]);
             break;
         case 2 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->windows = atoi(Values_p->pp[0]);
+            Config_p->tabs = atoi(Values_p->pp[0]);
             break;
         case 3 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->tabs = atoi(Values_p->pp[0]);
+            Config_p->Menu.program = atoi(Values_p->pp[0]);
             break;
         case 4 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Menu.program = atoi(Values_p->pp[0]);
+            Config_p->Menu.split = atoi(Values_p->pp[0]);
             break;
         case 5 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Menu.split = atoi(Values_p->pp[0]);
+            Config_p->Menu.append = atoi(Values_p->pp[0]);
             break;
         case 6 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Menu.append = atoi(Values_p->pp[0]);
+            Config_p->Menu.window = atoi(Values_p->pp[0]);
             break;
         case 7 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Menu.window = atoi(Values_p->pp[0]);
+            Config_p->Menu.tab = atoi(Values_p->pp[0]);
             break;
         case 8 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Menu.tab = atoi(Values_p->pp[0]);
+            Config_p->Menu.close = atoi(Values_p->pp[0]);
             break;
         case 9 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-            Config_p->Menu.close = atoi(Values_p->pp[0]);
-            break;
-        case 10 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
             Config_p->Menu.debug = atoi(Values_p->pp[0]);
             break;
-        case 11 :
+        case 10 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
             Config_p->Titlebar.on = atoi(Values_p->pp[0]);
             break;

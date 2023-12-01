@@ -661,8 +661,11 @@ TTYR_TTY_BEGIN()
         case TTYR_TTY_INSERT_TILE_LEFT_KEY   :
         case TTYR_TTY_INSERT_TILE_RIGHT_KEY  :
 
-            ttyr_tty_moveInsertTile(TTY_p->InsertTile_p, c);
-            break;
+            if (TTY_p->InsertTile_p) { 
+                ttyr_tty_moveInsertTile(TTY_p->InsertTile_p, c);
+                break;
+            }
+            // Fall through.
 
         default :
             TTYR_TTY_CHECK(ttyr_tty_resetTiling(Window_p))
@@ -726,7 +729,9 @@ TTYR_TTY_BEGIN()
                 if (Window_p->Tile_p->Parent_p == NULL) {
                     TTYR_TTY_CHECK(ttyr_tty_splitTile(Window_p->Tile_p, c))
                 } else {
-                    TTYR_TTY_CHECK(ttyr_tty_addTile(Window_p->Tile_p, c))
+                    if (ttyr_tty_addTile(Window_p->Tile_p, c)) {
+                        TTYR_TTY_END(ttyr_tty_resetTiling(Window_p))
+                    }
                 }
                 Window_p->Tiling.stage = TTYR_TTY_TILING_STAGE_INSERT;
                 TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
@@ -781,7 +786,9 @@ TTYR_TTY_BEGIN()
                 if (TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
                     TTYR_TTY_CHECK(ttyr_tty_splitTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, c))
                 } else {
-                    TTYR_TTY_CHECK(ttyr_tty_addTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, c))
+                    if (ttyr_tty_addTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, c)) {
+                        TTYR_TTY_END(ttyr_tty_resetTiling(Window_p))
+                    }
                 }
                 Window_p->Tiling.stage = TTYR_TTY_TILING_STAGE_INSERT;
                 TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))

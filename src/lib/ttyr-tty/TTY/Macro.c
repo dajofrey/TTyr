@@ -414,7 +414,6 @@ TTYR_TTY_BEGIN()
     nh_List MacroTiles = ttyr_tty_getTiles(Window_p->RootTile_p);
 
     ttyr_tty_Config Config = ttyr_tty_getConfig();
-    if (Config.Sidebar.state != TTYR_TTY_SIDEBAR_STATE_OFF) {col -= 2;}
 
     int cCol = col;
     int cCol2 = col;
