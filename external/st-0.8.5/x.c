@@ -1791,7 +1791,6 @@ kmap(KeySym k, uint state)
 		if ((k & 0xFFFF) < 0xFD00)
 			return NULL;
 	}
-
 	for (kp = key; kp < key + LEN(key); kp++) {
 		if (kp->k != k)
 			continue;

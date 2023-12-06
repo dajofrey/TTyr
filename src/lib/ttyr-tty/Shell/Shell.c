@@ -584,11 +584,11 @@ TTYR_TTY_BEGIN()
     // programs running in the terminal should not treat characters bracketed by those sequences as commands 
     // (Vim, for example, does not treat them as commands).
     // Source: https://en.wikipedia.org/wiki/ANSI_escape_code
-    if (Shell_p->ST_p->mode & MODE_BRCKTPASTE) {
+    if (Shell_p->ST_p->windowMode & MODE_BRCKTPASTE) {
         ttywrite(Shell_p->ST_p, "\033[200~", 6, 0);
     }
     ttywrite(Shell_p->ST_p, clipboard_p, strlen(clipboard_p), 1);
-    if (Shell_p->ST_p->mode & MODE_BRCKTPASTE) {
+    if (Shell_p->ST_p->windowMode & MODE_BRCKTPASTE) {
         ttywrite(Shell_p->ST_p, "\033[201~", 6, 0);
     }
 
@@ -651,12 +651,12 @@ TTYR_TTY_BEGIN()
             if (kp->mask != -1 && kp->mask != state)
                     continue;
 
-            if ((Shell_p->ST_p->mode & MODE_APPKEYPAD) ? kp->appkey < 0 : kp->appkey > 0)
+            if ((Shell_p->ST_p->windowMode & MODE_APPKEYPAD) ? kp->appkey < 0 : kp->appkey > 0)
                     continue;
-            if ((Shell_p->ST_p->mode & MODE_NUMLOCK) && kp->appkey == 2)
+            if ((Shell_p->ST_p->windowMode & MODE_NUMLOCK) && kp->appkey == 2)
                     continue;
 
-            if ((Shell_p->ST_p->mode & MODE_APPCURSOR) ? kp->appcursor < 0 : kp->appcursor > 0)
+            if ((Shell_p->ST_p->windowMode & MODE_APPCURSOR) ? kp->appcursor < 0 : kp->appcursor > 0)
                     continue;
 
             TTYR_TTY_END(kp->s)
@@ -670,7 +670,7 @@ static TTYR_TTY_RESULT ttyr_tty_sendMouseEvent(
 {
 TTYR_TTY_BEGIN()
 
-    if (Shell_p->ST_p->mode & MODE_MOUSESGR) {
+    if (Shell_p->ST_p->windowMode & MODE_MOUSESGR) {
 
         unsigned int button = 0;
         switch (Event.type) {
@@ -731,8 +731,9 @@ TTYR_TTY_BEGIN()
         // Handle special key.
         NH_BYTE *specialkey = NULL;
         if ((specialkey = ttyr_tty_getShellKey(Shell_p, Event.Keyboard.special, Event.Keyboard.state)) && Event.Keyboard.codepoint == 0) {
-            if (specialkey) {ttywrite(Shell_p->ST_p, specialkey, strlen(specialkey), 1);}
-
+            if (specialkey) {
+                ttywrite(Shell_p->ST_p, specialkey, strlen(specialkey), 1);
+            }
         } else if (PASTE_KEY) {
             ttyr_tty_pasteIntoShell(Shell_p);            
 
@@ -745,7 +746,7 @@ TTYR_TTY_BEGIN()
             NH_ENCODING_UTF32 codepoint = Event.Keyboard.codepoint;
             int length = nh_encoding_encodeUTF8Single(codepoint, p);
             if (length == 1 && Event.Keyboard.state & NH_WSI_MODIFIER_MOD1) {
-                if (Shell_p->ST_p->mode & MODE_8BIT) {
+                if (Shell_p->ST_p->windowMode & MODE_8BIT) {
                     if (*p < 0177) {
                         NH_ENCODING_UTF32 c = *p | 0x80;
                         length = nh_encoding_encodeUTF8Single(c, p);
