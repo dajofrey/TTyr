@@ -274,8 +274,10 @@ typedef struct ttyr_tty_ShellSelection {
     int stopScroll;
     int lines;
     NH_ENCODING_UTF32 **buffer_pp;
-    NH_BOOL active;
-    NH_BOOL draw;
+    bool active;
+    bool draw;
+    bool doubleClick;
+    bool moved;
 } ttyr_tty_ShellSelection;
 
 typedef struct ttyr_tty_Shell {
@@ -292,6 +294,7 @@ typedef struct ttyr_tty_Shell {
     int height;
     int scroll;
     nh_wsi_KeyboardEvent LastEvent;
+    nh_SystemTime LastClick;
 } ttyr_tty_Shell;
 
 #define SHELL_PATH "/bin/sh"
@@ -372,17 +375,17 @@ TTYR_TTY_BEGIN()
 
         // Copy color.
         if (line[i].fg != defaultfg) {
-            Row_p->Glyphs_p[i].Foreground.custom = NH_TRUE;
+            Row_p->Glyphs_p[i].Foreground.custom = true;
             ttyr_tty_getShellColor(line[i].fg, &Row_p->Glyphs_p[i].Foreground.Color);
         } else {
-            Row_p->Glyphs_p[i].Foreground.custom = NH_FALSE;
+            Row_p->Glyphs_p[i].Foreground.custom = false;
         }
 
         if (line[i].bg != defaultbg) {
-            Row_p->Glyphs_p[i].Background.custom = NH_TRUE;
+            Row_p->Glyphs_p[i].Background.custom = true;
             ttyr_tty_getShellColor(line[i].bg, &Row_p->Glyphs_p[i].Background.Color);
         } else {
-            Row_p->Glyphs_p[i].Background.custom = NH_FALSE;
+            Row_p->Glyphs_p[i].Background.custom = false;
         }
     }
 
@@ -453,7 +456,7 @@ TTYR_TTY_BEGIN()
         ttyread(Shell_p->ST_p);
     }
     if (Shell_p->ST_p->close) {
-        Program_p->close = NH_TRUE;
+        Program_p->close = true;
         TTYR_TTY_END(TTYR_TTY_SUCCESS)
     }
 
@@ -482,7 +485,7 @@ TTYR_TTY_BEGIN()
 
     if (Shell_p->drawing) {
         ttyr_tty_drawShell(Shell_p);
-        Program_p->refresh = NH_TRUE;
+        Program_p->refresh = true;
     }
 
     Shell_p->drawing = 0;
@@ -536,7 +539,9 @@ TTYR_TTY_BEGIN()
             int length = 0;
             if (Shell_p->Selection.Start.y == Shell_p->Selection.Stop.y) {
                 length = abs(Shell_p->Selection.Stop.x - Shell_p->Selection.Start.x)+1;
-            } else {
+            } else if (Shell_p->Selection.Start.y > Shell_p->Selection.Stop.y) {
+                length = (Shell_p->ST_p->col - Shell_p->Selection.Stop.x)-empty;
+            } else if (Shell_p->Selection.Start.y < Shell_p->Selection.Stop.y) {
                 length = (Shell_p->ST_p->col - Shell_p->Selection.Start.x)-empty;
             }
     
@@ -558,7 +563,7 @@ TTYR_TTY_BEGIN()
     // TODO sync?
     nh_wsi_setClipboard_f setClipboard_f = nh_core_loadExistingSymbol(NH_MODULE_WSI, 0, "nh_wsi_setClipboard");
     if (setClipboard_f) {
-        setClipboard_f(Clipboard.p, Clipboard.length, NH_TRUE);
+        setClipboard_f(Clipboard.p, Clipboard.length, true);
     }
 
     ttyr_tty_resetShellSelectionBuffer(Shell_p);
@@ -610,29 +615,64 @@ TTYR_TTY_BEGIN()
     int start = index1 < index2 ? index1 : index2;
     int stop = index1 > index2 ? index1 : index2;
 
-    NH_ENCODING_UTF32 *codepoints_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
-    TTYR_TTY_CHECK_MEM(codepoints_p)
-
     for (int i = start; i <= stop; ++i) {Shell_p->Selection.lines++;}
 
-    Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
-    TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
-
-    for (int i = 0; i < Shell_p->Selection.lines; ++i) {
+    if (Shell_p->Selection.doubleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
+        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
+        TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
         NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
         TTYR_TTY_CHECK_MEM(buffer_p)
-        Shell_p->Selection.buffer_pp[i] = buffer_p;
-    }
+        memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        Shell_p->Selection.buffer_pp[0] = buffer_p;
  
-    for (int i = start, buf = 0; i <= stop; ++i, ++buf) {
-        if (i < 0) { // In history?
-           for (int j = 0; j < Shell_p->ST_p->col; ++j) {
-               Shell_p->Selection.buffer_pp[buf][j] = Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(i)][j].u;
+        if (start < 0) { 
+           // In history.
+           for (int i = 0; i < Shell_p->ST_p->col; ++i) {
+               buffer_p[i] = Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i].u;
            }
         } else {
-           for (int j = 0; j < Shell_p->ST_p->col; ++j) {
-               Shell_p->Selection.buffer_pp[buf][j] = Shell_p->ST_p->line[i][j].u;
+           for (int i = 0; i < Shell_p->ST_p->col; ++i) {
+               buffer_p[i] = Shell_p->ST_p->line[start][i].u;
            }
+        }
+
+        int i1 = 0, i2 = 0;
+        if (Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x && Shell_p->Selection.doubleClick) {
+            if (start < 0) { 
+                // In history.
+                for (i1 = Shell_p->Selection.Start.x; i1 >= 0 && Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i1].u != ' '; --i1);
+                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col && Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i2].u != ' '; ++i2);
+            } else {
+                for (i1 = Shell_p->Selection.Start.x; i1 >= 0 && Shell_p->ST_p->line[start][i1].u != ' '; --i1);
+                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col && Shell_p->ST_p->line[start][i2].u != ' '; ++i2);
+            }
+        }
+ 
+        Shell_p->Selection.Start.x = i1+1;
+        Shell_p->Selection.Stop.x = i2-1;
+
+    } else {
+        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
+        TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
+    
+        for (int i = 0; i < Shell_p->Selection.lines; ++i) {
+            NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+            TTYR_TTY_CHECK_MEM(buffer_p)
+            memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+            Shell_p->Selection.buffer_pp[i] = buffer_p;
+        }
+     
+        for (int i = start, buf = 0; i <= stop; ++i, ++buf) {
+            if (i < 0) { 
+                // In history.
+               for (int j = 0; j < Shell_p->ST_p->col; ++j) {
+                   Shell_p->Selection.buffer_pp[buf][j] = Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(i)][j].u;
+               }
+            } else {
+               for (int j = 0; j < Shell_p->ST_p->col; ++j) {
+                   Shell_p->Selection.buffer_pp[buf][j] = Shell_p->ST_p->line[i][j].u;
+               }
+            }
         }
     }
 
@@ -768,20 +808,28 @@ TTYR_TTY_BEGIN()
             Shell_p->Selection.startScroll = Shell_p->scroll;
             Shell_p->Selection.Stop = Shell_p->Selection.Start;
             Shell_p->Selection.stopScroll = Shell_p->Selection.startScroll;
-            Shell_p->Selection.draw = NH_FALSE;
-            Shell_p->Selection.active = NH_TRUE;
+            Shell_p->Selection.active = true;
+            nh_SystemTime Now = nh_core_getSystemTime();
+            Shell_p->Selection.doubleClick = 
+                nh_core_getSystemTimeDiffInSeconds(Shell_p->LastClick, Now) < 0.3f;
+            Shell_p->Selection.draw = false;
+            Shell_p->Selection.moved = false;
+            Shell_p->LastClick = Now;
         }
         if (Event.Mouse.type == NH_WSI_MOUSE_LEFT && Event.Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
             Shell_p->Selection.Stop = Event.Mouse.Position;
             Shell_p->Selection.stopScroll = Shell_p->scroll;
-            Shell_p->Selection.active = NH_FALSE;
+            Shell_p->Selection.active = false;
+            Shell_p->Selection.draw = Shell_p->Selection.moved || Shell_p->Selection.doubleClick;
             ttyr_tty_handleShellSelection(Shell_p);
         }
         if (Event.Mouse.type == NH_WSI_MOUSE_MOVE) {
-            if (Shell_p->Selection.active == NH_TRUE) {
-                Shell_p->Selection.draw = NH_TRUE;
+            if (Shell_p->Selection.active == true) {
+                Shell_p->Selection.doubleClick = false;
+                Shell_p->Selection.draw = true;
                 Shell_p->Selection.Stop = Event.Mouse.Position;
                 Shell_p->Selection.stopScroll = Shell_p->scroll;
+                Shell_p->Selection.moved = true;
             }
         }
 
@@ -800,7 +848,7 @@ TTYR_TTY_BEGIN()
         }
     }
 
-    Program_p->refresh = NH_TRUE;
+    Program_p->refresh = true;
 
 TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 }
@@ -908,7 +956,7 @@ TTYR_TTY_BEGIN()
                 if (row - Shell_p->scroll == start && i < Shell_p->Selection.Stop.x) {continue;}
                 if (row - Shell_p->scroll == stop && i > Shell_p->Selection.Start.x) {continue;}
             }
-            Glyphs_p[i].Attributes.reverse = NH_TRUE;
+            Glyphs_p[i].Attributes.reverse = true;
         }
     }
 
