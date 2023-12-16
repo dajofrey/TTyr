@@ -280,9 +280,17 @@ typedef struct ttyr_tty_ShellSelection {
     bool moved;
 } ttyr_tty_ShellSelection;
 
+typedef struct ttyr_tty_ShellScroll {
+    nh_PixelPosition Position;
+    nh_PixelPosition Current;
+    bool active;
+    nh_SystemTime LastScroll;
+} ttyr_tty_ShellScroll;
+
 typedef struct ttyr_tty_Shell {
     ttyr_tty_ShellSocket Socket;
     ttyr_tty_ShellSelection Selection;
+    ttyr_tty_ShellScroll Scroll;
     ST *ST_p;
     ttyr_tty_Row *Rows_p;
     int ttyfd;
@@ -426,6 +434,37 @@ TTYR_TTY_BEGIN()
 TTYR_TTY_SILENT_END()
 }
 
+static TTYR_TTY_RESULT ttyr_tty_handleFastScroll(
+    ttyr_tty_Shell *Shell_p)
+{
+TTYR_TTY_BEGIN()
+
+    nh_SystemTime Now = nh_core_getSystemTime();
+    if (nh_core_getSystemTimeDiffInSeconds(Shell_p->Scroll.LastScroll, Now) > 0.05f) {
+        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    }
+
+    int diff = Shell_p->Scroll.Current.y - Shell_p->Scroll.Position.y;
+    if (diff < 0) {
+        if ((Shell_p->scroll + abs(diff)) < Shell_p->ST_p->scrollup) {
+            Shell_p->scroll += abs(diff);
+        } else if (Shell_p->scroll < Shell_p->ST_p->scrollup) {
+            Shell_p->scroll = Shell_p->ST_p->scrollup;
+        }
+   
+    } else if (diff > 0) {
+        if ((Shell_p->scroll - diff) > 0) {
+            Shell_p->scroll -= diff;
+        } else if (Shell_p->scroll > 0) {
+            Shell_p->scroll = 0;
+        }
+    }
+    Shell_p->Scroll.LastScroll = Now;
+    Shell_p->drawing = 1;
+ 
+TTYR_TTY_END(TTYR_TTY_SUCCESS)
+}
+
 static TTYR_TTY_RESULT ttyr_tty_updateShell(
     ttyr_tty_Program *Program_p)
 {
@@ -435,6 +474,10 @@ TTYR_TTY_BEGIN()
     if (!Shell_p->ST_p) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
  
     TTYR_TTY_CHECK(ttyr_tty_handleShellSocket(&Shell_p->Socket))
+
+    if (Shell_p->Scroll.active){ 
+        TTYR_TTY_CHECK(ttyr_tty_handleFastScroll(Shell_p))
+    }
 
     FD_ZERO(&Shell_p->rfd);
     FD_SET(Shell_p->ttyfd, &Shell_p->rfd);
@@ -803,6 +846,15 @@ TTYR_TTY_BEGIN()
 
     // Handle mouse events.
     if (Event.type == NH_WSI_EVENT_MOUSE) {
+        if (Event.Mouse.type == NH_WSI_MOUSE_MIDDLE && Event.Mouse.trigger == NH_WSI_TRIGGER_PRESS) {
+            Shell_p->Scroll.active = true;
+            Shell_p->Scroll.Position = Event.Window.Position;
+            Shell_p->Scroll.Current = Event.Window.Position;
+            Shell_p->Scroll.LastScroll = nh_core_getSystemTime();
+        }
+        if (Event.Mouse.type == NH_WSI_MOUSE_MIDDLE && Event.Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
+            Shell_p->Scroll.active = false;
+        }
         if (Event.Mouse.type == NH_WSI_MOUSE_LEFT && Event.Mouse.trigger == NH_WSI_TRIGGER_PRESS) {
             Shell_p->Selection.Start = Event.Mouse.Position;
             Shell_p->Selection.startScroll = Shell_p->scroll;
@@ -824,12 +876,15 @@ TTYR_TTY_BEGIN()
             ttyr_tty_handleShellSelection(Shell_p);
         }
         if (Event.Mouse.type == NH_WSI_MOUSE_MOVE) {
-            if (Shell_p->Selection.active == true) {
+            if (Shell_p->Selection.active) {
                 Shell_p->Selection.doubleClick = false;
                 Shell_p->Selection.draw = true;
                 Shell_p->Selection.Stop = Event.Mouse.Position;
                 Shell_p->Selection.stopScroll = Shell_p->scroll;
                 Shell_p->Selection.moved = true;
+            }
+            if (Shell_p->Scroll.active) {
+                Shell_p->Scroll.Current = Event.Window.Position;
             }
         }
 
@@ -1006,6 +1061,14 @@ TTYR_TTY_BEGIN()
 
     for (int i = 0; i < width; ++i) {
         Glyphs_p[i].codepoint = topbar_p[i];
+    }
+
+    if (Shell_p->scroll > 0) {
+        NH_BYTE scroll_p[64];
+        sprintf(scroll_p, "%d/%d", Shell_p->scroll, Shell_p->ST_p->scrollup);
+        for (int i = 0, j = strlen(scroll_p)-1; i < strlen(scroll_p); ++i, --j) {
+            Glyphs_p[(width-4)-i].codepoint = scroll_p[j];
+        }
     }
 
 TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)

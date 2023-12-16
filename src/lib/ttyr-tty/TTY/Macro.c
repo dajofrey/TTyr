@@ -508,22 +508,7 @@ TTYR_TTY_BEGIN()
         Window_p->Tile_p = MacroTile_p;
 
         if (Window_p->MouseMenu_p) {ttyr_tty_freeContextMenu(Window_p->MouseMenu_p);}
-        Window_p->MouseMenu_p = ttyr_tty_createMouseMenu1(col, Config.Titlebar.on ? row+1 : row);
-        TTYR_TTY_CHECK_NULL(Window_p->MouseMenu_p)
-        Window_p->MouseMenu_p->active = NH_TRUE;
-        Window_p->MouseMenu_p->cCol = cCol;
-        Window_p->MouseMenu_p->cRow = cRow;
-
-        Window_p->refreshGrid2 = NH_TRUE;
-    }
-
-    // Create mouse-menu on right-click and switch tiles.
-    if (Event.Mouse.type == NH_WSI_MOUSE_MIDDLE && Event.Mouse.trigger == NH_WSI_TRIGGER_PRESS && MicroTile_p) {
-        TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(MacroTile_p))->Tile_p = MicroTile_p;
-        Window_p->Tile_p = MacroTile_p;
-
-        if (Window_p->MouseMenu_p) {ttyr_tty_freeContextMenu(Window_p->MouseMenu_p);}
-        Window_p->MouseMenu_p = ttyr_tty_createMouseMenu2(col, Config.Titlebar.on ? row+1 : row);
+        Window_p->MouseMenu_p = ttyr_tty_createMouseMenu(col, Config.Titlebar.on ? row+1 : row);
         TTYR_TTY_CHECK_NULL(Window_p->MouseMenu_p)
         Window_p->MouseMenu_p->active = NH_TRUE;
         Window_p->MouseMenu_p->cCol = cCol;
@@ -545,6 +530,8 @@ TTYR_TTY_BEGIN()
         TTYR_TTY_CHECK(ttyr_tty_handleTopBarInput(MacroTile_p, Event))
     } else if (MicroTile_p && TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p) {
         // Forward program hit.
+        Event.Window.Position.x = Event.Mouse.Position.x;
+        Event.Window.Position.y = Event.Mouse.Position.y;
         Event.Mouse.Position.x = cCol;
         Event.Mouse.Position.y = cRow - 1; // Subtract topbar. 
         TTYR_TTY_CHECK(TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.handleInput_f(

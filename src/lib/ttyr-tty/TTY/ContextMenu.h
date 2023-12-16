@@ -48,11 +48,7 @@
         ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, NH_BOOL recursive, int x, int y
     );
 
-    ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu1(
-        int x, int y 
-    );
-
-    ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu2(
+    ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
         int x, int y 
     );
 

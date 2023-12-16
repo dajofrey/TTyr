@@ -434,17 +434,17 @@ TTYR_TTY_SILENT_END()
 // MOUSE MENU ======================================================================================
 // Mouse menu functions.
 
-ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu1(
+ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
     int x, int y)
 {
 TTYR_TTY_BEGIN()
 
+    ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
+    ttyr_tty_Config Config = ttyr_tty_getConfig();
+    ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
+
     nh_encoding_UTF32String Menu = nh_encoding_initUTF32(128);
     nh_encoding_appendUTF32Codepoint(&Menu, '{');
-
-    ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
-
-    ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
 
     // Generate command menu.
     if (Program_p && Program_p->Prototype_p && Program_p->Prototype_p->commands > 0) {
@@ -455,31 +455,8 @@ TTYR_TTY_BEGIN()
         }
     }
  
-    nh_encoding_appendUTF32Codepoint(&Menu, '}');
-
-    NH_ENCODING_UTF32 *p = Menu.p;
-    ttyr_tty_ContextMenu *Menu_p = ttyr_tty_parseContextMenu(&p, NULL);
-    TTYR_TTY_CHECK_NULL_2(NULL, Menu_p)
-
-    ttyr_tty_computeContextMenuPosition(Menu_p, x, y, ((ttyr_tty_View*)TTY_p->Views.pp[0])->cols, ((ttyr_tty_View*)TTY_p->Views.pp[0])->rows);
-
-    nh_encoding_freeUTF32(&Menu);
-
-TTYR_TTY_END(Menu_p)
-}
-
-ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu2(
-    int x, int y)
-{
-TTYR_TTY_BEGIN()
-
-    nh_encoding_UTF32String Menu = nh_encoding_initUTF32(128);
-    nh_encoding_appendUTF32Codepoint(&Menu, '{');
-
-    ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
-    ttyr_tty_Config Config = ttyr_tty_getConfig();
-
-    bool border = false;
+    nh_encoding_appendUTF32Codepoint(&Menu, ',');
+    bool border = true;
 
     if (Config.Menu.program && TTY_p->Prototypes.size > 1) {
         ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
