@@ -89,7 +89,7 @@ LIB_ST = external/st-0.8.5/libst.so
 BIN_TTYR = bin/ttyr
 
 build_netzhaut:
-	(cd external/Netzhaut && make -f build/automation/Makefile all)
+	(cd external/Netzhaut && make -f build/automation/Makefile nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
 create_bin_dir:
 	mkdir -p bin
 
@@ -101,7 +101,7 @@ bin: build_netzhaut $(BIN_TTYR)
 # Custom compiler flags
 $(OBJ_FILES_TTYR_TERMINAL): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib -Iexternal/Netzhaut/external/Vulkan-Headers/include -DINCLUDE_VOLK -DVK_VERSION_1_2 -DVK_USE_PLATFORM_XLIB_KHR -DVK_KHR_xlib_surface
 $(OBJ_FILES_TTYR_TTY): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib
-$(OBJ_FILES_TTYR_API): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib -Iexternal/Netzhaut/external/Vulkan-Headers/include -DINCLUDE_VOLK -DVK_VERSION_1_2 -DVK_USE_PLATFORM_XLIB_KHR -DVK_KHR_xlib_surface
+$(OBJ_FILES_TTYR_API): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib 
 $(OBJ_FILES_TTYR): CFLAGS += -Iexternal -Iexternal/Netzhaut/src/lib -Isrc/lib
 
 # Rule to compile source files into object files

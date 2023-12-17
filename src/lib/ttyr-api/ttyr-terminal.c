@@ -9,9 +9,17 @@
 // INCLUDES ========================================================================================
 
 #include "ttyr-terminal.h"
-#include "../ttyr-terminal/Terminal/Terminal.h"
-
 #include "nhcore/Loader/Loader.h"
+
+// TYPEDEFS ========================================================================================
+
+typedef ttyr_terminal_Terminal *(*ttyr_terminal_openTerminal_f)( 
+    char *config_p, ttyr_tty_TTY *TTY_p 
+); 
+
+typedef TTYR_TERMINAL_RESULT (*ttyr_terminal_cmd_setViewport_f)( 
+    ttyr_terminal_Terminal *Terminal_p, nh_gfx_Viewport *Viewport_p 
+); 
 
 // FUNCTIONS =======================================================================================
 

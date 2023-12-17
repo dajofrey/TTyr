@@ -9,10 +9,30 @@
 // INCLUDES ========================================================================================
 
 #include "ttyr-tty.h"
-#include "../ttyr-tty/TTY/TTY.h"
-
 #include "nhcore/Loader/Loader.h"
 
+// TYPEDEFS ========================================================================================
+
+typedef ttyr_tty_TTY *(*ttyr_tty_openTTY_f)( 
+    char *config_p 
+); 
+
+typedef TTYR_TTY_RESULT (*ttyr_tty_closeTTY_f)( 
+    ttyr_tty_TTY *TTY_p 
+); 
+
+typedef TTYR_TTY_RESULT (*ttyr_tty_cmd_claimStandardIO_f)( 
+    ttyr_tty_TTY *TTY_p 
+); 
+
+typedef TTYR_TTY_RESULT (*ttyr_tty_cmd_unclaimStandardIO_f)( 
+    ttyr_tty_TTY *TTY_p 
+); 
+
+typedef TTYR_TTY_RESULT (*ttyr_tty_cmd_sendEvent_f)( 
+    ttyr_tty_TTY *TTY_p, nh_wsi_Event Event 
+); 
+ 
 // ADD =============================================================================================
 
 static bool initialized = false;
