@@ -329,7 +329,7 @@ TTYR_TERMINAL_BEGIN()
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(Grid_p, state_p, Update_p, update_p))
         } else {
             Update_p->col++;
-            memset(&Update_p->Glyph, 0, sizeof(ttyr_tty_Glyph));
+            Update_p->Glyph.codepoint = 0;
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(Grid_p, state_p, Update_p, update_p))
         } 
     }

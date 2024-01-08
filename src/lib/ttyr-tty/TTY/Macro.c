@@ -18,6 +18,7 @@
 #include "Program.h"
 #include "TTY.h"
 #include "SideBar.h"
+#include "Titlebar.h"
 
 #include "../Common/Macros.h"
 
@@ -465,6 +466,14 @@ TTYR_TTY_BEGIN()
             TTY_p->Window_p->refreshGrid2 = NH_TRUE;
         }
     }
+
+    if (row == -1 && Config.Titlebar.on == true) {
+        // Forward titlebar hit.
+        if (Event.Mouse.trigger == NH_WSI_TRIGGER_PRESS) {
+            ttyr_tty_handleTitlebarHit(Event.Mouse, cCol);
+            TTY_p->Window_p->refreshGrid2 = NH_TRUE;
+        }
+    }
  
     if (MacroTile_p == NULL || MicroTile_p == NULL) {TTYR_TTY_END(TTYR_TTY_SUCCESS)}
 
@@ -573,7 +582,7 @@ TTYR_TTY_BEGIN()
             int row = -1;
             ttyr_tty_translateMousePosition(((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Views.pp[0], Event.Mouse, &col, &row);
             if (Config.Titlebar.on) {row--;}
-            if (col < 0 || row < 0) {break;}
+            if (col < 0) {break;}
             TTYR_TTY_CHECK(ttyr_tty_handleMouseInput(Window_p, Event, col, row))
             break;
         }

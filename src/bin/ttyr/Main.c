@@ -33,7 +33,7 @@ static ttyr_tty_TTY *TTY_p = NULL;
 static int handleArgs(
     int argc, char **argv_pp)
 {
-    Args.renderer = NH_GFX_API_OPENGL; // Use OpenGL as default renderer.
+    Args.renderer = NH_GFX_API_OPENGL;
     Args.no_unload = false;
 
     for (int i = 1; i < argc; ++i) {
@@ -121,4 +121,3 @@ int main(int argc, char **argv_pp)
 
     nh_api_terminate();
 }
-

@@ -53,6 +53,20 @@
 //TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 //}
 
+// INPUT =========================================================================================== 
+
+void ttyr_tty_handleTitlebarHit( 
+    nh_wsi_MouseEvent Event, int cCol) 
+{
+    ttyr_tty_Config Config = ttyr_tty_getConfig(); 
+    if (Event.trigger == NH_WSI_TRIGGER_PRESS && cCol-1 < Config.windows) { 
+        ttyr_tty_MacroWindow *Window_p = ttyr_tty_insertAndFocusWindow(nh_core_getWorkloadArg(), cCol-1); 
+        Window_p->refreshGrid2 = NH_TRUE; 
+        Window_p->refreshTitlebar = NH_TRUE; 
+        Window_p->Tile_p->refresh = NH_TRUE; 
+    } 
+} 
+
 // CHECK ===========================================================================================
 
 void ttyr_tty_checkTitlebar(
@@ -94,6 +108,13 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
     for (int i = 1; i < cols ; ++i) {
         Row_p->update_p[i] = 1;
         Row_p->Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
+    }
+
+    for (int i = 0; i < cols ; ++i) {
+        Row_p->Glyphs_p[i].Background.Color.r = Config.Titlebar.Color.r; 
+        Row_p->Glyphs_p[i].Background.Color.g = Config.Titlebar.Color.g; 
+        Row_p->Glyphs_p[i].Background.Color.b = Config.Titlebar.Color.b; 
+        Row_p->Glyphs_p[i].Background.custom = true; 
     }
 
     NH_BYTE rightSide_p[255] = {};

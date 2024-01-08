@@ -35,6 +35,7 @@ const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
     "ttyr.tty.menu.close",
     "ttyr.tty.menu.debug",
     "ttyr.tty.titlebar.on",
+    "ttyr.tty.titlebar.color",
 };
 
 size_t TTYR_TTY_SETTING_NAMES_PP_COUNT = 
@@ -104,6 +105,13 @@ TTYR_TTY_BEGIN()
         case 10 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
             Config_p->Titlebar.on = atoi(Values_p->pp[0]);
+            break;
+        case 11 :
+            if (Values_p->size != 4) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)} 
+            Config_p->Titlebar.Color.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
+            Config_p->Titlebar.Color.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
+            Config_p->Titlebar.Color.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
+            Config_p->Titlebar.Color.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
             break;
     }
 

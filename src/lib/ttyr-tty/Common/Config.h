@@ -31,6 +31,7 @@
         TTYR_TTY_SETTING_MENU_CLOSE,
         TTYR_TTY_SETTING_MENU_DEBUG,
         TTYR_TTY_SETTING_TITLEBAR_ON,
+        TTYR_TTY_SETTING_TITLEBAR_COLOR,
     } TTYR_TTY_SETTING_E;
 
 /** @} */
@@ -51,6 +52,7 @@
 
     typedef struct ttyr_tty_TitlebarConfig {
         NH_BOOL on;
+        nh_Color Color;
     } ttyr_tty_TitlebarConfig;
 
     typedef struct ttyr_tty_ShellConfig {

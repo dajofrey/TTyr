@@ -864,13 +864,16 @@ TTYR_TTY_BEGIN()
             nh_SystemTime Now = nh_core_getSystemTime();
             Shell_p->Selection.doubleClick = 
                 nh_core_getSystemTimeDiffInSeconds(Shell_p->LastClick, Now) < 0.3f;
-            Shell_p->Selection.draw = false;
+            Shell_p->Selection.draw = Shell_p->Selection.doubleClick;
             Shell_p->Selection.moved = false;
             Shell_p->LastClick = Now;
+            if (Shell_p->Selection.doubleClick) {ttyr_tty_handleShellSelection(Shell_p);}
         }
         if (Event.Mouse.type == NH_WSI_MOUSE_LEFT && Event.Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
-            Shell_p->Selection.Stop = Event.Mouse.Position;
-            Shell_p->Selection.stopScroll = Shell_p->scroll;
+            if (!Shell_p->Selection.doubleClick) {
+                Shell_p->Selection.Stop = Event.Mouse.Position;
+                Shell_p->Selection.stopScroll = Shell_p->scroll;
+            }
             Shell_p->Selection.active = false;
             Shell_p->Selection.draw = Shell_p->Selection.moved || Shell_p->Selection.doubleClick;
             ttyr_tty_handleShellSelection(Shell_p);
