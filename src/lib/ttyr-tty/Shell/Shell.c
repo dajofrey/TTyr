@@ -277,6 +277,7 @@ typedef struct ttyr_tty_ShellSelection {
     bool active;
     bool draw;
     bool doubleClick;
+    bool trippleClick;
     bool moved;
 } ttyr_tty_ShellSelection;
 
@@ -645,6 +646,8 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 
 // INPUT ===========================================================================================
 
+#define IS_STOP(u) (u == ' ' || u == ';' || u == '(' || u == ')' || u == '{' || u == '}' || u == '<' || u == '>')
+
 static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
     ttyr_tty_Shell *Shell_p)
 {
@@ -680,14 +683,48 @@ TTYR_TTY_BEGIN()
         }
 
         int i1 = 0, i2 = 0;
-        if (Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x && Shell_p->Selection.doubleClick) {
+        if (Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
             if (start < 0) { 
                 // In history.
-                for (i1 = Shell_p->Selection.Start.x; i1 >= 0 && Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i1].u != ' '; --i1);
-                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col && Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i2].u != ' '; ++i2);
+                for (i1 = Shell_p->Selection.Start.x; i1 >= 0 && !IS_STOP(Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i1].u); --i1);
+                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col && !IS_STOP(Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i2].u); ++i2);
             } else {
-                for (i1 = Shell_p->Selection.Start.x; i1 >= 0 && Shell_p->ST_p->line[start][i1].u != ' '; --i1);
-                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col && Shell_p->ST_p->line[start][i2].u != ' '; ++i2);
+                for (i1 = Shell_p->Selection.Start.x; i1 >= 0 && !IS_STOP(Shell_p->ST_p->line[start][i1].u); --i1);
+                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col && !IS_STOP(Shell_p->ST_p->line[start][i2].u); ++i2);
+            }
+        }
+ 
+        Shell_p->Selection.Start.x = i1+1;
+        Shell_p->Selection.Stop.x = i2-1;
+
+    } else if (Shell_p->Selection.trippleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
+        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
+        TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
+        NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        TTYR_TTY_CHECK_MEM(buffer_p)
+        memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        Shell_p->Selection.buffer_pp[0] = buffer_p;
+ 
+        if (start < 0) { 
+           // In history.
+           for (int i = 0; i < Shell_p->ST_p->col; ++i) {
+               buffer_p[i] = Shell_p->ST_p->history[Shell_p->ST_p->scrollup-abs(start)][i].u;
+           }
+        } else {
+           for (int i = 0; i < Shell_p->ST_p->col; ++i) {
+               buffer_p[i] = Shell_p->ST_p->line[start][i].u;
+           }
+        }
+
+        int i1 = 0, i2 = 0;
+        if (Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
+            if (start < 0) { 
+                // In history.
+                for (i1 = Shell_p->Selection.Start.x; i1 >= 0; --i1);
+                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col; ++i2);
+            } else {
+                for (i1 = Shell_p->Selection.Start.x; i1 >= 0; --i1);
+                for (i2 = Shell_p->Selection.Start.x; i2 < Shell_p->ST_p->col; ++i2);
             }
         }
  
@@ -862,25 +899,29 @@ TTYR_TTY_BEGIN()
             Shell_p->Selection.stopScroll = Shell_p->Selection.startScroll;
             Shell_p->Selection.active = true;
             nh_SystemTime Now = nh_core_getSystemTime();
-            Shell_p->Selection.doubleClick = 
-                nh_core_getSystemTimeDiffInSeconds(Shell_p->LastClick, Now) < 0.3f;
-            Shell_p->Selection.draw = Shell_p->Selection.doubleClick;
+            bool fastClick = nh_core_getSystemTimeDiffInSeconds(Shell_p->LastClick, Now) < 0.3f;
+            Shell_p->Selection.trippleClick = Shell_p->Selection.doubleClick && fastClick;
+            Shell_p->Selection.doubleClick = fastClick && !Shell_p->Selection.trippleClick;
+            Shell_p->Selection.draw = Shell_p->Selection.doubleClick || Shell_p->Selection.trippleClick;
             Shell_p->Selection.moved = false;
             Shell_p->LastClick = Now;
-            if (Shell_p->Selection.doubleClick) {ttyr_tty_handleShellSelection(Shell_p);}
+            if (Shell_p->Selection.doubleClick || Shell_p->Selection.trippleClick) {
+                ttyr_tty_handleShellSelection(Shell_p);
+            }
         }
         if (Event.Mouse.type == NH_WSI_MOUSE_LEFT && Event.Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
-            if (!Shell_p->Selection.doubleClick) {
+            if (!Shell_p->Selection.doubleClick && !Shell_p->Selection.trippleClick) {
                 Shell_p->Selection.Stop = Event.Mouse.Position;
                 Shell_p->Selection.stopScroll = Shell_p->scroll;
             }
             Shell_p->Selection.active = false;
-            Shell_p->Selection.draw = Shell_p->Selection.moved || Shell_p->Selection.doubleClick;
+            Shell_p->Selection.draw = Shell_p->Selection.moved || Shell_p->Selection.doubleClick || Shell_p->Selection.trippleClick;
             ttyr_tty_handleShellSelection(Shell_p);
         }
         if (Event.Mouse.type == NH_WSI_MOUSE_MOVE) {
             if (Shell_p->Selection.active) {
                 Shell_p->Selection.doubleClick = false;
+                Shell_p->Selection.trippleClick = false;
                 Shell_p->Selection.draw = true;
                 Shell_p->Selection.Stop = Event.Mouse.Position;
                 Shell_p->Selection.stopScroll = Shell_p->scroll;
