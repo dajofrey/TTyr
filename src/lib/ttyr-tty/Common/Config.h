@@ -15,27 +15,6 @@
 
 #endif
 
-/** @addtogroup lib_nhtty_enums
- *  @{
- */
-
-    typedef enum TTYR_TTY_SETTING_E {
-        TTYR_TTY_SETTING_SHELL_MAX_SCROLL,
-        TTYR_TTY_SETTING_WINDOWS,
-        TTYR_TTY_SETTING_TABS,
-        TTYR_TTY_SETTING_MENU_PROGRAM,
-        TTYR_TTY_SETTING_MENU_SPLIT,
-        TTYR_TTY_SETTING_MENU_APPEND,
-        TTYR_TTY_SETTING_MENU_WINDOW,
-        TTYR_TTY_SETTING_MENU_TAB,
-        TTYR_TTY_SETTING_MENU_CLOSE,
-        TTYR_TTY_SETTING_MENU_DEBUG,
-        TTYR_TTY_SETTING_TITLEBAR_ON,
-        TTYR_TTY_SETTING_TITLEBAR_COLOR,
-    } TTYR_TTY_SETTING_E;
-
-/** @} */
-
 /** @addtogroup lib_nhtty_structs
  *  @{
  */
@@ -52,7 +31,8 @@
 
     typedef struct ttyr_tty_TitlebarConfig {
         NH_BOOL on;
-        nh_Color Color;
+        nh_Color Foreground;
+        nh_Color Background;
     } ttyr_tty_TitlebarConfig;
 
     typedef struct ttyr_tty_ShellConfig {
@@ -70,15 +50,6 @@
 
 /** @} */
 
-/** @addtogroup lib_nhtty_vars
- *  @{
- */
-
-    extern const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[];
-    extern size_t TTYR_TTY_SETTING_NAMES_PP_COUNT;
-
-/** @} */
-
 /** @addtogroup lib_nhtty_functions
  *  @{
  */
@@ -87,7 +58,7 @@
     );
 
     const NH_BYTE *ttyr_tty_getSettingName(
-        TTYR_TTY_SETTING_E setting
+        unsigned int setting
     );
 
 /** @} */

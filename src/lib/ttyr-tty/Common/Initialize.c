@@ -9,7 +9,6 @@
 // INCLUDES ========================================================================================
 
 #include "Initialize.h"
-#include "IndexMap.h"
 #include "Macros.h"
 #include "Data/ttyr-tty.conf.inc"
 
@@ -28,7 +27,6 @@ TTYR_TTY_RESULT ttyr_tty_initialize()
 TTYR_TTY_BEGIN()
 
     nh_core_appendConfig(ttyr_tty_conf_inc, ttyr_tty_conf_inc_len, NH_FALSE);
-    ttyr_tty_createIndexMap();
 
 TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 }

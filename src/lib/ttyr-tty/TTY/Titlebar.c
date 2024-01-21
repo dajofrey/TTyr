@@ -60,7 +60,7 @@ void ttyr_tty_handleTitlebarHit(
 {
     ttyr_tty_Config Config = ttyr_tty_getConfig(); 
     if (Event.trigger == NH_WSI_TRIGGER_PRESS && cCol-1 < Config.windows) { 
-        ttyr_tty_MacroWindow *Window_p = ttyr_tty_insertAndFocusWindow(nh_core_getWorkloadArg(), cCol-1); 
+        ttyr_tty_MacroWindow *Window_p = ttyr_tty_insertAndFocusWindow(nh_core_getWorkloadArg(), cCol-1);
         Window_p->refreshGrid2 = NH_TRUE; 
         Window_p->refreshTitlebar = NH_TRUE; 
         Window_p->Tile_p->refresh = NH_TRUE; 
@@ -94,26 +94,27 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
 
     for (int i = 1; i < (Config.windows+1) && i < cols ; ++i) {
         Row_p->Glyphs_p[i].codepoint = 0x25a1;
-        Row_p->Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
         Row_p->update_p[i] = NH_TRUE;
         if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
             Row_p->Glyphs_p[i].codepoint = 0x25a0;
         }
     }
 
-//    Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
-//    Row_p->Glyphs_p[cols-4].codepoint = 0x25b3;
-//    Row_p->Glyphs_p[cols-5].codepoint = 0x25bd;
+    Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
 
     for (int i = 1; i < cols ; ++i) {
         Row_p->update_p[i] = 1;
-        Row_p->Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
     }
 
     for (int i = 0; i < cols ; ++i) {
-        Row_p->Glyphs_p[i].Background.Color.r = Config.Titlebar.Color.r; 
-        Row_p->Glyphs_p[i].Background.Color.g = Config.Titlebar.Color.g; 
-        Row_p->Glyphs_p[i].Background.Color.b = Config.Titlebar.Color.b; 
+        Row_p->Glyphs_p[i].Foreground.Color.r = Config.Titlebar.Foreground.r; 
+        Row_p->Glyphs_p[i].Foreground.Color.g = Config.Titlebar.Foreground.g; 
+        Row_p->Glyphs_p[i].Foreground.Color.b = Config.Titlebar.Foreground.b; 
+        Row_p->Glyphs_p[i].Foreground.custom = true; 
+ 
+        Row_p->Glyphs_p[i].Background.Color.r = Config.Titlebar.Background.r; 
+        Row_p->Glyphs_p[i].Background.Color.g = Config.Titlebar.Background.g; 
+        Row_p->Glyphs_p[i].Background.Color.b = Config.Titlebar.Background.b; 
         Row_p->Glyphs_p[i].Background.custom = true; 
     }
 
@@ -122,10 +123,10 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
 
     for (int i = 0; i < strlen(rightSide_p); ++i) {
         if (rightSide_p[i] == 'x') {
-            Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-1].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
+            Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
         }
-        Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-1].codepoint = rightSide_p[i];
-        Row_p->update_p[(cols-strlen(rightSide_p))+i-1] = 1;
+        Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].codepoint = rightSide_p[i];
+        Row_p->update_p[(cols-strlen(rightSide_p))+i-3] = 1;
     }
 
 //    NH_BYTE ram_p[255] = {};

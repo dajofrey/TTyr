@@ -9,7 +9,6 @@
 // INCLUDES ========================================================================================
 
 #include "Config.h"
-#include "IndexMap.h"
 #include "Macros.h"
 
 #include "../TTY/TTY.h"
@@ -23,7 +22,7 @@
 
 // NAMES ===========================================================================================
 
-const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
+static const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
     "ttyr.tty.shell.maxScroll",
     "ttyr.tty.windows",
     "ttyr.tty.tabs",
@@ -35,14 +34,15 @@ const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
     "ttyr.tty.menu.close",
     "ttyr.tty.menu.debug",
     "ttyr.tty.titlebar.on",
-    "ttyr.tty.titlebar.color",
+    "ttyr.tty.titlebar.foreground",
+    "ttyr.tty.titlebar.background",
 };
 
-size_t TTYR_TTY_SETTING_NAMES_PP_COUNT = 
+static size_t TTYR_TTY_SETTING_NAMES_PP_COUNT = 
     sizeof(TTYR_TTY_SETTING_NAMES_PP) / sizeof(TTYR_TTY_SETTING_NAMES_PP[0]);
 
 const NH_BYTE *ttyr_tty_getSettingName(
-    TTYR_TTY_SETTING_E setting)
+    unsigned int setting)
 {
 TTYR_TTY_BEGIN()
 TTYR_TTY_END(TTYR_TTY_SETTING_NAMES_PP[setting])
@@ -51,17 +51,14 @@ TTYR_TTY_END(TTYR_TTY_SETTING_NAMES_PP[setting])
 // FUNCTIONS =======================================================================================
 
 static TTYR_TTY_RESULT ttyr_tty_getSetting(
-    ttyr_tty_Config *Config_p, NH_BYTE *namespace_p, NH_BYTE *setting_p)
+    ttyr_tty_Config *Config_p, NH_BYTE *namespace_p, int index)
 {
 TTYR_TTY_BEGIN()
 
-    unsigned int *index_p = nh_core_getFromHashMap(&TTYR_TTY_INDEXMAP.SettingNames, setting_p);
-    if (index_p == NULL) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-
-    nh_List *Values_p = nh_core_getGlobalConfigSetting(namespace_p, -1, setting_p);
+    nh_List *Values_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TTY_SETTING_NAMES_PP[index]);
     TTYR_TTY_CHECK_NULL(Values_p)
 
-    switch (*index_p) {
+    switch (index) {
         case 0 :
             if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
             Config_p->Shell.maxScroll = atoi(Values_p->pp[0]);
@@ -108,10 +105,17 @@ TTYR_TTY_BEGIN()
             break;
         case 11 :
             if (Values_p->size != 4) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)} 
-            Config_p->Titlebar.Color.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
-            Config_p->Titlebar.Color.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
-            Config_p->Titlebar.Color.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
-            Config_p->Titlebar.Color.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
+            Config_p->Titlebar.Foreground.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
+            Config_p->Titlebar.Foreground.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
+            Config_p->Titlebar.Foreground.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
+            Config_p->Titlebar.Foreground.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
+            break;
+        case 12 :
+            if (Values_p->size != 4) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)} 
+            Config_p->Titlebar.Background.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
+            Config_p->Titlebar.Background.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
+            Config_p->Titlebar.Background.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
+            Config_p->Titlebar.Background.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
             break;
     }
 
@@ -129,7 +133,7 @@ TTYR_TTY_BEGIN()
     TTYR_TTY_CHECK_NULL_2(Config, TTY_p)
 
     for (int i = 0; i < TTYR_TTY_SETTING_NAMES_PP_COUNT; ++i) {
-        TTYR_TTY_CHECK_2(Config, ttyr_tty_getSetting(&Config, TTY_p->namespace_p, TTYR_TTY_SETTING_NAMES_PP[i]))
+        TTYR_TTY_CHECK_2(Config, ttyr_tty_getSetting(&Config, TTY_p->namespace_p, i))
     }
 
 TTYR_TTY_END(Config)

@@ -43,7 +43,6 @@ SRC_FILES_TTYR_TTY = \
     Common/About.c \
     Common/Log.c \
     Common/Config.c \
-    Common/IndexMap.c \
     Common/Initialize.c \
     Common/Terminate.c \
 

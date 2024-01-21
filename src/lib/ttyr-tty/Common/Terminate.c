@@ -10,7 +10,6 @@
 
 #include "Terminate.h"
 #include "Macros.h"
-#include "IndexMap.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -21,8 +20,6 @@
 TTYR_TTY_RESULT ttyr_tty_terminate()
 {
 TTYR_TTY_BEGIN()
-
-    ttyr_tty_freeIndexMap();
 
 TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 }

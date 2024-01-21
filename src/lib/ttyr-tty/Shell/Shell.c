@@ -844,10 +844,6 @@ TTYR_TTY_BEGIN()
 
     // Handle key-press events.
     if (Event.type == NH_WSI_EVENT_KEYBOARD && Event.Keyboard.trigger == NH_WSI_TRIGGER_PRESS) {
-
-        // Reset scrolling.
-        Shell_p->scroll = 0;
- 
         // Handle special key.
         NH_BYTE *specialkey = NULL;
         if ((specialkey = ttyr_tty_getShellKey(Shell_p, Event.Keyboard.special, Event.Keyboard.state)) && Event.Keyboard.codepoint == 0) {
@@ -862,6 +858,9 @@ TTYR_TTY_BEGIN()
 
         // Handle normal key.
         } else if (Event.Keyboard.codepoint != 0) {
+            // Reset scrolling.
+            Shell_p->scroll = 0;
+ 
             NH_BYTE p[4] = {0};
             NH_ENCODING_UTF32 codepoint = Event.Keyboard.codepoint;
             int length = nh_encoding_encodeUTF8Single(codepoint, p);
