@@ -11,7 +11,7 @@
 
 #include "Tiling.h"
 #include "Program.h"
-#include "TopBarMessage.h"
+#include "TopbarMessage.h"
 
 #include "../Common/Includes.h"
 
@@ -23,7 +23,7 @@ typedef struct ttyr_tty_MicroWindow ttyr_tty_MicroWindow;
  *  @{
  */
 
-    typedef struct ttyr_tty_TopBarSuggestions {
+    typedef struct ttyr_tty_TopbarSuggestions {
         nh_SystemTime Time;
 	ttyr_tty_Program *ProgramSuggestion_p;
 	NH_BYTE *CommandSuggestion_p;
@@ -31,11 +31,11 @@ typedef struct ttyr_tty_MicroWindow ttyr_tty_MicroWindow;
 	NH_BOOL update;
 	int commandIndex;
 	int programIndex;
-    } ttyr_tty_TopBarSuggestions;
+    } ttyr_tty_TopbarSuggestions;
 
-    typedef struct ttyr_tty_TopBar {
-	ttyr_tty_TopBarSuggestions Suggestions;
-        ttyr_tty_TopBarMessage Message;
+    typedef struct ttyr_tty_Topbar {
+	ttyr_tty_TopbarSuggestions Suggestions;
+        ttyr_tty_TopbarMessage Message;
         int state;
         int cursorX;
         int quitPosition;
@@ -44,7 +44,7 @@ typedef struct ttyr_tty_MicroWindow ttyr_tty_MicroWindow;
         NH_BOOL quitHover;
         nh_encoding_UTF32String Command;
         nh_Array History;
-    } ttyr_tty_TopBar;
+    } ttyr_tty_Topbar;
 
 /** @} */
 
@@ -52,31 +52,31 @@ typedef struct ttyr_tty_MicroWindow ttyr_tty_MicroWindow;
  *  @{
  */
 
-    ttyr_tty_TopBar ttyr_tty_initTopBar(
+    ttyr_tty_Topbar ttyr_tty_initTopbar(
     );
 
-    TTYR_TTY_RESULT ttyr_tty_freeTopBar(
-        ttyr_tty_TopBar *TopBar_p
+    TTYR_TTY_RESULT ttyr_tty_freeTopbar(
+        ttyr_tty_Topbar *Topbar_p
     );
 
-    void ttyr_tty_toggleTopBar(
-        ttyr_tty_TopBar *TopBar_p
+    void ttyr_tty_toggleTopbar(
+        ttyr_tty_Topbar *Topbar_p
     );
 
-    TTYR_TTY_RESULT ttyr_tty_getTopBarCursor(
-        ttyr_tty_TopBar *TopBar_p, int *x_p, int *y_p, NH_BOOL topTile
+    TTYR_TTY_RESULT ttyr_tty_getTopbarCursor(
+        ttyr_tty_Topbar *Topbar_p, int *x_p, int *y_p, NH_BOOL topTile
     );
 
-    TTYR_TTY_RESULT ttyr_tty_handleTopBarInput(
+    TTYR_TTY_RESULT ttyr_tty_handleTopbarInput(
         ttyr_tty_Tile *Tile_p, nh_wsi_Event Event 
     );
 
-    TTYR_TTY_RESULT ttyr_tty_drawTopBarRow(
+    TTYR_TTY_RESULT ttyr_tty_drawTopbarRow(
         ttyr_tty_Tile *Tile_p, ttyr_tty_Glyph *Glyphs_p, int cols, int row, NH_BOOL standardIO
     );
 
-    TTYR_TTY_RESULT ttyr_tty_updateTopBar(
-        ttyr_tty_TopBar *TopBar_p
+    TTYR_TTY_RESULT ttyr_tty_updateTopbar(
+        ttyr_tty_Topbar *Topbar_p
     );
 
 /** @} */

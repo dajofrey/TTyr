@@ -37,8 +37,6 @@
 
 ttyr_tty_FileEditor ttyr_tty_initFileEditor()
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_FileEditor Editor;
     Editor.Files = nh_core_initLinkedList();
     Editor.current = 0;
@@ -46,14 +44,12 @@ TTYR_TTY_BEGIN()
     Editor.tabSpaces = 4;
     Editor.tabToSpaces = NH_TRUE;
 
-TTYR_TTY_END(Editor)
+    return Editor;
 }
 
 TTYR_TTY_RESULT ttyr_tty_freeFileEditor(
      ttyr_tty_FileEditor *FileEditor_p)
 {
-TTYR_TTY_BEGIN()
-
     while (1) {
         ttyr_tty_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, 0);
         if (!File_p) {break;}
@@ -62,7 +58,7 @@ TTYR_TTY_BEGIN()
 
     nh_core_destroyLinkedList(&FileEditor_p->Files, NH_TRUE);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // RENDER ==========================================================================================
@@ -70,15 +66,13 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_renderFileEditor(
     ttyr_tty_FileEditor *FileEditor_p)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < FileEditor_p->Files.count; ++i) {
         ttyr_tty_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, i);
-        TTYR_TTY_CHECK_NULL(File_p)
-        TTYR_TTY_CHECK(ttyr_tty_renderFile(File_p))
+        TTYR_CHECK_NULL(File_p)
+        TTYR_CHECK(ttyr_tty_renderFile(File_p))
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // FILE ============================================================================================
@@ -86,8 +80,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static NH_BOOL ttyr_tty_hasFile(
     ttyr_tty_FileEditor *Editor_p, ttyr_tty_File *File_p)
 {
-TTYR_TTY_BEGIN()
-
     NH_BOOL hasFile = NH_FALSE;
 
     for (int i = 0; i < Editor_p->Files.count; ++i) {
@@ -98,20 +90,18 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_END(hasFile)
+    return hasFile;
 }
 
 // TODO Fix possible memory leaks.
 ttyr_tty_File *ttyr_tty_openFile(
     ttyr_tty_Program *Program_p, ttyr_tty_TreeListingNode *Node_p, NH_BOOL readOnly)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Program_p->handle_p)->FileEditor;
     ttyr_tty_FileEditorView *FileEditorView_p = &((ttyr_tty_Editor*)Program_p->handle_p)->View.FileEditor;
 
     ttyr_tty_File *File_p = nh_core_allocate(sizeof(ttyr_tty_File));
-    TTYR_TTY_CHECK_MEM_2(NULL, File_p)
+    TTYR_CHECK_MEM_2(NULL, File_p)
 
     File_p->type      = ttyr_tty_getFileType(&Node_p->Path);
     File_p->Node_p    = Node_p;
@@ -127,29 +117,27 @@ TTYR_TTY_BEGIN()
             break;
     }
 
-    TTYR_TTY_CHECK_NULL_2(NULL, File_p->handle_p)
-    TTYR_TTY_CHECK_2(NULL, ttyr_tty_createFileViews(FileEditorView_p, File_p))
+    TTYR_CHECK_NULL_2(NULL, File_p->handle_p)
+    TTYR_CHECK_2(NULL, ttyr_tty_createFileViews(FileEditorView_p, File_p))
 
     nh_core_prependToLinkedList(&FileEditor_p->Files, File_p);
     FileEditor_p->current = 0;
     Node_p->File_p = File_p;
 
-    TTYR_TTY_CHECK_2(NULL, ttyr_tty_renderFileEditor(FileEditor_p))
+    TTYR_CHECK_2(NULL, ttyr_tty_renderFileEditor(FileEditor_p))
 
-    TTYR_TTY_CHECK_2(NULL, ttyr_tty_setCustomSuffixMessage(
+    TTYR_CHECK_2(NULL, ttyr_tty_setCustomSuffixMessage(
         NULL, TTYR_TTY_MESSAGE_EDITOR_FILE_OPENED, Node_p->Path.p, Node_p->Path.length
     ))
 
-TTYR_TTY_END(File_p)
+    return File_p;
 }
 
 TTYR_TTY_RESULT ttyr_tty_closeFile(
     ttyr_tty_FileEditor *Editor_p, ttyr_tty_File *File_p)
 {
-TTYR_TTY_BEGIN()
-
     if (File_p == NULL || !ttyr_tty_hasFile(Editor_p, File_p)) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
 
     switch (File_p->type)
@@ -161,7 +149,7 @@ TTYR_TTY_BEGIN()
 
     nh_core_removeFromLinkedList2(&Editor_p->Files, File_p, NH_TRUE);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // HELP TEXT =======================================================================================
@@ -228,8 +216,6 @@ static const NH_BYTE *help_pp[] =
 TTYR_TTY_RESULT ttyr_tty_cycleThroughFiles(
     ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Program_p->handle_p)->FileEditor;
 
     switch (c)
@@ -280,25 +266,23 @@ TTYR_TTY_BEGIN()
 
     if (File_p != NULL) {
         // Move tree listing cursor to focused file.
-        TTYR_TTY_CHECK(ttyr_tty_setTreeListingCursor(Program_p, File_p))
+        TTYR_CHECK(ttyr_tty_setTreeListingCursor(Program_p, File_p))
         // Update message.
         ttyr_tty_setCustomSuffixMessage(NULL, TTYR_TTY_MESSAGE_EDITOR_FILE_EDIT, File_p->Node_p->Path.p, File_p->Node_p->Path.length);
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_handleFileEditorInput(
     ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Editor_p)->FileEditor;
     ttyr_tty_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, FileEditor_p->current);
 
     if (File_p != NULL) {
-        TTYR_TTY_CHECK(ttyr_tty_handleFileInput(Program_p, File_p, c, Editor_p->insertMode, &Program_p->refresh))
+        TTYR_CHECK(ttyr_tty_handleFileInput(Program_p, File_p, c, Editor_p->insertMode, &Program_p->refresh))
 
         switch (c) {
             case 'l' :
@@ -306,7 +290,7 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // DRAW ============================================================================================
@@ -314,8 +298,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_drawHelp(
     ttyr_tty_Glyph *Glyphs_p, int width, int line, int lines, int scroll)
 {
-TTYR_TTY_BEGIN()
-
     line += scroll;
 
 //    NH_BYTE *text_p = "No file opened.";
@@ -339,14 +321,12 @@ TTYR_TTY_BEGIN()
 //        }
 //    }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_updateFileEditorView(
     ttyr_tty_FileEditor *FileEditor_p, ttyr_tty_EditorView *View_p, int width)
 {
-TTYR_TTY_BEGIN()
-
     View_p->FileEditor.width = width;
 
     int oldMaxOnScreen = View_p->FileEditor.maxOnScreen;
@@ -359,36 +339,34 @@ TTYR_TTY_BEGIN()
         View_p->FileEditor.currentOffset = 0;
     }
 
-    TTYR_TTY_CHECK(ttyr_tty_updateFileViews(View_p))
+    TTYR_CHECK(ttyr_tty_updateFileViews(View_p))
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_drawFileEditorRow(
     ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width, int height, int row)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     ttyr_tty_FileEditor *FileEditor_p = &Editor_p->FileEditor;
     ttyr_tty_FileEditorView *View_p = &Editor_p->View.FileEditor;
 
-    TTYR_TTY_CHECK(ttyr_tty_updateFileEditorView(FileEditor_p, &Editor_p->View, width))
+    TTYR_CHECK(ttyr_tty_updateFileEditorView(FileEditor_p, &Editor_p->View, width))
 
     if (FileEditor_p->Files.count == 0) {
-        TTYR_TTY_CHECK(ttyr_tty_drawHelp(Glyphs_p, View_p->width, row, height, View_p->helpScroll))
+        TTYR_CHECK(ttyr_tty_drawHelp(Glyphs_p, View_p->width, row, height, View_p->helpScroll))
     }
 
     for (int i = View_p->currentOffset, width2 = 0, count = 0; i < FileEditor_p->Files.count; ++i, ++count) {
         if (count == View_p->maxOnScreen) {break;}
         ttyr_tty_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, i);
         ttyr_tty_FileView *FileView_p = ttyr_tty_getFileView(&Editor_p->View, File_p);
-        TTYR_TTY_CHECK_NULL(File_p)
-        TTYR_TTY_CHECK_NULL(FileView_p)
-        TTYR_TTY_CHECK(ttyr_tty_drawFileRow(Program_p, File_p, FileView_p, Glyphs_p+width2, row))
+        TTYR_CHECK_NULL(File_p)
+        TTYR_CHECK_NULL(FileView_p)
+        TTYR_CHECK(ttyr_tty_drawFileRow(Program_p, File_p, FileView_p, Glyphs_p+width2, row))
         width2 += FileView_p->width;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 

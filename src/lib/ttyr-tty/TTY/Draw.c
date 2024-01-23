@@ -17,8 +17,7 @@
 // INCLUDES ========================================================================================
 
 #include "Draw.h"
-#include "TopBar.h"
-#include "SideBar.h"
+#include "Topbar.h"
 #include "View.h"
 #include "Program.h"
 
@@ -39,19 +38,17 @@
 TTYR_TTY_RESULT ttyr_tty_getCursorPosition(
     ttyr_tty_Tile *MacroTile_p, ttyr_tty_Tile *MicroTile_p, NH_BOOL standardIO, int *x_p, int *y_p)
 {
-TTYR_TTY_BEGIN()
-
     *x_p = -1;
     *y_p = -1;
 
-    if (TTYR_TTY_MACRO_TAB(MacroTile_p)->TopBar.hasFocus) {
-        TTYR_TTY_CHECK(ttyr_tty_getTopBarCursor(&TTYR_TTY_MACRO_TAB(MacroTile_p)->TopBar, x_p, y_p, MacroTile_p->rowPosition == 0))
+    if (TTYR_TTY_MACRO_TAB(MacroTile_p)->Topbar.hasFocus) {
+        TTYR_CHECK(ttyr_tty_getTopbarCursor(&TTYR_TTY_MACRO_TAB(MacroTile_p)->Topbar, x_p, y_p, MacroTile_p->rowPosition == 0))
     }
     else if (TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p != NULL && TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f != NULL) {
-        TTYR_TTY_CHECK(TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f(TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p, x_p, y_p))
+        TTYR_CHECK(TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f(TTYR_TTY_MICRO_TILE(MicroTile_p)->Program_p, x_p, y_p))
         if (*x_p < 0 || *y_p < 0) {
              // Indicates that the program doesn't want the cursor to be shown.
-             TTYR_TTY_END(TTYR_TTY_SUCCESS)
+             return TTYR_TTY_SUCCESS;
         }
         *y_p += 2; 
         if (*x_p > -1 && *y_p > -1) {
@@ -65,25 +62,23 @@ TTYR_TTY_BEGIN()
         *y_p += MacroTile_p->rowPosition;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_refreshCursor(
     ttyr_tty_TTY *TTY_p) 
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_View *View_p = TTY_p->Views.pp[0];
     int x = -1, y = -1;
  
     if (TTY_p->hasFocus) {
         ttyr_tty_Tile *MicroTile_p = TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p;
-        TTYR_TTY_CHECK(ttyr_tty_getCursorPosition(TTY_p->Window_p->Tile_p, MicroTile_p, View_p->standardIO, &x, &y))
+        TTYR_CHECK(ttyr_tty_getCursorPosition(TTY_p->Window_p->Tile_p, MicroTile_p, View_p->standardIO, &x, &y))
     }
 
-    TTYR_TTY_CHECK(ttyr_tty_forwardCursor(View_p, x, y))
+    TTYR_CHECK(ttyr_tty_forwardCursor(View_p, x, y))
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // DRAW ============================================================================================
@@ -91,33 +86,25 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static void ttyr_tty_normalizeGlyph(
     ttyr_tty_Glyph *Glyph_p)
 {
-TTYR_TTY_BEGIN()
-
     memset(Glyph_p, 0, sizeof(ttyr_tty_Glyph));
     Glyph_p->codepoint = ' ';
-
-TTYR_TTY_SILENT_END()
+    return;
 }
 
 static void ttyr_tty_drawVerticalBorderGlyph(
     ttyr_tty_Glyph *Glyph_p)
 {
-TTYR_TTY_BEGIN()
-
     memset(Glyph_p, 0, sizeof(ttyr_tty_Glyph));
 
     Glyph_p->codepoint = ' ';
     Glyph_p->mark = TTYR_TTY_MARK_LINE_VERTICAL | TTYR_TTY_MARK_ACCENT;
     Glyph_p->Attributes.reverse = NH_TRUE;
-
-TTYR_TTY_SILENT_END()
+    return;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_draw(
     ttyr_tty_Tile *Tile_p, ttyr_tty_View *View_p, int row)
 {
-TTYR_TTY_BEGIN()
-
     // Normalize glyphs.
     for (int i = 0; i < Tile_p->colSize; ++i) {
         ttyr_tty_normalizeGlyph(View_p->Row.Glyphs_p+i);
@@ -144,27 +131,27 @@ TTYR_TTY_BEGIN()
 
     if (topbar) {
         if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) { 
-            TTYR_TTY_END(ttyr_tty_drawTopBarRow(
+            return ttyr_tty_drawTopbarRow(
                 Tile_p, View_p->Row.Glyphs_p, cols, row, View_p->standardIO
-            ))
+            );
         } else {
-            TTYR_TTY_END(ttyr_tty_drawTopBarRow(
+            return ttyr_tty_drawTopbarRow(
                 NULL, View_p->Row.Glyphs_p, cols, row, View_p->standardIO
-            ))
+            );
         }
     }
  
     if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) { 
-        TTYR_TTY_CHECK(ttyr_tty_drawMicroWindow(
+        TTYR_CHECK(ttyr_tty_drawMicroWindow(
             &TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow, View_p->Row.Glyphs_p, cols, Tile_p->rowSize, row, View_p->standardIO
         ))
     } else if (TTYR_TTY_MICRO_TILE(Tile_p)->Program_p) {
-        TTYR_TTY_CHECK(TTYR_TTY_MICRO_TILE(Tile_p)->Program_p->Prototype_p->Callbacks.draw_f(
+        TTYR_CHECK(TTYR_TTY_MICRO_TILE(Tile_p)->Program_p->Prototype_p->Callbacks.draw_f(
             TTYR_TTY_MICRO_TILE(Tile_p)->Program_p, View_p->Row.Glyphs_p, cols, Tile_p->rowSize-1, row-1
         ))
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // REFRESH =========================================================================================
@@ -172,11 +159,9 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_postProcessRow(
     ttyr_tty_View *View_p, int row)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Row *Row_p = View_p->Grid1_p+row;
 
-    if (View_p->standardIO) {TTYR_TTY_END(TTYR_TTY_SUCCESS)}
+    if (View_p->standardIO) {return TTYR_TTY_SUCCESS;}
 
     // Post process line.
     for (int i = 0; i < View_p->cols; ++i) {
@@ -219,14 +204,12 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_refreshGrid1Row(
     nh_List *Tiles_p, ttyr_tty_View *View_p, int row)
 {
-TTYR_TTY_BEGIN()
-
     memset(View_p->Row.Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
     int offset = 0;
 
@@ -242,7 +225,7 @@ TTYR_TTY_BEGIN()
             &&  Tile_p->rowPosition  + Tile_p->rowSize > row
             &&  Tile_p->colPosition == col-offset)
             {
-                TTYR_TTY_CHECK(ttyr_tty_draw(Tile_p, View_p, row))
+                TTYR_CHECK(ttyr_tty_draw(Tile_p, View_p, row))
 
                 for (int i = 0; i < Tile_p->colSize; ++i) {
                     ttyr_tty_Glyph *Glyph_p = View_p->Grid1_p[row].Glyphs_p+col+i;
@@ -260,16 +243,14 @@ TTYR_TTY_BEGIN()
         }
     }
 
-    TTYR_TTY_CHECK(ttyr_tty_postProcessRow(View_p, row))
+    TTYR_CHECK(ttyr_tty_postProcessRow(View_p, row))
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_refreshGrid1(
     ttyr_tty_TTY *TTY_p) 
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_View *View_p = TTY_p->Views.pp[0];
     ttyr_tty_Config Config = ttyr_tty_getConfig();
     int offset = 0;
@@ -278,30 +259,28 @@ TTYR_TTY_BEGIN()
     nh_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
 
     for (int row = 0; row < View_p->rows; ++row) {
-        TTYR_TTY_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, View_p, row))
+        TTYR_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, View_p, row))
     }
 
     nh_core_freeList(&Tiles, NH_FALSE);
 
-    TTYR_TTY_CHECK(ttyr_tty_forwardGrid1(View_p))
+    TTYR_CHECK(ttyr_tty_forwardGrid1(View_p))
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_refreshGrid2(
     ttyr_tty_TTY *TTY_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_View *View_p = TTY_p->Views.pp[0];
 
     for (int row = 0; row < View_p->rows; ++row) {
         memset(View_p->Grid2_p[row].Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
     }
  
-    TTYR_TTY_CHECK(ttyr_tty_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
-    TTYR_TTY_CHECK(ttyr_tty_forwardGrid2(View_p))
+    TTYR_CHECK(ttyr_tty_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
+    TTYR_CHECK(ttyr_tty_forwardGrid2(View_p))
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 

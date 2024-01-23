@@ -189,19 +189,17 @@ static NH_BYTE *cControlKeywords_pp[] = {
 TTYR_TTY_TEXT ttyr_tty_getTextType(
     nh_encoding_UTF32String *Path_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (Path_p == NULL) {TTYR_TTY_END(TTYR_TTY_TEXT_UNDEFINED)}
+    if (Path_p == NULL) {return TTYR_TTY_TEXT_UNDEFINED;}
 
     if (Path_p->length > 1) {
         if (Path_p->p[Path_p->length - 2] == '.' && Path_p->p[Path_p->length - 1] == 'c') {
-            TTYR_TTY_END(TTYR_TTY_TEXT_C)
+            return TTYR_TTY_TEXT_C;
         }
         if (Path_p->p[Path_p->length - 2] == '.' && Path_p->p[Path_p->length - 1] == 'h') {
-            TTYR_TTY_END(TTYR_TTY_TEXT_C)
+            return TTYR_TTY_TEXT_C;
         }
     }
 
-TTYR_TTY_END(TTYR_TTY_TEXT_UNDEFINED)
+    return TTYR_TTY_TEXT_UNDEFINED;
 }
 

@@ -31,10 +31,8 @@
 ttyr_tty_Tile *ttyr_tty_createTile(
     void *p, TTYR_TTY_TILE_TYPE_E type, ttyr_tty_Tile *Parent_p, int index)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Tile *Tile_p = nh_core_allocate(sizeof(ttyr_tty_Tile));
-    TTYR_TTY_CHECK_MEM_2(NULL, Tile_p)
+    TTYR_CHECK_MEM_2(NULL, Tile_p)
 
     Tile_p->type = type;
     Tile_p->p = p;
@@ -50,15 +48,13 @@ TTYR_TTY_BEGIN()
         nh_core_insertIntoLinkedList(&Parent_p->Children, Tile_p, index);
     }
 
-TTYR_TTY_END(Tile_p)
+    return Tile_p;
 }
 
 // Helper function for destroying a tile without side effects.
 static void ttyr_tty_destroyTile(
     ttyr_tty_Tile *Tile_p)
 {
-TTYR_TTY_BEGIN()
-
     if (Tile_p->p) {
         switch (Tile_p->type) {
             case TTYR_TTY_TILE_TYPE_MACRO : ttyr_tty_destroyMacroTile(Tile_p->p); break;
@@ -68,28 +64,21 @@ TTYR_TTY_BEGIN()
 
     nh_core_destroyLinkedList(&Tile_p->Children, NH_FALSE); 
     nh_core_free(Tile_p);
-
-TTYR_TTY_SILENT_END()
 }
 
 static ttyr_tty_Tile *ttyr_tty_getNextFocusTile(
     ttyr_tty_Tile *Tile_p)
 {
-TTYR_TTY_BEGIN()
-
     while (Tile_p->Children.count > 0) {
         Tile_p = nh_core_getFromLinkedList(&Tile_p->Children, 0);
     }
-
-TTYR_TTY_END(Tile_p)
+    return Tile_p;
 }
 
 TTYR_TTY_RESULT ttyr_tty_closeTile(
     ttyr_tty_Tile *Tile_p, void *p)
 {
-TTYR_TTY_BEGIN()
-
-    if (!Tile_p) {TTYR_TTY_END(TTYR_TTY_SUCCESS)}
+    if (!Tile_p) {return TTYR_TTY_SUCCESS;}
 
     if (!Tile_p->Parent_p) {
 
@@ -177,7 +166,7 @@ TTYR_TTY_BEGIN()
         ttyr_tty_destroyTile(Tile_p);
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // GET =============================================================================================
@@ -185,18 +174,16 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 static int ttyr_tty_getTileNumber(
     ttyr_tty_Tile *Current_p, ttyr_tty_Tile *Stop_p, int *nr_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (Current_p == Stop_p) {TTYR_TTY_END(*nr_p)}
+    if (Current_p == Stop_p) {return *nr_p;}
 
     for (int i = 0; i < Current_p->Children.count; ++i) {
         ttyr_tty_Tile *Child_p = nh_core_getFromLinkedList(&Current_p->Children, i);
         if (Child_p->Children.count <= 0) {*nr_p += 1;}
         int result = ttyr_tty_getTileNumber(Child_p, Stop_p, nr_p);
-        if (result > -1) {TTYR_TTY_END(result)}
+        if (result > -1) {return result;}
     }
 
-TTYR_TTY_END(-1)
+    return -1;
 }
 
 // d -> right -> horizontal orientation -> 
@@ -205,25 +192,21 @@ TTYR_TTY_END(-1)
 static ttyr_tty_Tile *ttyr_tty_getTileFromNumber(
     ttyr_tty_Tile *Current_p, int stop, int *nr_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (*nr_p == stop) {TTYR_TTY_END(Current_p)}
+    if (*nr_p == stop) {return Current_p;}
 
     for (int i = 0; i < Current_p->Children.count; ++i) {
         ttyr_tty_Tile *Child_p = nh_core_getFromLinkedList(&Current_p->Children, i);
         if (Child_p->Children.count <= 0) {*nr_p += 1;}
         ttyr_tty_Tile *Result_p = ttyr_tty_getTileFromNumber(Child_p, stop, nr_p);
-        if (Result_p != NULL) {TTYR_TTY_END(Result_p)}
+        if (Result_p != NULL) {return Result_p;}
     }
 
-TTYR_TTY_END(NULL)
+    return NULL;
 }
 
 nh_List ttyr_tty_getTiles(
     ttyr_tty_Tile *Root_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_List List = nh_core_initList(4);
 
     for (int i = 0; Root_p != NULL;++i) {
@@ -233,20 +216,17 @@ TTYR_TTY_BEGIN()
         nh_core_appendToList(&List, Tile_p);
     }
 
-TTYR_TTY_END(List)
+    return List;
 }
 
 static int ttyr_tty_getTileIndex(
     ttyr_tty_Tile *Tile_p)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < Tile_p->Parent_p->Children.count; ++i) {
         ttyr_tty_Tile *Child_p = nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, i);
-        if (Child_p == Tile_p) {TTYR_TTY_END(i)}
+        if (Child_p == Tile_p) {return i;}
     }
-
-TTYR_TTY_END(-1)
+    return -1;
 }
 
 // SWITCH ==========================================================================================
@@ -254,8 +234,6 @@ TTYR_TTY_END(-1)
 static TTYR_TTY_RESULT ttyr_tty_leaveTilingAndFocusTile(
     ttyr_tty_MacroWindow *Window_p, ttyr_tty_Tile *Focus_p)
 {
-TTYR_TTY_BEGIN()
-
     if (Focus_p->type == TTYR_TTY_TILE_TYPE_MICRO) {
         TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p = Focus_p;
     } else {
@@ -268,32 +246,30 @@ TTYR_TTY_BEGIN()
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
     TTY_p->InsertTile_p = NULL;
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static ttyr_tty_Tile *ttyr_tty_getNextDirectionalTile(
     ttyr_tty_Tile *Tile_p, int direction)
 {
-TTYR_TTY_BEGIN()
-
     if (!Tile_p->Parent_p) {
-        TTYR_TTY_END(NULL)
+        return NULL;
     }
 
     switch (direction) {
         case 1 : // right
         case 3 : // left
             if (Tile_p->Parent_p->orientation != TTYR_TTY_TILE_ORIENTATION_VERTICAL) {
-                TTYR_TTY_END(NULL)
+                return NULL;
             }
             for (int i = 0; i < Tile_p->Parent_p->Children.count; ++i) {
                 ttyr_tty_Tile *Child_p = nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, i);
                 if (Child_p == Tile_p) {
                     if (direction == 3 && i > 0) {
-                        TTYR_TTY_END(nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i-1))
+                        return nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i-1);
                     }
                     if (direction == 1 && (i+1 < Tile_p->Parent_p->Children.count)) {
-                        TTYR_TTY_END(nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i+1))
+                        return nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i+1);
                     }
                 }
             }
@@ -301,30 +277,28 @@ TTYR_TTY_BEGIN()
         case 0 : // top
         case 2 : // bottom
             if (Tile_p->Parent_p->orientation != TTYR_TTY_TILE_ORIENTATION_HORIZONTAL) {
-                TTYR_TTY_END(NULL)
+                return NULL;
             }
             for (int i = 0; i < Tile_p->Parent_p->Children.count; ++i) {
                 ttyr_tty_Tile *Child_p = nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, i);
                 if (Child_p == Tile_p) {
                     if (direction == 0 && i > 0) {
-                        TTYR_TTY_END(nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i-1))
+                        return nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i-1);
                     }
                     if (direction == 2 && (i+1 < Tile_p->Parent_p->Children.count)) {
-                        TTYR_TTY_END(nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i+1))
+                        return nh_core_getFromLinkedList(&Tile_p->Parent_p->Children,i+1);
                     }
                 }
             }
             break;
     }
 
-TTYR_TTY_END(NULL)
+    return NULL;
 }
 
 ttyr_tty_Tile *ttyr_tty_switchTile(
     ttyr_tty_MacroWindow *Window_p, ttyr_tty_Tile *MacroTile_p, int direction)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Tile *MicroTile_p = TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(MacroTile_p))->Tile_p;
 
     ttyr_tty_Tile *Result_p = NULL;
@@ -343,7 +317,7 @@ TTYR_TTY_BEGIN()
         ttyr_tty_leaveTilingAndFocusTile(Window_p, Result_p);
     }
 
-TTYR_TTY_END(Result_p)
+    return Result_p;
 }
 
 // UPDATE ==========================================================================================
@@ -351,8 +325,6 @@ TTYR_TTY_END(Result_p)
 static TTYR_TTY_RESULT ttyr_tty_computeTileSizeRecursively(
     ttyr_tty_Tile *Tile_p, int viewRows, int viewCols)
 {
-TTYR_TTY_BEGIN()
-
     Tile_p->rightSeparator = NH_FALSE;
 
     if (Tile_p->Parent_p == NULL) {
@@ -397,20 +369,16 @@ TTYR_TTY_BEGIN()
                 break;
         }
 
-        TTYR_TTY_CHECK(ttyr_tty_computeTileSizeRecursively(Child_p, viewRows, viewCols))
+        TTYR_CHECK(ttyr_tty_computeTileSizeRecursively(Child_p, viewRows, viewCols))
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_updateTiling(
     ttyr_tty_Tile *RootTile_p, int viewRows, int viewCols)
 {
-TTYR_TTY_BEGIN()
-
-    TTYR_TTY_CHECK(ttyr_tty_computeTileSizeRecursively(RootTile_p, viewRows, viewCols))
-
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return ttyr_tty_computeTileSizeRecursively(RootTile_p, viewRows, viewCols);
 }
 
 // INSERT ==========================================================================================
@@ -418,10 +386,8 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 static void ttyr_tty_moveInsertTile(
     ttyr_tty_Tile *Tile_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
     int index = ttyr_tty_getTileIndex(Tile_p);
-    if (index == -1) {TTYR_TTY_SILENT_END()}
+    if (index == -1) {return;}
 
     switch (c) 
     {
@@ -457,15 +423,11 @@ TTYR_TTY_BEGIN()
             }
             break;
     }
-
-TTYR_TTY_SILENT_END()
 }
 
 static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
     ttyr_tty_Tile *Parent_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
     int orientation = 0;
@@ -484,7 +446,7 @@ TTYR_TTY_BEGIN()
 
     if (Parent_p->Children.count > 0 && Parent_p->orientation != orientation) {
         // Changing orientation is not allowed because it's confusing.
-        TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
 
     // Configure orientation.
@@ -549,27 +511,21 @@ TTYR_TTY_BEGIN()
             break;
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_addTile(
     ttyr_tty_Tile *Tile_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
-    if (Tile_p->Parent_p == NULL || Tile_p->Parent_p->Children.count == 0) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-
-TTYR_TTY_END(ttyr_tty_insertEmptyTile(Tile_p->Parent_p, c))
+    if (Tile_p->Parent_p == NULL || Tile_p->Parent_p->Children.count == 0) {return TTYR_TTY_ERROR_BAD_STATE;}
+    return ttyr_tty_insertEmptyTile(Tile_p->Parent_p, c);
 }
 
 static TTYR_TTY_RESULT ttyr_tty_splitTile(
     ttyr_tty_Tile *Tile_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
-    if (Tile_p->Children.count != 0) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
-
-TTYR_TTY_END(ttyr_tty_insertEmptyTile(Tile_p, c))
+    if (Tile_p->Children.count != 0) {return TTYR_TTY_ERROR_BAD_STATE;}
+    return ttyr_tty_insertEmptyTile(Tile_p, c);
 }
 
 // RESET ===========================================================================================
@@ -577,37 +533,35 @@ TTYR_TTY_END(ttyr_tty_insertEmptyTile(Tile_p, c))
 TTYR_TTY_RESULT ttyr_tty_resetTiling(
     ttyr_tty_MacroWindow *Window_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
     if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
         switch (Window_p->Tiling.stage)
         {
             case TTYR_TTY_TILING_STAGE_OVERVIEW :
-                TTYR_TTY_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
+                TTYR_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
                 break;
 
             case TTYR_TTY_TILING_STAGE_INSERT :
                 ttyr_tty_closeTile(TTY_p->InsertTile_p, TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p)));
-                TTYR_TTY_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
+                TTYR_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
                 break;
         }
     } else {
         switch (Window_p->Tiling.stage)
         {
             case TTYR_TTY_TILING_STAGE_OVERVIEW :
-                TTYR_TTY_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
+                TTYR_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
                 break;
 
             case TTYR_TTY_TILING_STAGE_INSERT :
                 ttyr_tty_closeTile(TTY_p->InsertTile_p, Window_p);
-                TTYR_TTY_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
+                TTYR_CHECK(ttyr_tty_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
                 break;
         }
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // MESSAGES ========================================================================================
@@ -615,23 +569,21 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_updateTilingMessages(
     ttyr_tty_MacroWindow *Window_p)
 {
-TTYR_TTY_BEGIN()
-
     if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MACRO) {
         if (Window_p->Tile_p->Parent_p == NULL) {
-            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->TopBar, TTYR_TTY_MESSAGE_TILING_WASD))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASD))
         } else {
-            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->TopBar, TTYR_TTY_MESSAGE_TILING_WASDF))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASDF))
         }
     } else if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
         if (TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
-            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->TopBar, TTYR_TTY_MESSAGE_TILING_WASD))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASD))
         } else {
-            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->TopBar, TTYR_TTY_MESSAGE_TILING_WASDF))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASDF))
         }
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // INPUT ===========================================================================================
@@ -639,8 +591,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_handlePotentialMacroTileInsertion(
     ttyr_tty_MacroWindow *Window_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
     if (c == 13) 
@@ -651,7 +601,7 @@ TTYR_TTY_BEGIN()
             TTYR_TTY_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.current = 0; 
         }
 
-        TTYR_TTY_DIAGNOSTIC_END(ttyr_tty_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p))
+        return ttyr_tty_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p);
     }
 
     switch (c) 
@@ -668,17 +618,15 @@ TTYR_TTY_BEGIN()
             // Fall through.
 
         default :
-            TTYR_TTY_CHECK(ttyr_tty_resetTiling(Window_p))
+            TTYR_CHECK(ttyr_tty_resetTiling(Window_p))
     }
 
-TTYR_TTY_DIAGNOSTIC_END(ttyr_tty_updateTilingMessages(Window_p))
+    return ttyr_tty_updateTilingMessages(Window_p);
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handlePotentialMicroTileInsertion(
     ttyr_tty_MacroWindow *Window_p, NH_ENCODING_UTF32 c)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
     if (c == 13)
@@ -687,7 +635,7 @@ TTYR_TTY_BEGIN()
         TTYR_TTY_MICRO_TILE(TTY_p->InsertTile_p)->Program_p = ttyr_tty_createProgramInstance(
             TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Prototype_p, NH_FALSE);
 
-        TTYR_TTY_DIAGNOSTIC_END(ttyr_tty_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p))
+        return ttyr_tty_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p);
     }
 
     switch (c)
@@ -701,17 +649,15 @@ TTYR_TTY_BEGIN()
             break;
 
         default :
-            TTYR_TTY_CHECK(ttyr_tty_resetTiling(Window_p))
+            TTYR_CHECK(ttyr_tty_resetTiling(Window_p))
     }
 
-TTYR_TTY_DIAGNOSTIC_END(ttyr_tty_updateTilingMessages(Window_p))
+    return ttyr_tty_updateTilingMessages(Window_p);
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleMacroTilingInput(
     ttyr_tty_MacroWindow *Window_p, nh_wsi_KeyboardEvent Event)
 {
-TTYR_TTY_BEGIN()
-
     NH_ENCODING_UTF32 c = Event.codepoint;
 
     switch (Window_p->Tiling.stage)
@@ -720,40 +666,38 @@ TTYR_TTY_BEGIN()
 
             if (c == TTYR_TTY_SPLIT_KEY) {
                 // Split tile.
-                TTYR_TTY_CHECK(ttyr_tty_splitTile(Window_p->Tile_p, TTYR_TTY_INSERT_TILE_RIGHT_KEY))
+                TTYR_CHECK(ttyr_tty_splitTile(Window_p->Tile_p, TTYR_TTY_INSERT_TILE_RIGHT_KEY))
                 Window_p->Tiling.stage = TTYR_TTY_TILING_STAGE_INSERT;
-                TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
+                TTYR_CHECK(ttyr_tty_updateTilingMessages(Window_p))
             }
             else if (c == TTYR_TTY_INSERT_TILE_LEFT_KEY || c == TTYR_TTY_INSERT_TILE_RIGHT_KEY || c == TTYR_TTY_INSERT_TILE_TOP_KEY || c == TTYR_TTY_INSERT_TILE_BOTTOM_KEY) {
                 // Append or split tile.
                 if (Window_p->Tile_p->Parent_p == NULL) {
-                    TTYR_TTY_CHECK(ttyr_tty_splitTile(Window_p->Tile_p, c))
+                    TTYR_CHECK(ttyr_tty_splitTile(Window_p->Tile_p, c))
                 } else {
                     if (ttyr_tty_addTile(Window_p->Tile_p, c)) {
-                        TTYR_TTY_END(ttyr_tty_resetTiling(Window_p))
+                        return ttyr_tty_resetTiling(Window_p);
                     }
                 }
                 Window_p->Tiling.stage = TTYR_TTY_TILING_STAGE_INSERT;
-                TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
+                TTYR_CHECK(ttyr_tty_updateTilingMessages(Window_p))
             } else {
-                TTYR_TTY_CHECK(ttyr_tty_resetTiling(Window_p))
+                TTYR_CHECK(ttyr_tty_resetTiling(Window_p))
             }
             break;
 
         case TTYR_TTY_TILING_STAGE_INSERT :
 
-            TTYR_TTY_CHECK(ttyr_tty_handlePotentialMacroTileInsertion(Window_p, c))
+            TTYR_CHECK(ttyr_tty_handlePotentialMacroTileInsertion(Window_p, c))
             break;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleMicroTilingInput(
     ttyr_tty_MacroWindow *Window_p, nh_wsi_KeyboardEvent Event)
 {
-TTYR_TTY_BEGIN()
-
     NH_ENCODING_UTF32 c = Event.codepoint;
 
     switch (Window_p->Tiling.stage)
@@ -765,7 +709,7 @@ TTYR_TTY_BEGIN()
                 Window_p->LastFocus_p = Window_p->Tile_p;
                 TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->LastFocus_p = 
                     TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p;
-                TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
+                TTYR_CHECK(ttyr_tty_updateTilingMessages(Window_p))
             }
             break;
 
@@ -773,53 +717,51 @@ TTYR_TTY_BEGIN()
 
             if (c == TTYR_TTY_TILING_KEY) {
                 Window_p->Tiling.mode = TTYR_TTY_TILING_MODE_MACRO;
-                TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
+                TTYR_CHECK(ttyr_tty_updateTilingMessages(Window_p))
             } 
             else if (c == TTYR_TTY_SPLIT_KEY) {
                 // Split tile.
-                TTYR_TTY_CHECK(ttyr_tty_splitTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, TTYR_TTY_INSERT_TILE_RIGHT_KEY))
+                TTYR_CHECK(ttyr_tty_splitTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, TTYR_TTY_INSERT_TILE_RIGHT_KEY))
                 Window_p->Tiling.stage = TTYR_TTY_TILING_STAGE_INSERT;
-                TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
+                TTYR_CHECK(ttyr_tty_updateTilingMessages(Window_p))
             }
             else if (c == TTYR_TTY_INSERT_TILE_LEFT_KEY || c == TTYR_TTY_INSERT_TILE_RIGHT_KEY || c == TTYR_TTY_INSERT_TILE_TOP_KEY || c == TTYR_TTY_INSERT_TILE_BOTTOM_KEY) {
                 // Append or split tile.
                 if (TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
-                    TTYR_TTY_CHECK(ttyr_tty_splitTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, c))
+                    TTYR_CHECK(ttyr_tty_splitTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, c))
                 } else {
                     if (ttyr_tty_addTile(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p, c)) {
-                        TTYR_TTY_END(ttyr_tty_resetTiling(Window_p))
+                        return ttyr_tty_resetTiling(Window_p);
                     }
                 }
                 Window_p->Tiling.stage = TTYR_TTY_TILING_STAGE_INSERT;
-                TTYR_TTY_CHECK(ttyr_tty_updateTilingMessages(Window_p))
+                TTYR_CHECK(ttyr_tty_updateTilingMessages(Window_p))
             }
             else {
-                TTYR_TTY_CHECK(ttyr_tty_resetTiling(Window_p))
+                TTYR_CHECK(ttyr_tty_resetTiling(Window_p))
             }
             break;
 
         case TTYR_TTY_TILING_STAGE_INSERT :
 
-            TTYR_TTY_CHECK(ttyr_tty_handlePotentialMicroTileInsertion(Window_p, c))
+            TTYR_CHECK(ttyr_tty_handlePotentialMicroTileInsertion(Window_p, c))
             break;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_handleTilingInput(
     ttyr_tty_MacroWindow *Window_p, nh_wsi_KeyboardEvent Event)
 {
-TTYR_TTY_BEGIN()
-
-    if (Event.trigger != NH_WSI_TRIGGER_PRESS) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (Event.trigger != NH_WSI_TRIGGER_PRESS) {return TTYR_TTY_SUCCESS;}
 
     if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
-        TTYR_TTY_CHECK(ttyr_tty_handleMicroTilingInput(Window_p, Event))
+        TTYR_CHECK(ttyr_tty_handleMicroTilingInput(Window_p, Event))
     } else if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MACRO) {
-        TTYR_TTY_CHECK(ttyr_tty_handleMacroTilingInput(Window_p, Event))
+        TTYR_CHECK(ttyr_tty_handleMacroTilingInput(Window_p, Event))
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 

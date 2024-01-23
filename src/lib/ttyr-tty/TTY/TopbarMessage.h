@@ -11,7 +11,7 @@
 
 #include "../Common/Includes.h"
 
-typedef struct ttyr_tty_TopBar ttyr_tty_TopBar;
+typedef struct ttyr_tty_Topbar ttyr_tty_Topbar;
 
 #endif
 
@@ -61,12 +61,12 @@ typedef struct ttyr_tty_TopBar ttyr_tty_TopBar;
  *  @{
  */
 
-    typedef struct ttyr_tty_TopBarMessage {
+    typedef struct ttyr_tty_TopbarMessage {
         NH_BOOL block;
         nh_encoding_UTF32String Text;
         void *args_p;
         TTYR_TTY_RESULT (*callback_f)(nh_wsi_KeyboardEvent Event, NH_BOOL *continue_p);
-    } ttyr_tty_TopBarMessage;
+    } ttyr_tty_TopbarMessage;
 
 /** @} */
 
@@ -79,24 +79,24 @@ typedef struct ttyr_tty_TopBar ttyr_tty_TopBar;
     );
 
     TTYR_TTY_RESULT ttyr_tty_clearMessage(
-        ttyr_tty_TopBar *TopBar_p
+        ttyr_tty_Topbar *Topbar_p
     );
 
     TTYR_TTY_RESULT ttyr_tty_setDefaultMessage(
-        ttyr_tty_TopBar *TopBar_p, TTYR_TTY_MESSAGE message
+        ttyr_tty_Topbar *Topbar_p, TTYR_TTY_MESSAGE message
     );
     
     TTYR_TTY_RESULT ttyr_tty_setCustomMessage(
-        ttyr_tty_TopBar *TopBar_p, NH_ENCODING_UTF32 *suffix_p, int suffixLength
+        ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *suffix_p, int suffixLength
     );
 
     TTYR_TTY_RESULT ttyr_tty_setCustomSuffixMessage(
-        ttyr_tty_TopBar *TopBar_p, TTYR_TTY_MESSAGE prefix, NH_ENCODING_UTF32 *suffix_p, 
+        ttyr_tty_Topbar *Topbar_p, TTYR_TTY_MESSAGE prefix, NH_ENCODING_UTF32 *suffix_p, 
         int suffixLength
     );
 
     TTYR_TTY_RESULT ttyr_tty_setBinaryQueryMessage(
-        ttyr_tty_TopBar *TopBar_p, NH_ENCODING_UTF32 *query_p, int length, void *args_p, 
+        ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *query_p, int length, void *args_p, 
         TTYR_TTY_RESULT (*callback_f)(nh_wsi_KeyboardEvent Event, NH_BOOL *continue_p)
     );
 

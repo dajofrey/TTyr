@@ -46,15 +46,13 @@
 static TTYR_TTY_RESULT ttyr_tty_getMaxCursorPosition(
     short unsigned int *rows, short unsigned int *cols) 
 {
-TTYR_TTY_BEGIN()
-
 #ifdef __unix__
 
     char buf[32];
     unsigned int i = 0;
   
     if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
   
     while (i < sizeof(buf) - 1) {
@@ -65,31 +63,29 @@ TTYR_TTY_BEGIN()
     buf[i] = '\0';
   
     if (buf[0] != '\x1b' || buf[1] != '[') {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
     if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
   
 #endif
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_getStandardOutputWindowSize(
     int *cols_p, int *rows_p)
 {
-TTYR_TTY_BEGIN()
-
 #ifdef __unix__
 
     struct winsize ws;
   
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) {
-            TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+            return TTYR_TTY_ERROR_BAD_STATE;
         }
-        TTYR_TTY_CHECK(ttyr_tty_getMaxCursorPosition(&ws.ws_row, &ws.ws_col))
+        TTYR_CHECK(ttyr_tty_getMaxCursorPosition(&ws.ws_row, &ws.ws_col))
     } 
 
     *cols_p = ws.ws_col;
@@ -97,7 +93,7 @@ TTYR_TTY_BEGIN()
 
 #endif
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // KEYS ============================================================================================
@@ -105,8 +101,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_readLinuxStandardInput(
     NH_ENCODING_UTF32 codepoints_p[4], int *count_p)
 {
-TTYR_TTY_BEGIN()
-
 #ifdef __unix__
 
     fd_set set;
@@ -118,7 +112,7 @@ TTYR_TTY_BEGIN()
     timeout.tv_usec = 1;
   
     int rv = select(fileno(stdin) + 1, &set, NULL, NULL, &timeout);
-    if (rv == -1 || rv == 0) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (rv == -1 || rv == 0) {return TTYR_TTY_SUCCESS;}
 
     NH_BYTE p[4];
     int nread = read(STDIN_FILENO, p, 4);
@@ -132,14 +126,12 @@ TTYR_TTY_BEGIN()
 
 #endif
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_readStandardInput(
     ttyr_tty_TTY *TTY_p)
 {
-TTYR_TTY_BEGIN()
-
     int count = 0;
 
     do {
@@ -148,7 +140,7 @@ TTYR_TTY_BEGIN()
     NH_ENCODING_UTF32 codepoints_p[4];
 
 #ifdef __unix__
-    TTYR_TTY_CHECK(ttyr_tty_readLinuxStandardInput(codepoints_p, &count))
+    TTYR_CHECK(ttyr_tty_readLinuxStandardInput(codepoints_p, &count))
 #endif
 
     for (int i = 0; i < count; ++i) {
@@ -160,7 +152,7 @@ TTYR_TTY_BEGIN()
 
     }  while (count);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // WRITE ===========================================================================================
@@ -168,8 +160,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 TTYR_TTY_RESULT ttyr_tty_writeCursorToStandardOutput(
     int x, int y)
 {
-TTYR_TTY_BEGIN()
-
     nh_String String = nh_core_initString(255);
 
     NH_BYTE buf[32] = {'\0'};
@@ -182,14 +172,12 @@ TTYR_TTY_BEGIN()
 
     nh_core_freeString(&String);
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_writeToStandardOutput(
     ttyr_tty_Row *Rows_p, int cols, int rows)
 {
-TTYR_TTY_BEGIN()
-
     nh_String String = nh_core_initString(255);
 
     // Move cursor to home.
@@ -273,7 +261,7 @@ TTYR_TTY_BEGIN()
 
     nh_core_freeString(&String);
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // RAW MODE ========================================================================================
@@ -281,15 +269,13 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_enterRawMode(
     ttyr_tty_View *View_p) 
 {
-TTYR_TTY_BEGIN()
-
 #ifdef __unix__
 
     // https://stackoverflow.com/questions/43202800/when-exiting-terminal-rawmode-my-contents-stays-on-the-screen
     write(STDOUT_FILENO, "\033[?1049h\033[2J\033[H", 15);
 
     if (tcgetattr(STDIN_FILENO, &View_p->Termios) == -1) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
   
     struct termios raw = View_p->Termios;
@@ -302,23 +288,21 @@ TTYR_TTY_BEGIN()
     raw.c_cc[VTIME] = 1;
   
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+        return TTYR_TTY_ERROR_BAD_STATE;
     }
 
 #endif
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_exitRawMode(
     ttyr_tty_View *View_p) 
 {
-TTYR_TTY_BEGIN()
-
 #ifdef __unix__
 
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &View_p->Termios) == -1) {
-         TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)
+         return TTYR_TTY_ERROR_BAD_STATE;
     }
 
     // https://stackoverflow.com/questions/43202800/when-exiting-terminal-rawmode-my-contents-stays-on-the-screen
@@ -326,7 +310,7 @@ TTYR_TTY_BEGIN()
 
 #endif
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // CLAIM STDOUT ====================================================================================
@@ -336,30 +320,26 @@ static NH_BOOL claimed = NH_FALSE;
 TTYR_TTY_RESULT ttyr_tty_claimStandardIO(
     ttyr_tty_TTY *TTY_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (claimed) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+    if (claimed) {return TTYR_TTY_ERROR_BAD_STATE;}
 
     ttyr_tty_View *View_p = ttyr_tty_createView(TTY_p, NULL, NH_TRUE);
-    TTYR_TTY_CHECK_NULL(View_p)
+    TTYR_CHECK_NULL(View_p)
 
     TTYR_TTY_RESULT error = ttyr_tty_enterRawMode(View_p);
     if (error) {
         ttyr_tty_destroyView(TTY_p, View_p);
-        TTYR_TTY_END(error)
+        return error;
     }
 
     claimed = NH_TRUE;
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_unclaimStandardIO(
     ttyr_tty_TTY *TTY_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (!claimed) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+    if (!claimed) {return TTYR_TTY_ERROR_BAD_STATE;}
 
     ttyr_tty_View *View_p = NULL;
     for (int i = 0; i < TTY_p->Views.size; ++i) {
@@ -368,25 +348,22 @@ TTYR_TTY_BEGIN()
         View_p = NULL;
     }
 
-    TTYR_TTY_CHECK_NULL(View_p)
+    TTYR_CHECK_NULL(View_p)
 
-    TTYR_TTY_CHECK(ttyr_tty_exitRawMode(View_p))
+    TTYR_CHECK(ttyr_tty_exitRawMode(View_p))
     ttyr_tty_destroyView(TTY_p, View_p);
 
     claimed = NH_FALSE;
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 NH_BOOL ttyr_tty_claimsStandardIO(
     ttyr_tty_TTY *TTY_p)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < TTY_p->Views.size; ++i) {
-        if (((ttyr_tty_View*)TTY_p->Views.pp[i])->standardIO) {TTYR_TTY_END(NH_TRUE)}
+        if (((ttyr_tty_View*)TTY_p->Views.pp[i])->standardIO) {return NH_TRUE;}
     }
-
-TTYR_TTY_END(NH_FALSE)
+    return NH_FALSE;
 }
 

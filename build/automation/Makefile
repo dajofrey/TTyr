@@ -21,10 +21,9 @@ SRC_FILES_TTYR_TTY = \
     TTY/Draw.c \
     TTY/Program.c \
     TTY/Macro.c \
-    TTY/SideBar.c \
     TTY/Titlebar.c \
-    TTY/TopBar.c \
-    TTY/TopBarMessage.c \
+    TTY/Topbar.c \
+    TTY/TopbarMessage.c \
     TTY/Tiling.c \
     TTY/StandardIO.c \
     TTY/View.c \

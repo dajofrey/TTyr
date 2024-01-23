@@ -33,7 +33,7 @@
 
     typedef struct ttyr_tty_Topbars {
         NH_BOOL on;
-    } ttyr_tty_TopBars;
+    } ttyr_tty_Topbars;
 
     typedef struct ttyr_tty_Preview {
         NH_BOOL blink;
@@ -49,7 +49,7 @@
     typedef struct ttyr_tty_TTY {
         ttyr_tty_Clipboard Clipboard;
         ttyr_tty_Borders Borders;
-        ttyr_tty_TopBars TopBars;
+        ttyr_tty_Topbars Topbars;
         ttyr_tty_Preview Preview;
         ttyr_tty_Titlebar Titlebar;
         ttyr_tty_MacroWindow *Window_p;

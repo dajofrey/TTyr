@@ -19,8 +19,6 @@
 
 TTYR_TTY_RESULT ttyr_tty_terminate()
 {
-TTYR_TTY_BEGIN()
-
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+     return TTYR_TTY_SUCCESS;
 }
 

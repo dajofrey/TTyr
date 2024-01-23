@@ -39,68 +39,42 @@
 
 #define TTYR_TTY_MICRO_TAB(macro_tab_pointer) ((ttyr_tty_MicroTab*)((ttyr_tty_MacroTab*)macro_tab_pointer)->MicroWindow.Tabs_p->pp[((ttyr_tty_MacroTab*)macro_tab_pointer)->MicroWindow.current])
 
-// FLOW LOGGING ====================================================================================
-
-#ifdef NH_LOG_FLOW
-    #define TTYR_TTY_BEGIN() {_ttyr_tty_logBegin(__FILE__, __func__);}
-#else
-    #define TTYR_TTY_BEGIN() 
-#endif
-
-#ifdef NH_LOG_FLOW
-    #define TTYR_TTY_END(result) {_ttyr_tty_logEnd(__FILE__, __func__); return result;}
-#else
-    #define TTYR_TTY_END(result) {return result;} 
-#endif
-
-#ifdef NH_LOG_FLOW
-    #define TTYR_TTY_SILENT_END() {_ttyr_tty_logEnd(__FILE__, __func__); return;}
-#else
-    #define TTYR_TTY_SILENT_END() {return;} 
-#endif
-
-#ifdef NH_LOG_FLOW
-    #define TTYR_TTY_DIAGNOSTIC_END(result) {return _ttyr_tty_logDiagnosticEnd(__FILE__, __func__, result, __LINE__);}
-#else
-    #define TTYR_TTY_DIAGNOSTIC_END(result) {return result;} 
-#endif
-
 // ERROR LOGGING ===================================================================================
 
-#define TTYR_TTY_CHECK(checkable)                                             \
-{                                                                           \
-    TTYR_TTY_RESULT checkResult = checkable;                                  \
-    if (checkResult != TTYR_TTY_SUCCESS) {TTYR_TTY_DIAGNOSTIC_END(checkResult)} \
+#define TTYR_CHECK(checkable)                                  \
+{                                                              \
+    TTYR_TTY_RESULT checkResult = checkable;                   \
+    if (checkResult != TTYR_TTY_SUCCESS) {return checkResult;} \
 }
 
-#define TTYR_TTY_CHECK_2(checkReturn, checkable)                   \
-{                                                                \
-    TTYR_TTY_RESULT checkResult = checkable;                       \
-    if (checkResult != TTYR_TTY_SUCCESS) {TTYR_TTY_END(checkReturn)} \
+#define TTYR_CHECK_2(checkReturn, checkable)                   \
+{                                                              \
+    TTYR_TTY_RESULT checkResult = checkable;                   \
+    if (checkResult != TTYR_TTY_SUCCESS) {return checkReturn;} \
 }
 
-#define TTYR_TTY_CHECK_NULL(checkable)                                              \
-{                                                                                 \
-    void *checkResult_p = checkable;                                              \
-    if (checkResult_p == NULL) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_NULL_POINTER)} \
+#define TTYR_CHECK_NULL(checkable)                                   \
+{                                                                    \
+    void *checkResult_p = checkable;                                 \
+    if (checkResult_p == NULL) {return TTYR_TTY_ERROR_NULL_POINTER;} \
 }
 
-#define TTYR_TTY_CHECK_NULL_2(checkReturn, checkable)      \
-{                                                        \
-    void *checkResult_p = checkable;                     \
-    if (checkResult_p == NULL) {TTYR_TTY_END(checkReturn)} \
+#define TTYR_CHECK_NULL_2(checkReturn, checkable)     \
+{                                                     \
+    void *checkResult_p = checkable;                  \
+    if (checkResult_p == NULL) {return checkReturn;}  \
 }
 
-#define TTYR_TTY_CHECK_MEM(checkable)                                     \
+#define TTYR_CHECK_MEM(checkable)                                         \
 {                                                                         \
     void *checkResult_p = checkable;                                      \
     if (checkResult_p == NULL) {return TTYR_TTY_ERROR_MEMORY_ALLOCATION;} \
 }
 
-#define TTYR_TTY_CHECK_MEM_2(checkReturn, checkable)       \
-{                                                        \
-    void *checkResult_p = checkable;                     \
-    if (checkResult_p == NULL) {TTYR_TTY_END(checkReturn)} \
+#define TTYR_CHECK_MEM_2(checkReturn, checkable)     \
+{                                                    \
+    void *checkResult_p = checkable;                 \
+    if (checkResult_p == NULL) {return checkReturn;} \
 }
 
 #endif // TTYR_TTY_COMMON_MACROS_H

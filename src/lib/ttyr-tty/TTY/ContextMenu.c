@@ -34,32 +34,27 @@
 
 // ACTION ==========================================================================================
 
-static NH_BOOL ttyr_tty_pathMatchesContextMenu(
+static bool ttyr_tty_pathMatchesContextMenu(
     ttyr_tty_ContextMenu *Menu_p, const NH_ENCODING_UTF32 **pp, int count)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = count-1; i >= 0; --i) {
         if (!Menu_p || Menu_p->Name.length == 0) {
-            TTYR_TTY_END(NH_FALSE)
+            return false;
         }
         for (int j = 0; j < Menu_p->Name.length; ++j) {
             if (pp[i][j] == 0 || pp[i][j] != Menu_p->Name.p[j]) {
-                TTYR_TTY_END(NH_FALSE)
+                return false;
                 break;
             }
         }
         Menu_p = Menu_p->Parent_p;
     }
-
-TTYR_TTY_END(NH_TRUE)
+    return true;
 }
 
 static int ttyr_tty_isContextMenuTiling(
     ttyr_tty_ContextMenu *Menu_p)
 {
-TTYR_TTY_BEGIN()
-
     static const NH_ENCODING_UTF32 append_p[] = {'A', 'p', 'p', 'e', 'n', 'd', 0};
     static const NH_ENCODING_UTF32 split_p[] = {'S', 'p', 'l', 'i', 't', 0};
     static const NH_ENCODING_UTF32 window_p[] = {'W', 'i', 'n', 'd', 'o', 'w', 0};
@@ -74,18 +69,16 @@ TTYR_TTY_BEGIN()
 
     for (int i = 0; i < 4; ++i) {
         if (ttyr_tty_pathMatchesContextMenu(Menu_p, paths_ppp[i], 2)) {
-            TTYR_TTY_END(i)
+            return i;
         }
     }
 
-TTYR_TTY_END(-1)
+    return -1;
 }
 
 static int ttyr_tty_isContextMenuWindowOrTabSelect(
     ttyr_tty_ContextMenu *Menu_p)
 {
-TTYR_TTY_BEGIN()
-
     static const NH_ENCODING_UTF32 window_p[] = {'W', 'i', 'n', 'd', 'o', 'w', 0};
     static const NH_ENCODING_UTF32 tab_p[] = {'T', 'a', 'b', 0};
     static const NH_ENCODING_UTF32 p1[] = {'1', 1, ' ', 0};
@@ -121,18 +114,16 @@ TTYR_TTY_BEGIN()
 
     for (int i = 0; i < 18; ++i) {
         if (ttyr_tty_pathMatchesContextMenu(Menu_p, paths_ppp[i], 2)) {
-            TTYR_TTY_END(i)
+            return i;
         }
     }
 
-TTYR_TTY_END(-1)
+    return -1;
 }
 
 static int ttyr_tty_handleContextMenuTiling(
     int action, ttyr_tty_Tile *Tile_p, int cCol, int cRow)
 {
-TTYR_TTY_BEGIN()
-
     nh_wsi_KeyboardEvent Event;
     ttyr_tty_MacroWindow *Window_p = ((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p;
 
@@ -247,7 +238,7 @@ TTYR_TTY_BEGIN()
             break;
     }
 
-TTYR_TTY_END(-1)
+    return -1;
 }
 
 // CREATE/FREE =====================================================================================
@@ -255,10 +246,8 @@ TTYR_TTY_END(-1)
 static ttyr_tty_ContextMenu *ttyr_tty_parseContextMenu(
     NH_ENCODING_UTF32 **menu_pp, ttyr_tty_ContextMenu *Parent_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_ContextMenu *Menu_p = nh_core_allocate(sizeof(ttyr_tty_ContextMenu));
-    TTYR_TTY_CHECK_MEM_2(NULL, Menu_p)
+    TTYR_CHECK_MEM_2(NULL, Menu_p)
 
     Menu_p->Parent_p = Parent_p;
     Menu_p->active = NH_FALSE;
@@ -274,7 +263,7 @@ TTYR_TTY_BEGIN()
         if (**menu_pp == '{' || (**menu_pp == ',' && curly)) {
             (*menu_pp)++;
             ttyr_tty_ContextMenu *Child_p = ttyr_tty_parseContextMenu(menu_pp, Menu_p);
-            TTYR_TTY_CHECK_NULL_2(NULL, Child_p)
+            TTYR_CHECK_NULL_2(NULL, Child_p)
             nh_core_appendToList(&Menu_p->Items, Child_p);
             curly = NH_TRUE;
             continue;
@@ -285,10 +274,10 @@ TTYR_TTY_BEGIN()
                 (*menu_pp)++;
                 continue;
             }
-            TTYR_TTY_END(Menu_p)
+            return Menu_p;
         }
         else if (**menu_pp == ',') {
-            TTYR_TTY_END(Menu_p)
+            return Menu_p;
         }
         else {
             nh_encoding_appendUTF32Codepoint(&Menu_p->Name, **menu_pp);
@@ -296,22 +285,19 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_END(Menu_p)
+    return Menu_p;
 }
 
 void ttyr_tty_freeContextMenu(
     ttyr_tty_ContextMenu *Menu_p)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < Menu_p->Items.size; ++i) {
         ttyr_tty_freeContextMenu(Menu_p->Items.pp[i]);
     }
     nh_core_freeList(&Menu_p->Items, NH_FALSE);
     nh_encoding_freeUTF32(&Menu_p->Name);
     nh_core_free(Menu_p);
-
-TTYR_TTY_SILENT_END()
+    return;
 }
 
 // POSITION ========================================================================================
@@ -319,10 +305,7 @@ TTYR_TTY_SILENT_END()
 static void ttyr_tty_computeContextMenuPosition(
     ttyr_tty_ContextMenu *Menu_p, int x, int y, int maxX, int maxY)
 {
-TTYR_TTY_BEGIN()
-
     // Get menu width.
-
     int width = 0;
     for (int i = 0; i < Menu_p->Items.size; ++i) {
         nh_encoding_UTF32String *Name_p = &((ttyr_tty_ContextMenu*)Menu_p->Items.pp[i])->Name;
@@ -344,33 +327,28 @@ TTYR_TTY_BEGIN()
     }
     if (Menu_p->Position.x + width + 1 > maxX) {
         Menu_p->Position.x -= (Menu_p->Position.x + width + 1) - maxX;
-        TTYR_TTY_SILENT_END() // TODO
+        return; // TODO
     }
 
     for (int i = 0; i < Menu_p->Items.size; ++i) {
         ttyr_tty_computeContextMenuPosition(Menu_p->Items.pp[i], x + width + 2, Menu_p->Position.y + i, maxX, maxY);
     }
 
-TTYR_TTY_SILENT_END()
+    return;
 }
 
 static NH_BOOL ttyr_tty_compareContextMenuName(
     ttyr_tty_ContextMenu *Menu_p, NH_BYTE *name_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_encoding_UTF8String Name = nh_encoding_encodeUTF8(Menu_p->Name.p, Menu_p->Name.length);
     NH_BOOL result = !strcmp(Name.p, name_p);
     nh_encoding_freeUTF8(&Name);
-
-TTYR_TTY_END(result)
+    return result;
 }
 
 ttyr_tty_ContextMenu *ttyr_tty_isContextMenuHit(
     ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, NH_BOOL recursive, int x, int y)
 {
-TTYR_TTY_BEGIN()
-
     int x2 = x;
     int y2 = Menu_p->Position.y;
 
@@ -390,23 +368,21 @@ TTYR_TTY_BEGIN()
             if (Name_p->length > width2) {width2 = Name_p->length;}
         }
         if ((Menu_p->Position.x + width2 + 2 < maxCols && Parent_p->Position.x + width + 2 < maxCols) || Menu_p->Items.size == 0) {
-            TTYR_TTY_END(Menu_p)
+            return Menu_p;
         }
     }
 
     for (int i = 0; (Menu_p->active || Menu_p->hit) && i < Menu_p->Items.size && recursive; ++i) {
         ttyr_tty_ContextMenu *Result_p = ttyr_tty_isContextMenuHit(Menu_p->Items.pp[i], Menu_p, recursive, x, y);
-        if (Result_p) {TTYR_TTY_END(Result_p)}
+        if (Result_p) {return Result_p;}
     }
 
-TTYR_TTY_END(NULL)
+    return NULL;
 }
 
 void ttyr_tty_updateContextMenuHit(
     ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, int x, int y, NH_BOOL activate)
 {
-TTYR_TTY_BEGIN()
-
     NH_BOOL newHit = !Menu_p->hit;
     Menu_p->hit = ttyr_tty_isContextMenuHit(Menu_p, Parent_p, NH_FALSE, x, y) != NULL && Menu_p->Name.length > 0;
 
@@ -428,7 +404,7 @@ TTYR_TTY_BEGIN()
         if (((ttyr_tty_ContextMenu*)Menu_p->Items.pp[i])->hit) {Menu_p->hit = NH_TRUE;}
     }
 
-TTYR_TTY_SILENT_END()
+    return;
 }
 
 // MOUSE MENU ======================================================================================
@@ -437,8 +413,6 @@ TTYR_TTY_SILENT_END()
 ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
     int x, int y)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
     ttyr_tty_Config Config = ttyr_tty_getConfig();
     ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
@@ -606,21 +580,19 @@ TTYR_TTY_BEGIN()
     }
 
     ttyr_tty_ContextMenu *Menu_p = ttyr_tty_parseContextMenu(&p, NULL);
-    TTYR_TTY_CHECK_NULL_2(NULL, Menu_p)
+    TTYR_CHECK_NULL_2(NULL, Menu_p)
 
     ttyr_tty_computeContextMenuPosition(Menu_p, x, y, ((ttyr_tty_View*)TTY_p->Views.pp[0])->cols, ((ttyr_tty_View*)TTY_p->Views.pp[0])->rows);
 
     nh_encoding_freeUTF32(&Menu);
 
-TTYR_TTY_END(Menu_p)
+    return Menu_p;
 }
 
 TTYR_TTY_RESULT ttyr_tty_handleMouseMenuPress(
     ttyr_tty_ContextMenu *Root_p, ttyr_tty_ContextMenu *Menu_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (!Menu_p->Parent_p || Menu_p->Name.length == 0) {TTYR_TTY_END(TTYR_TTY_SUCCESS)}
+    if (!Menu_p->Parent_p || Menu_p->Name.length == 0) {return TTYR_TTY_SUCCESS;}
 
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
@@ -635,17 +607,17 @@ TTYR_TTY_BEGIN()
         nh_wsi_KeyboardEvent Event;
         Event.trigger = NH_WSI_TRIGGER_PRESS;
         Event.codepoint = 13;
-        TTYR_TTY_END(ttyr_tty_handleTilingInput(TTY_p->Window_p, Event))
+        return ttyr_tty_handleTilingInput(TTY_p->Window_p, Event);
     }
 
     int select = ttyr_tty_isContextMenuWindowOrTabSelect(Menu_p);
     if (select >= 0) {
         if (select < 9) {
-            TTYR_TTY_CHECK_NULL(ttyr_tty_insertAndFocusWindow(TTY_p, select))
+            TTYR_CHECK_NULL(ttyr_tty_insertAndFocusWindow(TTY_p, select))
         } else {
             ((ttyr_tty_MacroTile*)TTY_p->Window_p->Tile_p->p)->current = select - 9; 
         }
-        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     // Handle program switch if necessary.
@@ -674,7 +646,7 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // DRAW ============================================================================================
@@ -682,10 +654,8 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 TTYR_TTY_RESULT ttyr_tty_drawContextMenuRecursively(
     ttyr_tty_ContextMenu *Menu_p, ttyr_tty_Row *Grid_p)
 {
-TTYR_TTY_BEGIN()
-
     if (Menu_p == NULL || Menu_p->Items.size == 0 || Menu_p->hit == NH_FALSE && Menu_p->active == NH_FALSE) {
-        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     int width = 0;
@@ -779,9 +749,9 @@ TTYR_TTY_BEGIN()
     // Recursion.
     for (int i = 0; i < Menu_p->Items.size; ++i) {
         ttyr_tty_ContextMenu *Child_p = Menu_p->Items.pp[i];
-        TTYR_TTY_CHECK(ttyr_tty_drawContextMenuRecursively(Child_p, Grid_p))
+        TTYR_CHECK(ttyr_tty_drawContextMenuRecursively(Child_p, Grid_p))
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 

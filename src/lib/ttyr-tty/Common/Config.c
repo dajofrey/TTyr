@@ -44,8 +44,7 @@ static size_t TTYR_TTY_SETTING_NAMES_PP_COUNT =
 const NH_BYTE *ttyr_tty_getSettingName(
     unsigned int setting)
 {
-TTYR_TTY_BEGIN()
-TTYR_TTY_END(TTYR_TTY_SETTING_NAMES_PP[setting])
+    return TTYR_TTY_SETTING_NAMES_PP[setting];
 }
 
 // FUNCTIONS =======================================================================================
@@ -53,65 +52,63 @@ TTYR_TTY_END(TTYR_TTY_SETTING_NAMES_PP[setting])
 static TTYR_TTY_RESULT ttyr_tty_getSetting(
     ttyr_tty_Config *Config_p, NH_BYTE *namespace_p, int index)
 {
-TTYR_TTY_BEGIN()
-
     nh_List *Values_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TTY_SETTING_NAMES_PP[index]);
-    TTYR_TTY_CHECK_NULL(Values_p)
+    TTYR_CHECK_NULL(Values_p)
 
     switch (index) {
         case 0 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Shell.maxScroll = atoi(Values_p->pp[0]);
             break;
         case 1 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->windows = atoi(Values_p->pp[0]);
             break;
         case 2 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->tabs = atoi(Values_p->pp[0]);
             break;
         case 3 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.program = atoi(Values_p->pp[0]);
             break;
         case 4 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.split = atoi(Values_p->pp[0]);
             break;
         case 5 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.append = atoi(Values_p->pp[0]);
             break;
         case 6 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.window = atoi(Values_p->pp[0]);
             break;
         case 7 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.tab = atoi(Values_p->pp[0]);
             break;
         case 8 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.close = atoi(Values_p->pp[0]);
             break;
         case 9 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Menu.debug = atoi(Values_p->pp[0]);
             break;
         case 10 :
-            if (Values_p->size != 1) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)}
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
             Config_p->Titlebar.on = atoi(Values_p->pp[0]);
             break;
         case 11 :
-            if (Values_p->size != 4) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)} 
+            if (Values_p->size != 4) {return TTYR_TTY_ERROR_BAD_STATE;} 
             Config_p->Titlebar.Foreground.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
             Config_p->Titlebar.Foreground.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
             Config_p->Titlebar.Foreground.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
             Config_p->Titlebar.Foreground.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
             break;
         case 12 :
-            if (Values_p->size != 4) {TTYR_TTY_END(TTYR_TTY_ERROR_BAD_STATE)} 
+            if (Values_p->size != 4) {return TTYR_TTY_ERROR_BAD_STATE;} 
             Config_p->Titlebar.Background.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
             Config_p->Titlebar.Background.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
             Config_p->Titlebar.Background.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
@@ -119,23 +116,21 @@ TTYR_TTY_BEGIN()
             break;
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 ttyr_tty_Config ttyr_tty_getConfig()
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Config Config;
     memset(&Config, 0, sizeof(ttyr_tty_Config));
 
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
-    TTYR_TTY_CHECK_NULL_2(Config, TTY_p)
+    TTYR_CHECK_NULL_2(Config, TTY_p)
 
     for (int i = 0; i < TTYR_TTY_SETTING_NAMES_PP_COUNT; ++i) {
-        TTYR_TTY_CHECK_2(Config, ttyr_tty_getSetting(&Config, TTY_p->namespace_p, i))
+        TTYR_CHECK_2(Config, ttyr_tty_getSetting(&Config, TTY_p->namespace_p, i))
     }
 
-TTYR_TTY_END(Config)
+    return Config;
 }
 

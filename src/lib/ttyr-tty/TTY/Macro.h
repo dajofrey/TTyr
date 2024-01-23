@@ -10,7 +10,7 @@
  */
 
 #include "Tiling.h"
-#include "TopBar.h"
+#include "Topbar.h"
 #include "Micro.h"
 #include "ContextMenu.h"
 
@@ -26,7 +26,7 @@
  */
 
     typedef struct ttyr_tty_MacroTab {
-        ttyr_tty_TopBar TopBar;
+        ttyr_tty_Topbar Topbar;
         ttyr_tty_MicroWindow MicroWindow;
     } ttyr_tty_MacroTab;
 

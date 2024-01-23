@@ -38,22 +38,17 @@
 TTYR_TTY_RESULT ttyr_tty_getViewSize(
     ttyr_tty_View *View_p) 
 {
-TTYR_TTY_BEGIN()
-
     if (View_p->standardIO) {
-        TTYR_TTY_CHECK(ttyr_tty_getStandardOutputWindowSize(&View_p->cols, &View_p->rows))
+        TTYR_CHECK(ttyr_tty_getStandardOutputWindowSize(&View_p->cols, &View_p->rows))
     }
-
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_translateMousePosition(
     ttyr_tty_View *View_p, nh_wsi_MouseEvent Mouse, int *col_p, int *row_p)
 {
-TTYR_TTY_BEGIN()
-
     if (View_p->standardIO) {
-        TTYR_TTY_CHECK(TTYR_TTY_ERROR_BAD_STATE)
+        TTYR_CHECK(TTYR_TTY_ERROR_BAD_STATE)
     }
 
     int index = 0;
@@ -68,17 +63,15 @@ TTYR_TTY_BEGIN()
     }
     *row_p = index-1;
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_updateView(
     ttyr_tty_View *View_p, NH_BOOL *updated_p, NH_BOOL macro)
 {
-TTYR_TTY_BEGIN()
-
     if (View_p->cols == View_p->previousCols && View_p->rows == View_p->previousRows &&
         View_p->Size.width == View_p->PreviousSize.width && View_p->Size.height == View_p->PreviousSize.height) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     ttyr_tty_Config Config = ttyr_tty_getConfig();
@@ -125,7 +118,7 @@ TTYR_TTY_BEGIN()
 
     if (updated_p) {*updated_p = NH_TRUE;}
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // CREATE/DESTROY ==================================================================================
@@ -133,34 +126,24 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 static void ttyr_tty_initTilesBuffer(
     nh_RingBuffer *Buffer_p, int itemCount)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < itemCount; ++i) {
         nh_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
         *Array_p = nh_core_initArray(sizeof(ttyr_terminal_TileUpdate), 255);
     }
-
-TTYR_TTY_SILENT_END()
 }
 
 static void ttyr_tty_initBoxesBuffer(
     nh_RingBuffer *Buffer_p, int itemCount)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < itemCount; ++i) {
         nh_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
         *Array_p = nh_core_initArray(sizeof(ttyr_terminal_Box), 16);
     }
-
-TTYR_TTY_SILENT_END()
 }
 
 ttyr_tty_View *ttyr_tty_createView(
     ttyr_tty_TTY *TTY_p, void *p, NH_BOOL standardIO)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_View View;
     memset(&View, 0, sizeof(ttyr_tty_View));
 
@@ -178,7 +161,7 @@ TTYR_TTY_BEGIN()
     ))
 
     ttyr_tty_View *View_p = nh_core_allocate(sizeof(ttyr_tty_View));
-    TTYR_TTY_CHECK_MEM_2(NULL, View_p)
+    TTYR_CHECK_MEM_2(NULL, View_p)
 
     *View_p = View;
 
@@ -186,14 +169,12 @@ TTYR_TTY_BEGIN()
         nh_core_appendToList(&TTY_p->Views, View_p);
     }
 
-TTYR_TTY_END(View_p)
+    return View_p;
 }
 
 TTYR_TTY_RESULT ttyr_tty_destroyView(
     ttyr_tty_TTY *TTY_p, ttyr_tty_View *View_p)
 {
-TTYR_TTY_BEGIN()
-
     for (int i = 0; i < 64; ++i) {
         nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
         nh_core_freeArray(Array_p);
@@ -224,7 +205,7 @@ TTYR_TTY_BEGIN()
         nh_core_free(View_p); 
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // FORWARD FUNCTIONS ===============================================================================
@@ -233,10 +214,8 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 TTYR_TTY_RESULT ttyr_tty_forwardCursor(
     ttyr_tty_View *View_p, int x, int y)
 {
-TTYR_TTY_BEGIN()
-
     if (View_p->standardIO) {
-        TTYR_TTY_END(ttyr_tty_writeCursorToStandardOutput(x, y))
+        return ttyr_tty_writeCursorToStandardOutput(x, y);
     }
 
     ttyr_tty_Config Config = ttyr_tty_getConfig();
@@ -257,15 +236,13 @@ TTYR_TTY_BEGIN()
 
     nh_core_appendToArray(Array_p, &Update, 1);
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_setContextMenus(
     ttyr_tty_ContextMenu *Menu_p, nh_Array *Boxes_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (!Menu_p->active || Menu_p->Items.size == 0) {TTYR_TTY_END(TTYR_TTY_SUCCESS)}
+    if (!Menu_p->active || Menu_p->Items.size == 0) {return TTYR_TTY_SUCCESS;}
 
     ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
 
@@ -285,16 +262,14 @@ TTYR_TTY_BEGIN()
         ttyr_tty_setContextMenus(Menu_p->Items.pp[i], Boxes_p);
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
     ttyr_tty_View *View_p)
 {
-TTYR_TTY_BEGIN()
-
     if (View_p->standardIO) {
-        TTYR_TTY_END(ttyr_tty_writeToStandardOutput(View_p->Grid1_p, View_p->cols, View_p->rows))
+        return ttyr_tty_writeToStandardOutput(View_p->Grid1_p, View_p->cols, View_p->rows);
     }
 
     ttyr_tty_Config Config = ttyr_tty_getConfig();
@@ -359,7 +334,7 @@ TTYR_TTY_BEGIN()
             if (CurrentProgram_p == Program_p && TTY_p->hasFocus) {continue;}
 
             int x = 0, y = 0;
-            TTYR_TTY_CHECK(ttyr_tty_getCursorPosition(MacroTiles.pp[i], MicroTiles.pp[j], View_p->standardIO, &x, &y))
+            TTYR_CHECK(ttyr_tty_getCursorPosition(MacroTiles.pp[i], MicroTiles.pp[j], View_p->standardIO, &x, &y))
 
             ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
             memset(Box_p, 0, sizeof(ttyr_terminal_Box));
@@ -372,14 +347,12 @@ TTYR_TTY_BEGIN()
     }
     nh_core_freeList(&MacroTiles, NH_FALSE);
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_forwardGrid2(
     ttyr_tty_View *View_p)
 {
-TTYR_TTY_BEGIN()
-
     // Write to nhterminal.
     nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
@@ -396,23 +369,21 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_forwardEvent(
     ttyr_tty_View *View_p, nh_wsi_Event Event)
 {
-TTYR_TTY_BEGIN()
-
     if (View_p->standardIO) {
-        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     // Write to nhterminal.
     nh_wsi_Event *Event_p = nh_core_advanceRingBuffer(&View_p->Forward.Events);
-    TTYR_TTY_CHECK_MEM(Event_p)
+    TTYR_CHECK_MEM(Event_p)
     *Event_p = Event;
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 

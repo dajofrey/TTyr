@@ -8,8 +8,8 @@
 
 // INCLUDES ========================================================================================
 
-#include "TopBarMessage.h"
-#include "TopBar.h"
+#include "TopbarMessage.h"
+#include "Topbar.h"
 #include "TTY.h"
 
 #include "../Common/Macros.h"
@@ -64,8 +64,6 @@ NH_ENCODING_UTF32 TTYR_TTY_MESSAGE_EN_MISC_INVALID_ARGUMENT_P[] = {73, 110, 118,
 NH_ENCODING_UTF32 *ttyr_tty_getMessage(
     TTYR_TTY_MESSAGE message, int *length_p)
 {
-TTYR_TTY_BEGIN()
-
     NH_ENCODING_UTF32 *message_p = NULL;
 
     switch (message)
@@ -204,75 +202,64 @@ TTYR_TTY_BEGIN()
             break;
     }
 
-TTYR_TTY_END(message_p)
+    return message_p;
 }
 
 // SET =============================================================================================
 
 static TTYR_TTY_RESULT ttyr_tty_setMessage(
-    ttyr_tty_TopBar *TopBar_p, NH_ENCODING_UTF32 *message_p, int length)
+    ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *message_p, int length)
 {
-TTYR_TTY_BEGIN()
+    ttyr_tty_TopbarMessage *Message_p = NULL;
 
-    ttyr_tty_TopBarMessage *Message_p = NULL;
-
-    if (TopBar_p) {
-        Message_p = &TopBar_p->Message;
+    if (Topbar_p) {
+        Message_p = &Topbar_p->Message;
     } else {
-        Message_p = &TTYR_TTY_MACRO_TAB(((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p)->TopBar.Message;
+        Message_p = &TTYR_TTY_MACRO_TAB(((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p)->Topbar.Message;
     }
 
     nh_encoding_freeUTF32(&Message_p->Text);
     nh_encoding_appendUTF32(&Message_p->Text, message_p, length);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_clearMessage(
-    ttyr_tty_TopBar *TopBar_p)
+    ttyr_tty_Topbar *Topbar_p)
 {
-TTYR_TTY_BEGIN()
+    ttyr_tty_TopbarMessage *Message_p = NULL;
 
-    ttyr_tty_TopBarMessage *Message_p = NULL;
-
-    if (TopBar_p) {
-        Message_p = &TopBar_p->Message;
+    if (Topbar_p) {
+        Message_p = &Topbar_p->Message;
     } else {
-        Message_p = &TTYR_TTY_MACRO_TAB(((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p)->TopBar.Message;
+        Message_p = &TTYR_TTY_MACRO_TAB(((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p)->Topbar.Message;
     }
 
     nh_encoding_freeUTF32(&Message_p->Text);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_setDefaultMessage(
-    ttyr_tty_TopBar *TopBar_p, TTYR_TTY_MESSAGE message)
+    ttyr_tty_Topbar *Topbar_p, TTYR_TTY_MESSAGE message)
 {
-TTYR_TTY_BEGIN()
-
     int length = 0;
     NH_ENCODING_UTF32 *codepoints_p = ttyr_tty_getMessage(message, &length);
-    TTYR_TTY_CHECK(ttyr_tty_setMessage(TopBar_p, codepoints_p, length))
+    TTYR_CHECK(ttyr_tty_setMessage(Topbar_p, codepoints_p, length))
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_setCustomMessage(
-    ttyr_tty_TopBar *TopBar_p, NH_ENCODING_UTF32 *message_p, int messageLength)
+    ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *message_p, int messageLength)
 {
-TTYR_TTY_BEGIN()
-
-    TTYR_TTY_CHECK(ttyr_tty_setMessage(TopBar_p, message_p, messageLength))
-
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    TTYR_CHECK(ttyr_tty_setMessage(Topbar_p, message_p, messageLength))
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_setCustomSuffixMessage(
-    ttyr_tty_TopBar *TopBar_p, TTYR_TTY_MESSAGE prefix, NH_ENCODING_UTF32 *suffix_p, int suffixLength)
+    ttyr_tty_Topbar *Topbar_p, TTYR_TTY_MESSAGE prefix, NH_ENCODING_UTF32 *suffix_p, int suffixLength)
 {
-TTYR_TTY_BEGIN()
-
     int length = 0;
     NH_ENCODING_UTF32 *codepoints_p = ttyr_tty_getMessage(prefix, &length);
 
@@ -280,20 +267,18 @@ TTYR_TTY_BEGIN()
     nh_encoding_appendUTF32(&Message, codepoints_p, length);
     nh_encoding_appendUTF32(&Message, suffix_p, suffixLength);
 
-    TTYR_TTY_CHECK(ttyr_tty_setMessage(TopBar_p, Message.p, length + suffixLength))
+    TTYR_CHECK(ttyr_tty_setMessage(Topbar_p, Message.p, length + suffixLength))
 
     nh_encoding_freeUTF32(&Message);
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_setBinaryQueryMessage(
-    ttyr_tty_TopBar *TopBar_p, NH_ENCODING_UTF32 *query_p, int length, void *args_p, 
+    ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *query_p, int length, void *args_p, 
     TTYR_TTY_RESULT (*callback_f)(nh_wsi_KeyboardEvent Event, NH_BOOL *continue_p))
 {
-TTYR_TTY_BEGIN()
-
-//    ttyr_tty_TopBarMessage *Message_p = &((ttyr_tty_MacroTile*)((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p->p)->TopBar.Message;
+//    ttyr_tty_TopbarMessage *Message_p = &((ttyr_tty_MacroTile*)((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p->p)->Topbar.Message;
 //    if (Message_p->block) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_BAD_STATE)}
 //
 //    int yesNoLength;
@@ -303,7 +288,7 @@ TTYR_TTY_BEGIN()
 //    nh_encoding_appendUTF32(&Question, query_p, length);
 //    nh_encoding_appendUTF32(&Question, yesNo_p, yesNoLength);
 //
-//    TTYR_TTY_CHECK(ttyr_tty_setMessage(TopBar_p, Question.p, Question.length))
+//    TTYR_CHECK(ttyr_tty_setMessage(Topbar_p, Question.p, Question.length))
 //
 //    Message_p->block = NH_TRUE;
 //    Message_p->args_p = args_p;
@@ -311,6 +296,6 @@ TTYR_TTY_BEGIN()
 //
 //    nh_encoding_freeUTF32(&Question);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 

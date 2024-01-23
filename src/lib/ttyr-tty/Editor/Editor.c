@@ -35,24 +35,18 @@
 
 static ttyr_tty_EditorView ttyr_tty_initEditorView()
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_EditorView View;
 
     memset(&View, 0, sizeof(ttyr_tty_EditorView));
     View.FileEditor.FileViews = nh_core_initList(8);
 
-TTYR_TTY_END(View)
+    return View;
 }
 
 static void ttyr_tty_freeEditorView(
     ttyr_tty_EditorView *View_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_core_freeList(&View_p->FileEditor.FileViews, NH_TRUE);
- 
-TTYR_TTY_SILENT_END()
 }
 
 // UPDATE ==========================================================================================
@@ -60,8 +54,6 @@ TTYR_TTY_SILENT_END()
 static void ttyr_tty_closeTreeListingNode(
     ttyr_tty_FileEditor *Editor_p, ttyr_tty_TreeListingNode *Node_p)
 {
-TTYR_TTY_BEGIN()
-
 //    for (int i = 0; i < Node_p->Children.size; ++i) {
 //        ttyr_tty_TreeListingNode *Child_p = Node_p->Children.pp[i];
 //        nh_encoding_freeUTF32(&Child_p->Path);
@@ -71,15 +63,11 @@ TTYR_TTY_BEGIN()
 //    if (Node_p->File_p) {ttyr_tty_closeFile(Editor_p, Node_p->File_p);}
 //
 //    nh_core_freeList(&Node_p->Children, NH_TRUE);
-
-TTYR_TTY_SILENT_END()
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleDeletedNodes(
     ttyr_tty_FileEditor *Editor_p, ttyr_tty_TreeListingNode *Node_p)
 {
-TTYR_TTY_BEGIN()
-
 //#ifdef __unix__
 //
 //    struct dirent **namelist_pp = NULL;
@@ -127,7 +115,7 @@ TTYR_TTY_BEGIN()
 //        }
 //
 //        if (Child_p->Children.size > 0) {
-//            TTYR_TTY_CHECK(ttyr_tty_handleDeletedNodes(Editor_p, Child_p, updated_p))
+//            TTYR_CHECK(ttyr_tty_handleDeletedNodes(Editor_p, Child_p, updated_p))
 //        }
 //    }
 //
@@ -145,33 +133,31 @@ TTYR_TTY_BEGIN()
 //
 //#endif
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 TTYR_TTY_RESULT ttyr_tty_updateEditor(
     ttyr_tty_Program *Program_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
 
     if (!Editor_p->treeListing) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     nh_SystemTime Now = nh_core_getSystemTime();
     if (nh_core_getSystemTimeDiffInSeconds(Editor_p->LastUpdate, Now) < Editor_p->updateIntervalInSeconds) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
-    TTYR_TTY_CHECK(ttyr_tty_handleDeletedNodes(&Editor_p->FileEditor, Editor_p->TreeListing.Root_p))
+    TTYR_CHECK(ttyr_tty_handleDeletedNodes(&Editor_p->FileEditor, Editor_p->TreeListing.Root_p))
 
     Editor_p->LastUpdate = Now;
     Editor_p->TreeListing.dirty = NH_TRUE;
     Program_p->refresh = NH_TRUE;
     Editor_p->LastUpdate = Now;
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // INPUT ===========================================================================================
@@ -179,10 +165,8 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_handleEditorInput(
     ttyr_tty_Program *Program_p, nh_wsi_Event Event)
 {
-TTYR_TTY_BEGIN()
-
-    if (Event.type != NH_WSI_EVENT_KEYBOARD) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
-    if (Event.Keyboard.trigger != NH_WSI_TRIGGER_PRESS) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (Event.type != NH_WSI_EVENT_KEYBOARD) {return TTYR_TTY_SUCCESS;}
+    if (Event.Keyboard.trigger != NH_WSI_TRIGGER_PRESS) {return TTYR_TTY_SUCCESS;}
 
     NH_ENCODING_UTF32 c = Event.Keyboard.codepoint;
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
@@ -193,7 +177,7 @@ TTYR_TTY_BEGIN()
         case CTRL_KEY('i') :
         case 27 :
             Editor_p->insertMode = c == 27 ? NH_FALSE : !Editor_p->insertMode; 
-            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(
                 NULL, Editor_p->insertMode ? TTYR_TTY_MESSAGE_EDITOR_INSERT_ACTIVATED : TTYR_TTY_MESSAGE_EDITOR_INSERT_DEACTIVATED 
             ))
             Program_p->refresh = NH_TRUE;
@@ -203,7 +187,7 @@ TTYR_TTY_BEGIN()
         case 'g' : if (Editor_p->insertMode) {goto FILE_EDITOR_INPUT;}
 
             // Switching file focus is mostly done in the file editor using the next function.
-            TTYR_TTY_CHECK(ttyr_tty_cycleThroughFiles(Program_p, c))
+            TTYR_CHECK(ttyr_tty_cycleThroughFiles(Program_p, c))
             Program_p->refresh = NH_TRUE;
             break;
 
@@ -212,7 +196,7 @@ TTYR_TTY_BEGIN()
         case 's' :
         case 'd' : if (Editor_p->insertMode) {goto FILE_EDITOR_INPUT;}
             if  (Editor_p->treeListing) {
-                TTYR_TTY_CHECK(ttyr_tty_handleTreeListingInput(Program_p, c))
+                TTYR_CHECK(ttyr_tty_handleTreeListingInput(Program_p, c))
             }
             Editor_p->treeListing = NH_TRUE;
             Program_p->refresh = NH_TRUE;
@@ -222,12 +206,12 @@ TTYR_TTY_BEGIN()
             goto FILE_EDITOR_INPUT;
     }
  
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 
 FILE_EDITOR_INPUT :
-    TTYR_TTY_CHECK(ttyr_tty_handleFileEditorInput(Program_p, c))
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    TTYR_CHECK(ttyr_tty_handleFileEditorInput(Program_p, c))
+    return TTYR_TTY_SUCCESS;
 }
 
 // DRAW ============================================================================================
@@ -235,8 +219,6 @@ TTYR_TTY_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_drawEditor(
     ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width, int height, int row)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     Editor_p->View.height = height;
 
@@ -247,24 +229,22 @@ TTYR_TTY_BEGIN()
 
     // Draw tree listing row if necessary.
     if (Editor_p->treeListing) {
-        TTYR_TTY_CHECK(ttyr_tty_drawTreeListingRow(Program_p, Glyphs_p, width, height, row))
+        TTYR_CHECK(ttyr_tty_drawTreeListingRow(Program_p, Glyphs_p, width, height, row))
         Glyphs_p += Editor_p->View.TreeListing.width;
     }
     
     // Draw file editor row.
-    TTYR_TTY_CHECK(ttyr_tty_drawFileEditorRow(
+    TTYR_CHECK(ttyr_tty_drawFileEditorRow(
         Program_p, Glyphs_p, Editor_p->treeListing ? width - Editor_p->View.TreeListing.width : width, 
         height, row
     ))
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_drawEditorTopbar(
     ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     ttyr_tty_File *File_p = nh_core_getFromLinkedList(&Editor_p->FileEditor.Files, Editor_p->FileEditor.current);
 
@@ -290,7 +270,7 @@ TTYR_TTY_BEGIN()
         Glyphs_p[i].codepoint = topbar_p[i];
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // CURSOR ==========================================================================================
@@ -298,8 +278,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_getEditorCursor(
     ttyr_tty_Program *Program_p, int *x_p, int *y_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     ttyr_tty_FileView *FileView_p = NULL;
 
@@ -324,7 +302,7 @@ TTYR_TTY_BEGIN()
         *y_p = -1;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // COMMANDS ========================================================================================
@@ -332,8 +310,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_executeEditorCommand(
     ttyr_tty_Program *Program_p, nh_List *Arguments_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
 
 //    switch (Program_p->command)
@@ -341,7 +317,7 @@ TTYR_TTY_BEGIN()
 //        case TTYR_TTY_EDITOR_COMMAND_PREVIEW:
 //
 //            Editor_p->TreeListing.preview = !Editor_p->TreeListing.preview; 
-//            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(
+//            TTYR_CHECK(ttyr_tty_setDefaultMessage(
 //               &ttyr_tty_getTTY()->Tab_p->Tile_p->Status,
 //               Editor_p->TreeListing.preview ? TTYR_TTY_MESSAGE_EDITOR_PREVIEW_ENABLED : TTYR_TTY_MESSAGE_EDITOR_PREVIEW_DISABLED
 //            ))
@@ -351,7 +327,7 @@ TTYR_TTY_BEGIN()
 //        case TTYR_TTY_EDITOR_COMMAND_TREE:
 //
 //            Editor_p->treeListing = !Editor_p->treeListing; 
-//            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(
+//            TTYR_CHECK(ttyr_tty_setDefaultMessage(
 //               &ttyr_tty_getTTY()->Tab_p->Tile_p->Status,
 //               Editor_p->treeListing ? TTYR_TTY_MESSAGE_EDITOR_SHOW_TREE : TTYR_TTY_MESSAGE_EDITOR_HIDE_TREE 
 //            ))
@@ -365,17 +341,17 @@ TTYR_TTY_BEGIN()
 //
 //            ttyr_tty_TreeListingNode *Node_p = 
 //                ttyr_tty_insertTreeListingNode(&Editor_p->TreeListing, Argument_p->p, Argument_p->length);
-//            TTYR_TTY_CHECK_NULL(Node_p)
+//            TTYR_CHECK_NULL(Node_p)
 //
 //            ttyr_tty_File *File_p = ttyr_tty_openFile(Program_p, Node_p, NH_FALSE);
-//            TTYR_TTY_CHECK_NULL(File_p)
+//            TTYR_CHECK_NULL(File_p)
 //
-//            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(
+//            TTYR_CHECK(ttyr_tty_setDefaultMessage(
 //                &ttyr_tty_getTTY()->Tab_p->Tile_p->Status, TTYR_TTY_MESSAGE_EDITOR_NEW_FILE
 //            ))
 //
 //            Program_p->refresh = NH_TRUE;
-//            TTYR_TTY_CHECK(ttyr_tty_setTreeListingCursor(Program_p, File_p))
+//            TTYR_CHECK(ttyr_tty_setTreeListingCursor(Program_p, File_p))
 //            break;
 //        }
 //
@@ -387,11 +363,11 @@ TTYR_TTY_BEGIN()
 //                    nh_core_getFromLinkedList(&Editor_p->FileEditor.Files, Editor_p->FileEditor.current);
 //
 //                if (Arguments_p->size == 0) {
-//                    TTYR_TTY_CHECK(ttyr_tty_clearFileSearch(File_p))
+//                    TTYR_CHECK(ttyr_tty_clearFileSearch(File_p))
 //                }
 //                else {
 //                    nh_encoding_UTF32String *Argument_p = Arguments_p->pp[0];
-//                    TTYR_TTY_CHECK(ttyr_tty_searchFile(File_p, Argument_p->p, Argument_p->length))
+//                    TTYR_CHECK(ttyr_tty_searchFile(File_p, Argument_p->p, Argument_p->length))
 //                }
 //            }
 //            break;
@@ -410,7 +386,7 @@ TTYR_TTY_BEGIN()
 //            sprintf(tabSpaces_p, "%d", Editor_p->FileEditor.tabSpaces);
 //            nh_encoding_UTF32String TabSpaces = nh_encoding_decodeUTF8(tabSpaces_p, strlen(tabSpaces_p), NULL);
 //
-//            TTYR_TTY_CHECK(ttyr_tty_setCustomMessage(
+//            TTYR_CHECK(ttyr_tty_setCustomMessage(
 //               &ttyr_tty_getTTY()->Tab_p->Tile_p->Status, TTYR_TTY_MESSAGE_EDITOR_NUMBER_OF_TAB_SPACES,
 //               TabSpaces.p, TabSpaces.length
 //            ))
@@ -421,7 +397,7 @@ TTYR_TTY_BEGIN()
 //        case TTYR_TTY_EDITOR_COMMAND_TAB_TO_SPACES:
 //
 //            Editor_p->FileEditor.tabToSpaces = !Editor_p->FileEditor.tabToSpaces;
-//            TTYR_TTY_CHECK(ttyr_tty_setDefaultMessage(
+//            TTYR_CHECK(ttyr_tty_setDefaultMessage(
 //               &ttyr_tty_getTTY()->Tab_p->Tile_p->Status, Editor_p->FileEditor.tabToSpaces ? 
 //               TTYR_TTY_MESSAGE_EDITOR_TAB_TO_SPACES_ENABLED : TTYR_TTY_MESSAGE_EDITOR_TAB_TO_SPACES_DISABLED
 //            ))
@@ -430,7 +406,7 @@ TTYR_TTY_BEGIN()
 //        default : TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_UNKNOWN_COMMAND)
 //    }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // INIT/DESTROY ====================================================================================
@@ -438,10 +414,8 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static void *ttyr_tty_initEditor(
     void *arg_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = nh_core_allocate(sizeof(ttyr_tty_Editor));
-    TTYR_TTY_CHECK_MEM_2(NULL, Editor_p)
+    TTYR_CHECK_MEM_2(NULL, Editor_p)
 
     Editor_p->View        = ttyr_tty_initEditorView();
     Editor_p->focus       = 0;
@@ -453,14 +427,12 @@ TTYR_TTY_BEGIN()
     Editor_p->LastUpdate = nh_core_getSystemTime();
     Editor_p->updateIntervalInSeconds = 0.2;
 
-TTYR_TTY_END(Editor_p)
+    return Editor_p;
 }
 
 static void ttyr_tty_destroyEditor(
     void *handle_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Editor *Editor_p = handle_p;
 
     ttyr_tty_freeEditorView(&Editor_p->View);
@@ -468,8 +440,6 @@ TTYR_TTY_BEGIN()
     ttyr_tty_freeTreeListing(&Editor_p->TreeListing);
 
     nh_core_free(Editor_p);
-
-TTYR_TTY_SILENT_END()
 }
 
 // PROTOTYPE =======================================================================================
@@ -484,24 +454,18 @@ typedef enum TTYR_TTY_EDITOR_COMMAND_E {
 static void ttyr_tty_destroyEditorPrototype(
     ttyr_tty_ProgramPrototype *Prototype_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_encoding_freeUTF32(&Prototype_p->Name);
     nh_encoding_freeUTF32(&Prototype_p->CommandNames_p[0]);
     nh_encoding_freeUTF32(&Prototype_p->CommandNames_p[1]);
     nh_encoding_freeUTF32(&Prototype_p->CommandNames_p[2]);
     nh_core_free(Prototype_p->CommandNames_p);
     nh_core_free(Prototype_p);
-
-TTYR_TTY_SILENT_END()
 }
 
 ttyr_tty_ProgramPrototype *ttyr_tty_createEditorPrototype()
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_ProgramPrototype *Prototype_p = nh_core_allocate(sizeof(ttyr_tty_ProgramPrototype));
-    TTYR_TTY_CHECK_MEM_2(NULL, Prototype_p)
+    TTYR_CHECK_MEM_2(NULL, Prototype_p)
 
     memset(Prototype_p, 0, sizeof(ttyr_tty_ProgramPrototype));
 
@@ -521,7 +485,7 @@ TTYR_TTY_BEGIN()
 
     nh_encoding_UTF32String *CommandNames_p =
         nh_core_allocate(sizeof(nh_encoding_UTF32String)*TTYR_TTY_EDITOR_COMMAND_E_COUNT);
-    TTYR_TTY_CHECK_MEM_2(NULL, CommandNames_p)
+    TTYR_CHECK_MEM_2(NULL, CommandNames_p)
 
     NH_ENCODING_UTF32 command1_p[7] = {'p', 'r', 'e', 'v', 'i', 'e', 'w'};
     NH_ENCODING_UTF32 command2_p[4] = {'t', 'r', 'e', 'e'};
@@ -538,6 +502,6 @@ TTYR_TTY_BEGIN()
     Prototype_p->CommandNames_p = CommandNames_p;
     Prototype_p->commands = TTYR_TTY_EDITOR_COMMAND_E_COUNT;
 
-TTYR_TTY_END(Prototype_p)
+    return Prototype_p;
 }
 

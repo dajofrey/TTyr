@@ -340,8 +340,6 @@ static const unsigned int FOURBIT_COLORS_PP[16][3] = {
 static void ttyr_tty_getShellColor(
     uint32_t color, nh_Color *Color_p)
 {
-TTYR_TTY_BEGIN()
-
     if (IS_TRUECOL(color)) {
         Color_p->r = (float)TRUERED(color)/255;
         Color_p->g = (float)TRUEGREEN(color)/255;
@@ -353,8 +351,6 @@ TTYR_TTY_BEGIN()
         Color_p->b = (float)FOURBIT_COLORS_PP[color][2]/255;
         Color_p->a = (float)1.0f;
     }
- 
-TTYR_TTY_SILENT_END()
 }
 
 // COPY ============================================================================================
@@ -362,8 +358,6 @@ TTYR_TTY_SILENT_END()
 static void ttyr_tty_copyShellRow(
     ttyr_tty_Shell *Shell_p, Line line, int cols, ttyr_tty_Row *Row_p)
 {
-TTYR_TTY_BEGIN()
-
     // Set range of glyphs in row y.
     for (int i = 0; i < cols && i < Shell_p->ST_p->col; ++i) 
     {
@@ -397,8 +391,6 @@ TTYR_TTY_BEGIN()
             Row_p->Glyphs_p[i].Background.custom = false;
         }
     }
-
-TTYR_TTY_SILENT_END()
 }
 
 // UPDATE ==========================================================================================
@@ -406,8 +398,6 @@ TTYR_TTY_SILENT_END()
 static void ttyr_tty_drawShell(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     ST *ST_p = Shell_p->ST_p;
 
     int cx = ST_p->c.x, ocx = ST_p->ocx, ocy = ST_p->ocy;
@@ -431,18 +421,14 @@ TTYR_TTY_BEGIN()
 
     ST_p->ocx = cx;
     ST_p->ocy = ST_p->c.y;
-
-TTYR_TTY_SILENT_END()
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleFastScroll(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_SystemTime Now = nh_core_getSystemTime();
     if (nh_core_getSystemTimeDiffInSeconds(Shell_p->Scroll.LastScroll, Now) > 0.05f) {
-        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     int diff = Shell_p->Scroll.Current.y - Shell_p->Scroll.Position.y;
@@ -463,21 +449,19 @@ TTYR_TTY_BEGIN()
     Shell_p->Scroll.LastScroll = Now;
     Shell_p->drawing = 1;
  
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_updateShell(
     ttyr_tty_Program *Program_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
-    if (!Shell_p->ST_p) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (!Shell_p->ST_p) {return TTYR_TTY_SUCCESS;}
  
-    TTYR_TTY_CHECK(ttyr_tty_handleShellSocket(&Shell_p->Socket))
+    TTYR_CHECK(ttyr_tty_handleShellSocket(&Shell_p->Socket))
 
     if (Shell_p->Scroll.active){ 
-        TTYR_TTY_CHECK(ttyr_tty_handleFastScroll(Shell_p))
+        TTYR_CHECK(ttyr_tty_handleFastScroll(Shell_p))
     }
 
     FD_ZERO(&Shell_p->rfd);
@@ -490,7 +474,7 @@ TTYR_TTY_BEGIN()
 
     if (select(Shell_p->ttyfd+1, &Shell_p->rfd, NULL, NULL, &timeout) < 0) {
             if (errno == EINTR) {
-                TTYR_TTY_END(TTYR_TTY_SUCCESS)
+                return TTYR_TTY_SUCCESS;
             }
             die("select failed: %s\n", strerror(errno));
     }
@@ -501,7 +485,7 @@ TTYR_TTY_BEGIN()
     }
     if (Shell_p->ST_p->close) {
         Program_p->close = true;
-        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     /*
@@ -523,7 +507,7 @@ TTYR_TTY_BEGIN()
         Shell_p->timeout = (maxlatency - TIMEDIFF(Shell_p->now, Shell_p->trigger)) \
             / maxlatency * minlatency;
         if (Shell_p->timeout > 0) {
-            TTYR_TTY_END(TTYR_TTY_SUCCESS)
+            return TTYR_TTY_SUCCESS;
         }
     }
 
@@ -534,7 +518,7 @@ TTYR_TTY_BEGIN()
 
     Shell_p->drawing = 0;
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // COPY/PASTE ======================================================================================
@@ -542,8 +526,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static void ttyr_tty_resetShellSelectionBuffer(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     if (Shell_p->Selection.buffer_pp != NULL) {
         for (int i = 0; i < Shell_p->Selection.lines; ++i) {
             nh_core_free(Shell_p->Selection.buffer_pp[i]);
@@ -552,19 +534,15 @@ TTYR_TTY_BEGIN()
         Shell_p->Selection.buffer_pp = NULL;
     }
     Shell_p->Selection.lines = 0;
-
-TTYR_TTY_SILENT_END()
 }
 
 static TTYR_TTY_RESULT ttyr_tty_copyFromShell(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_encoding_UTF8String Clipboard = nh_encoding_initUTF8(32);
 
     if (Shell_p->Selection.lines == 0) {
-        TTYR_TTY_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     for (int i = 0; i < Shell_p->Selection.lines; ++i) {
@@ -616,19 +594,17 @@ TTYR_TTY_BEGIN()
 
     nh_encoding_freeUTF8(&Clipboard);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_pasteIntoShell(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_wsi_getClipboard_f getClipboard_f = nh_core_loadExistingSymbol(NH_MODULE_WSI, 0, "nh_wsi_getClipboard");
-    if (!getClipboard_f) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (!getClipboard_f) {return TTYR_TTY_SUCCESS;}
 
     NH_BYTE *clipboard_p = getClipboard_f();
-    if (!clipboard_p) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (!clipboard_p) {return TTYR_TTY_SUCCESS;}
 
     // In bracketed paste mode, text pasted into the terminal will be surrounded by ESC [200~ and ESC [201~; 
     // programs running in the terminal should not treat characters bracketed by those sequences as commands 
@@ -642,7 +618,7 @@ TTYR_TTY_BEGIN()
         ttywrite(Shell_p->ST_p, "\033[201~", 6, 0);
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // INPUT ===========================================================================================
@@ -664,9 +640,9 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
 
     if (Shell_p->Selection.doubleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
         Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
-        TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
+        TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
         NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
-        TTYR_TTY_CHECK_MEM(buffer_p)
+        TTYR_CHECK_MEM(buffer_p)
         memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
         Shell_p->Selection.buffer_pp[0] = buffer_p;
  
@@ -700,9 +676,9 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
 
     } else if (Shell_p->Selection.trippleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
         Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
-        TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
+        TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
         NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
-        TTYR_TTY_CHECK_MEM(buffer_p)
+        TTYR_CHECK_MEM(buffer_p)
         memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
         Shell_p->Selection.buffer_pp[0] = buffer_p;
  
@@ -736,11 +712,11 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
 
     } else {
         Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
-        TTYR_TTY_CHECK_MEM(Shell_p->Selection.buffer_pp)
+        TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
     
         for (int i = 0; i < Shell_p->Selection.lines; ++i) {
             NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
-            TTYR_TTY_CHECK_MEM(buffer_p)
+            TTYR_CHECK_MEM(buffer_p)
             memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
             Shell_p->Selection.buffer_pp[i] = buffer_p;
         }
@@ -765,34 +741,30 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
 static NH_BYTE *ttyr_tty_getShellKey(
     ttyr_tty_Shell *Shell_p, NH_WSI_KEY_E k, uint state)
 {
-TTYR_TTY_BEGIN()
-
     for (ttyr_tty_ShellKey *kp = KEYS_P; kp < KEYS_P + sizeof(KEYS_P)/sizeof(KEYS_P[0]); kp++) {
-            if (kp->key != k)
-                    continue;
+        if (kp->key != k)
+                continue;
 
-            if (kp->mask != -1 && kp->mask != state)
-                    continue;
+        if (kp->mask != -1 && kp->mask != state)
+                continue;
 
-            if ((Shell_p->ST_p->windowMode & MODE_APPKEYPAD) ? kp->appkey < 0 : kp->appkey > 0)
-                    continue;
-            if ((Shell_p->ST_p->windowMode & MODE_NUMLOCK) && kp->appkey == 2)
-                    continue;
+        if ((Shell_p->ST_p->windowMode & MODE_APPKEYPAD) ? kp->appkey < 0 : kp->appkey > 0)
+                continue;
+        if ((Shell_p->ST_p->windowMode & MODE_NUMLOCK) && kp->appkey == 2)
+                continue;
 
-            if ((Shell_p->ST_p->windowMode & MODE_APPCURSOR) ? kp->appcursor < 0 : kp->appcursor > 0)
-                    continue;
+        if ((Shell_p->ST_p->windowMode & MODE_APPCURSOR) ? kp->appcursor < 0 : kp->appcursor > 0)
+                continue;
 
-            TTYR_TTY_END(kp->s)
+        return kp->s;
     }
 
-    TTYR_TTY_END(NULL)
+    return NULL;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_sendMouseEvent(
     ttyr_tty_Shell *Shell_p, nh_wsi_MouseEvent Event)
 {
-TTYR_TTY_BEGIN()
-
     if (Shell_p->ST_p->windowMode & MODE_MOUSESGR) {
 
         unsigned int button = 0;
@@ -830,16 +802,14 @@ TTYR_TTY_BEGIN()
         ttywrite(Shell_p->ST_p, buf_p, len, 0);
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
     ttyr_tty_Program *Program_p, nh_wsi_Event Event)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
-    if (!Shell_p->ST_p) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)}
+    if (!Shell_p->ST_p) {return TTYR_TTY_SUCCESS;}
 
     if (Event.type == NH_WSI_EVENT_KEYBOARD) {
         Shell_p->LastEvent = Event.Keyboard;
@@ -952,7 +922,7 @@ TTYR_TTY_BEGIN()
 
     Program_p->refresh = true;
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // CURSOR ==========================================================================================
@@ -960,9 +930,7 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_getShellCursor(
     ttyr_tty_Program *Program_p, int *x_p, int *y_p)
 {
-TTYR_TTY_BEGIN()
-
-    if (((ttyr_tty_Shell*)Program_p->handle_p)->scroll != 0) {TTYR_TTY_END(TTYR_TTY_SUCCESS)}
+    if (((ttyr_tty_Shell*)Program_p->handle_p)->scroll != 0) {return TTYR_TTY_SUCCESS;}
 
     // ST_p is created late during first draw, which might not have happened before this is called.
     if (((ttyr_tty_Shell*)Program_p->handle_p)->ST_p) {
@@ -970,7 +938,7 @@ TTYR_TTY_BEGIN()
         *y_p = ((ttyr_tty_Shell*)Program_p->handle_p)->ST_p->ocy;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // DRAW ============================================================================================
@@ -978,10 +946,8 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_resizeShellIfRequired(
     ttyr_tty_Shell *Shell_p, int width, int height)
 {
-TTYR_TTY_BEGIN()
-
     if (Shell_p->width == width && Shell_p->height == height) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     if (Shell_p->Rows_p) {
@@ -1006,16 +972,14 @@ TTYR_TTY_BEGIN()
     Shell_p->width = width;
     Shell_p->height = height;
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_startShellIfRequired(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     if (Shell_p->ST_p) {
-        TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+        return TTYR_TTY_SUCCESS;
     }
 
     ttyr_tty_Config Config = ttyr_tty_getConfig();
@@ -1027,16 +991,14 @@ TTYR_TTY_BEGIN()
 
     cresize(Shell_p->ST_p, Shell_p->width, Shell_p->height);
 
-    TTYR_TTY_CHECK(ttyr_tty_createShellSocket(&Shell_p->Socket, Shell_p->ST_p->pid))
+    TTYR_CHECK(ttyr_tty_createShellSocket(&Shell_p->Socket, Shell_p->ST_p->pid))
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static void ttyr_tty_drawSelectionIfRequired(
     ttyr_tty_Shell *Shell_p, ttyr_tty_Glyph *Glyphs_p, int width, int row)
 {
-TTYR_TTY_BEGIN()
-
     int index1 = Shell_p->Selection.Start.y - Shell_p->Selection.startScroll;
     int index2 = Shell_p->Selection.Stop.y - Shell_p->Selection.stopScroll;
 
@@ -1063,32 +1025,26 @@ TTYR_TTY_BEGIN()
             }
         }
     }
-
-TTYR_TTY_SILENT_END()
 }
 
 static TTYR_TTY_RESULT ttyr_tty_drawShellRow(
     ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width, int height, int row)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
 
-    TTYR_TTY_CHECK(ttyr_tty_resizeShellIfRequired(Shell_p, width, height))
-    TTYR_TTY_CHECK(ttyr_tty_startShellIfRequired(Shell_p))
+    TTYR_CHECK(ttyr_tty_resizeShellIfRequired(Shell_p, width, height))
+    TTYR_CHECK(ttyr_tty_startShellIfRequired(Shell_p))
     
     memcpy(Glyphs_p, Shell_p->Rows_p[row].Glyphs_p, sizeof(ttyr_tty_Glyph)*width);
 
     ttyr_tty_drawSelectionIfRequired(Shell_p, Glyphs_p, width, row);
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static TTYR_TTY_RESULT ttyr_tty_drawShellTopbar(
     ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
 
     NH_BYTE topbar_p[1024];
@@ -1120,7 +1076,7 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // COMMANDS ========================================================================================
@@ -1134,8 +1090,6 @@ typedef enum TTYR_TTY_SHELL_COMMAND_E {
 static TTYR_TTY_RESULT ttyr_tty_handleShellCommand(
     ttyr_tty_Program *Program_p, nh_List *Arguments_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
 
     switch (Program_p->command)
@@ -1148,7 +1102,7 @@ TTYR_TTY_BEGIN()
             break;
     }
 
-TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 // INIT/DESTROY ====================================================================================
@@ -1156,19 +1110,14 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static void *ttyr_tty_initShell(
     void *arg_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = nh_core_allocate(sizeof(ttyr_tty_Shell));
     memset(Shell_p, 0, sizeof(ttyr_tty_Shell));
-
-TTYR_TTY_END(Shell_p)
+    return Shell_p;
 }
 
 static void ttyr_tty_destroyShell(
     void *handle_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_Shell *Shell_p = handle_p;
 
     if (Shell_p->ST_p) {
@@ -1183,8 +1132,6 @@ TTYR_TTY_BEGIN()
 
     nh_core_free(Shell_p->Rows_p);
     nh_core_free(Shell_p);
-
-TTYR_TTY_SILENT_END()
 }
 
 // PROTOTYPE =======================================================================================
@@ -1192,8 +1139,6 @@ TTYR_TTY_SILENT_END()
 static void ttyr_tty_destroyShellPrototype(
     ttyr_tty_ProgramPrototype *Prototype_p)
 {
-TTYR_TTY_BEGIN()
-
     nh_encoding_freeUTF32(&Prototype_p->Name);
 
     for (int i = 0; i < TTYR_TTY_SHELL_COMMAND_E_COUNT; ++i) {
@@ -1202,16 +1147,12 @@ TTYR_TTY_BEGIN()
 
     nh_core_free(Prototype_p->CommandNames_p);
     nh_core_free(Prototype_p);
-
-TTYR_TTY_SILENT_END()
 }
 
 ttyr_tty_ProgramPrototype *ttyr_tty_createShellPrototype()
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_ProgramPrototype *Prototype_p = nh_core_allocate(sizeof(ttyr_tty_ProgramPrototype));
-    TTYR_TTY_CHECK_MEM_2(NULL, Prototype_p)
+    TTYR_CHECK_MEM_2(NULL, Prototype_p)
 
     memset(Prototype_p, 0, sizeof(ttyr_tty_ProgramPrototype));
 
@@ -1231,7 +1172,7 @@ TTYR_TTY_BEGIN()
 
     nh_encoding_UTF32String *CommandNames_p =
         nh_core_allocate(sizeof(nh_encoding_UTF32String)*TTYR_TTY_SHELL_COMMAND_E_COUNT);
-    TTYR_TTY_CHECK_MEM_2(NULL, CommandNames_p)
+    TTYR_CHECK_MEM_2(NULL, CommandNames_p)
  
     NH_ENCODING_UTF32 command1_p[4] = {'c', 'o', 'p', 'y'};
     NH_ENCODING_UTF32 command2_p[5] = {'p', 'a', 's', 't', 'e'};
@@ -1245,5 +1186,5 @@ TTYR_TTY_BEGIN()
     Prototype_p->CommandNames_p = CommandNames_p;
     Prototype_p->commands = TTYR_TTY_SHELL_COMMAND_E_COUNT;
 
-TTYR_TTY_END(Prototype_p)
+    return Prototype_p;
 }

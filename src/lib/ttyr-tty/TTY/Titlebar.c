@@ -8,7 +8,7 @@
 
 // INCLUDES ========================================================================================
 
-#include "SideBar.h"
+#include "Titlebar.h"
 #include "Program.h"
 #include "TTY.h"
 
