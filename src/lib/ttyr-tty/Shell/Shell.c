@@ -549,6 +549,7 @@ TTYR_TTY_BEGIN()
             nh_core_free(Shell_p->Selection.buffer_pp[i]);
         }
         nh_core_free(Shell_p->Selection.buffer_pp);
+        Shell_p->Selection.buffer_pp = NULL;
     }
     Shell_p->Selection.lines = 0;
 
@@ -651,8 +652,6 @@ TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_SUCCESS)
 static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
     ttyr_tty_Shell *Shell_p)
 {
-TTYR_TTY_BEGIN()
-
     ttyr_tty_resetShellSelectionBuffer(Shell_p);
 
     int index1 = Shell_p->Selection.Start.y - Shell_p->Selection.startScroll;
@@ -694,8 +693,10 @@ TTYR_TTY_BEGIN()
             }
         }
  
-        Shell_p->Selection.Start.x = i1+1;
-        Shell_p->Selection.Stop.x = i2-1;
+        if (i1 != i2) {
+            Shell_p->Selection.Start.x = i1+1;
+            Shell_p->Selection.Stop.x = i2-1;
+        }
 
     } else if (Shell_p->Selection.trippleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
         Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
@@ -728,8 +729,10 @@ TTYR_TTY_BEGIN()
             }
         }
  
-        Shell_p->Selection.Start.x = i1+1;
-        Shell_p->Selection.Stop.x = i2-1;
+        if (i1 != i2) {
+            Shell_p->Selection.Start.x = i1+1;
+            Shell_p->Selection.Stop.x = i2-1;
+        }
 
     } else {
         Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
@@ -756,7 +759,7 @@ TTYR_TTY_BEGIN()
         }
     }
 
-TTYR_TTY_END(TTYR_TTY_SUCCESS)
+    return TTYR_TTY_SUCCESS;
 }
 
 static NH_BYTE *ttyr_tty_getShellKey(
@@ -934,7 +937,8 @@ TTYR_TTY_BEGIN()
         if (Shell_p->ST_p->mode & TERM_MODE_ALTSCREEN) {
             ttyr_tty_sendMouseEvent(Shell_p, Event.Mouse);
         } else {
-            if (Event.Mouse.type == NH_WSI_MOUSE_SCROLL && !(Shell_p->LastEvent.state & NH_WSI_MODIFIER_CONTROL)) {
+#define CTRL_ACTIVE ((Shell_p->LastEvent.state & NH_WSI_MODIFIER_CONTROL) && (Shell_p->LastEvent.trigger != NH_WSI_TRIGGER_RELEASE && (Shell_p->LastEvent.special != NH_WSI_KEY_CONTROL_L && Shell_p->LastEvent.special != NH_WSI_KEY_CONTROL_R)))
+            if (Event.Mouse.type == NH_WSI_MOUSE_SCROLL && !CTRL_ACTIVE) {
                 if (Event.Mouse.trigger == NH_WSI_TRIGGER_DOWN) {
                     if (Shell_p->scroll > 0) {Shell_p->scroll--;};
                 }
@@ -1054,7 +1058,9 @@ TTYR_TTY_BEGIN()
                 if (row - Shell_p->scroll == start && i < Shell_p->Selection.Stop.x) {continue;}
                 if (row - Shell_p->scroll == stop && i > Shell_p->Selection.Start.x) {continue;}
             }
-            Glyphs_p[i].Attributes.reverse = true;
+            if (Shell_p->Selection.Start.x != Shell_p->Selection.Stop.x || start != stop || Glyphs_p[i].codepoint != ' ') {
+                Glyphs_p[i].Attributes.reverse = true;
+            }
         }
     }
 

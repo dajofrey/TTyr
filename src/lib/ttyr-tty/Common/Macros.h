@@ -91,10 +91,10 @@
     if (checkResult_p == NULL) {TTYR_TTY_END(checkReturn)} \
 }
 
-#define TTYR_TTY_CHECK_MEM(checkable)                                                    \
-{                                                                                      \
-    void *checkResult_p = checkable;                                                   \
-    if (checkResult_p == NULL) {TTYR_TTY_DIAGNOSTIC_END(TTYR_TTY_ERROR_MEMORY_ALLOCATION)} \
+#define TTYR_TTY_CHECK_MEM(checkable)                                     \
+{                                                                         \
+    void *checkResult_p = checkable;                                      \
+    if (checkResult_p == NULL) {return TTYR_TTY_ERROR_MEMORY_ALLOCATION;} \
 }
 
 #define TTYR_TTY_CHECK_MEM_2(checkReturn, checkable)       \
