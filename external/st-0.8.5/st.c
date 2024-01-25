@@ -888,7 +888,6 @@ treset(ST *st)
 	st->history = NULL;
         st->close = 0;
 	st->scrollup = 0;
-        st->maxScrollup = 100;
 	st->bot = st->row - 1;
 	st->mode = TERM_MODE_WRAP|TERM_MODE_UTF8;
 	memset(st->trantbl, CS_USA, sizeof(st->trantbl));
