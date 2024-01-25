@@ -1,6 +1,15 @@
 # TTýr
  
-TODO
+Terminal Emulator Written In C99.
+
+![tiling](./build/data/image/screenshot.png)
+
+What makes TTýr special?
+
+ - Minimalistic Design
+ - Hybrid Tabing/Tiling
+ - GPU Acceleration
+ - API
 
 ## Contents
   

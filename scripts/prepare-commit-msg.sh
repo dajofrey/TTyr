@@ -2,7 +2,7 @@
 
 # Declare an empty array
 files_to_process=()
-other=false
+other="false"
 
 # Run 'git diff --staged --name-only' and process each line
 while IFS= read -r line; do
@@ -11,7 +11,7 @@ while IFS= read -r line; do
     # Add the line to the array
     files_to_process+=("$line")
   else
-    other=true
+    other="true"
   fi
 done < <(git diff --staged --name-only)
 
@@ -75,7 +75,7 @@ for unique_file in "${unique_files[@]}"; do
   done
 done
 
-if other
+if [[ "$other" = true ]]; then
   echo -e "\nWorkload in: other"
   echo "Workload scope options:"
   for option in "${workload_options[@]}"; do
