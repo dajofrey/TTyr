@@ -351,11 +351,7 @@ static TTYR_TTY_RESULT ttyr_tty_handleKeyboardInput(
         if (New_p) {return TTYR_TTY_SUCCESS;}
     }
 
-    if (TTYR_TTY_QUIT_KEY == Event.Keyboard.codepoint && Event.Keyboard.trigger == NH_WSI_TRIGGER_PRESS) {
-        TTYR_TTY_MICRO_TAB(MacroTab_p)->Tile_p->close = NH_TRUE;
-        Window_p->Tile_p->refresh = NH_TRUE;
-    }
-    else if (TTYR_TTY_TOPBAR_KEY == Event.Keyboard.codepoint && Event.Keyboard.trigger == NH_WSI_TRIGGER_PRESS) {
+    if (TTYR_TTY_TOPBAR_KEY == Event.Keyboard.codepoint && Event.Keyboard.trigger == NH_WSI_TRIGGER_PRESS) {
         ttyr_tty_toggleTopbar(&MacroTab_p->Topbar);
         Window_p->Tile_p->refresh = NH_TRUE;
     }
