@@ -14,7 +14,7 @@
 // TYPEDEFS ========================================================================================
 
 typedef ttyr_tty_TTY *(*ttyr_tty_openTTY_f)( 
-    char *config_p 
+    char *config_p, ttyr_tty_Interface *Interface_p 
 ); 
 
 typedef TTYR_TTY_RESULT (*ttyr_tty_closeTTY_f)( 
@@ -49,11 +49,11 @@ static void ttyr_api_initialize() {
 }
 
 ttyr_tty_TTY *ttyr_api_openTTY(
-    NH_BYTE *config_p)
+    NH_BYTE *config_p, ttyr_tty_Interface *Interface_p)
 {
     ttyr_api_initialize();
     ttyr_tty_openTTY_f openTTY_f = !NH_LOADER_P ? NULL : NH_LOADER_P->loadExternalSymbol_f(name_p, "ttyr_tty_openTTY");
-    return openTTY_f ? openTTY_f(config_p) : NULL;
+    return openTTY_f ? openTTY_f(config_p, Interface_p) : NULL;
 }
 
 TTYR_TTY_RESULT ttyr_api_closeTTY(

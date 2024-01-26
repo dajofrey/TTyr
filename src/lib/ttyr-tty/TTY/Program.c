@@ -28,7 +28,7 @@
 // PROGRAM INSTANCE ================================================================================
 
 ttyr_tty_Program *ttyr_tty_createProgramInstance(
-    ttyr_tty_ProgramPrototype *Prototype_p, bool once)
+    ttyr_tty_Interface *Prototype_p, bool once)
 {
     ttyr_tty_Program *Program_p = nh_core_allocate(sizeof(ttyr_tty_Program));
     TTYR_CHECK_MEM_2(NULL, Program_p)
@@ -62,7 +62,7 @@ TTYR_TTY_RESULT ttyr_tty_destroyProgramInstance(
 // INTERFACE =======================================================================================
 
 TTYR_TTY_RESULT ttyr_tty_addProgram(
-    ttyr_tty_TTY *TTY_p, ttyr_tty_ProgramPrototype *Prototype_p, bool once)
+    ttyr_tty_TTY *TTY_p, ttyr_tty_Interface *Prototype_p, bool once)
 {
 //    if (once) {
 //        ttyr_tty_MacroTile *Tile_p = TTY_p->Window_p->Tile_p;
@@ -93,7 +93,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
 
     // Check if there already exists a program with this name.
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-        if (nh_encoding_compareUTF32(((ttyr_tty_ProgramPrototype*)TTY_p->Prototypes.pp[i])->Name.p, Prototype_p->Name.p)) {
+        if (nh_encoding_compareUTF32(((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Name.p, Prototype_p->Name.p)) {
             return TTYR_TTY_ERROR_BAD_STATE;
         }
     }
@@ -107,7 +107,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
         ttyr_tty_Tile *Tile_p = Tiles.pp[i];
         bool add = true;
         for (int j = 0; TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p && j < TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p->size; ++j) {
-            ttyr_tty_ProgramPrototype *MicroTileProgramPrototype_p = 
+            ttyr_tty_Interface *MicroTileProgramPrototype_p = 
                 ((ttyr_tty_MicroTab*)TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p->pp[j])->Prototype_p;
             if (!MicroTileProgramPrototype_p) {continue;}
             if (nh_encoding_compareUTF32(MicroTileProgramPrototype_p->Name.p, Prototype_p->Name.p)) {

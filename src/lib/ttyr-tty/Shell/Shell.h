@@ -20,7 +20,7 @@
  *  @{
  */
 
-    ttyr_tty_ProgramPrototype *ttyr_tty_createShellPrototype(
+    ttyr_tty_Interface *ttyr_tty_createShellInterface(
     );
     
 /** @} */

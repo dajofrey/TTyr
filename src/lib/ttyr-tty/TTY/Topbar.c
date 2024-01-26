@@ -359,7 +359,7 @@ static int ttyr_tty_drawTopbarCommand(
 }
 
 static void ttyr_tty_setNextCommandSuggestionIndex(
-    ttyr_tty_Topbar *Topbar_p, ttyr_tty_ProgramPrototype *Prototype_p)
+    ttyr_tty_Topbar *Topbar_p, ttyr_tty_Interface *Prototype_p)
 {
     if (Topbar_p->Suggestions.commandIndex == -1) {
         Topbar_p->Suggestions.commandIndex = 0;
@@ -428,7 +428,7 @@ static TTYR_TTY_RESULT ttyr_tty_drawTopbarProgramSuggestion(
         return TTYR_TTY_SUCCESS;
     }
 
-    ttyr_tty_ProgramPrototype *Prototype_p = 
+    ttyr_tty_Interface *Prototype_p = 
         ((ttyr_tty_MicroTab*)Window_p->Tabs_p->pp[Topbar_p->Suggestions.programIndex])->Prototype_p;
     TTYR_CHECK_NULL(Prototype_p)
 
@@ -445,7 +445,7 @@ static TTYR_TTY_RESULT ttyr_tty_drawTopbarProgramSuggestion(
 static TTYR_TTY_RESULT ttyr_tty_setSuggestionIndex(
     ttyr_tty_Topbar *Topbar_p, ttyr_tty_MicroWindow *Window_p, NH_BOOL command)
 {
-    ttyr_tty_ProgramPrototype *Prototype_p = ttyr_tty_getCurrentProgram(Window_p)->Prototype_p;
+    ttyr_tty_Interface *Prototype_p = ttyr_tty_getCurrentProgram(Window_p)->Prototype_p;
  
     // Check if current is perfect match.
     NH_BOOL match = Topbar_p->Command.length ? NH_TRUE : NH_FALSE;
@@ -574,7 +574,7 @@ static TTYR_TTY_RESULT ttyr_tty_drawTopbarMessage(
         if (Program_p->Prototype_p->Callbacks.drawTopbar_f) {
             TTYR_CHECK(Program_p->Prototype_p->Callbacks.drawTopbar_f(Program_p, Glyphs_p, cols))
         } else {
-            ttyr_tty_ProgramPrototype *Prototype_p = Program_p->Prototype_p;
+            ttyr_tty_Interface *Prototype_p = Program_p->Prototype_p;
             for (int i = 0; i < cols && i < Program_p->Prototype_p->Name.length; ++i) {
                 Glyphs_p[i] = ttyr_tty_getGlyphHelper(Program_p->Prototype_p->Name.p[i]);
             }

@@ -26,7 +26,7 @@
     } ttyr_tty_MicroTile;
 
     typedef struct ttyr_tty_MicroTab {
-        ttyr_tty_ProgramPrototype *Prototype_p; /**<Type of programs spawned by this micro tab.*/
+        ttyr_tty_Interface *Prototype_p; /**<Type of programs spawned by this micro tab.*/
         ttyr_tty_Tile *RootTile_p;              /**<Root tile.*/
         ttyr_tty_Tile *Tile_p;                  /**<Current focused tile.*/
         ttyr_tty_Tile *LastFocus_p;
@@ -57,7 +57,7 @@
     );
     
     TTYR_TTY_RESULT ttyr_tty_appendMicroTab(
-        ttyr_tty_MicroWindow *Window_p, ttyr_tty_ProgramPrototype *Prototype_p, NH_BOOL once
+        ttyr_tty_MicroWindow *Window_p, ttyr_tty_Interface *Prototype_p, NH_BOOL once
     );
 
     TTYR_TTY_RESULT ttyr_tty_getMicroTiles(

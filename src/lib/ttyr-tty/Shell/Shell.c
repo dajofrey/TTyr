@@ -1137,7 +1137,7 @@ static void ttyr_tty_destroyShell(
 // PROTOTYPE =======================================================================================
 
 static void ttyr_tty_destroyShellPrototype(
-    ttyr_tty_ProgramPrototype *Prototype_p)
+    ttyr_tty_Interface *Prototype_p)
 {
     nh_encoding_freeUTF32(&Prototype_p->Name);
 
@@ -1149,12 +1149,12 @@ static void ttyr_tty_destroyShellPrototype(
     nh_core_free(Prototype_p);
 }
 
-ttyr_tty_ProgramPrototype *ttyr_tty_createShellPrototype()
+ttyr_tty_Interface *ttyr_tty_createShellInterface()
 {
-    ttyr_tty_ProgramPrototype *Prototype_p = nh_core_allocate(sizeof(ttyr_tty_ProgramPrototype));
+    ttyr_tty_Interface *Prototype_p = nh_core_allocate(sizeof(ttyr_tty_Interface));
     TTYR_CHECK_MEM_2(NULL, Prototype_p)
 
-    memset(Prototype_p, 0, sizeof(ttyr_tty_ProgramPrototype));
+    memset(Prototype_p, 0, sizeof(ttyr_tty_Interface));
 
     Prototype_p->Callbacks.init_f = ttyr_tty_initShell;
     Prototype_p->Callbacks.draw_f = ttyr_tty_drawShellRow;
