@@ -46,7 +46,7 @@
  *  @{
  */
 
-    ttyr_tty_ProgramPrototype *ttyr_tty_createEditorPrototype(
+    ttyr_tty_Interface *ttyr_tty_createEditorPrototype(
     );
 
 /** @} */

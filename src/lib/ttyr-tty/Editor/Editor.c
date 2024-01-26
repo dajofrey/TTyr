@@ -452,7 +452,7 @@ typedef enum TTYR_TTY_EDITOR_COMMAND_E {
 } TTYR_TTY_EDITOR_COMMAND_E;
 
 static void ttyr_tty_destroyEditorPrototype(
-    ttyr_tty_ProgramPrototype *Prototype_p)
+    ttyr_tty_Interface *Prototype_p)
 {
     nh_encoding_freeUTF32(&Prototype_p->Name);
     nh_encoding_freeUTF32(&Prototype_p->CommandNames_p[0]);
@@ -462,12 +462,12 @@ static void ttyr_tty_destroyEditorPrototype(
     nh_core_free(Prototype_p);
 }
 
-ttyr_tty_ProgramPrototype *ttyr_tty_createEditorPrototype()
+ttyr_tty_Interface *ttyr_tty_createEditorPrototype()
 {
-    ttyr_tty_ProgramPrototype *Prototype_p = nh_core_allocate(sizeof(ttyr_tty_ProgramPrototype));
+    ttyr_tty_Interface *Prototype_p = nh_core_allocate(sizeof(ttyr_tty_Interface));
     TTYR_CHECK_MEM_2(NULL, Prototype_p)
 
-    memset(Prototype_p, 0, sizeof(ttyr_tty_ProgramPrototype));
+    memset(Prototype_p, 0, sizeof(ttyr_tty_Interface));
 
     Prototype_p->Callbacks.init_f = ttyr_tty_initEditor;
     Prototype_p->Callbacks.draw_f = ttyr_tty_drawEditor;

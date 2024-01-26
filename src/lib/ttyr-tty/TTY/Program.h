@@ -21,11 +21,11 @@ typedef struct ttyr_tty_TTY ttyr_tty_TTY;
  */
 
     TTYR_TTY_RESULT ttyr_tty_addProgram(
-        ttyr_tty_TTY *TTY_p, ttyr_tty_ProgramPrototype *Prototype_p, bool once
+        ttyr_tty_TTY *TTY_p, ttyr_tty_Interface *Prototype_p, bool once
     );
 
     ttyr_tty_Program *ttyr_tty_createProgramInstance(
-        ttyr_tty_ProgramPrototype *Prototype_p, bool once
+        ttyr_tty_Interface *Prototype_p, bool once
     );
 
     TTYR_TTY_RESULT ttyr_tty_destroyProgramInstance(

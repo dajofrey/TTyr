@@ -64,7 +64,7 @@
 
     typedef struct ttyr_tty_TTY ttyr_tty_TTY;
     typedef struct ttyr_tty_Program ttyr_tty_Program;
-    typedef struct ttyr_tty_ProgramPrototype ttyr_tty_ProgramPrototype;
+    typedef struct ttyr_tty_Interface ttyr_tty_Interface;
     typedef struct ttyr_tty_Glyph ttyr_tty_Glyph;
     
     typedef void *(*ttyr_tty_init_f)(void *arg_p);
@@ -75,7 +75,7 @@
     typedef TTYR_TTY_RESULT (*ttyr_tty_update_f)(ttyr_tty_Program *Program_p);
     typedef TTYR_TTY_RESULT (*ttyr_tty_handleCommand_f)(ttyr_tty_Program *Program_p, nh_List *Arguments_p);
     typedef void (*ttyr_tty_destroy_f)(void *p);
-    typedef void (*ttyr_tty_destroyPrototype_f)(ttyr_tty_ProgramPrototype *Prototype_p);
+    typedef void (*ttyr_tty_destroyPrototype_f)(ttyr_tty_Interface *Prototype_p);
 
 // STRUCTS =========================================================================================
 
@@ -110,7 +110,7 @@
         bool *update_p;
     } ttyr_tty_Row;
 
-    typedef struct ttyr_tty_ProgramCallbacks {
+    typedef struct ttyr_tty_InterfaceCallbacks {
         ttyr_tty_init_f init_f;
         ttyr_tty_draw_f draw_f;
         ttyr_tty_drawTopbar_f drawTopbar_f;
@@ -120,18 +120,18 @@
         ttyr_tty_handleCommand_f handleCommand_f;
         ttyr_tty_destroy_f destroy_f;
         ttyr_tty_destroyPrototype_f destroyPrototype_f;
-    } ttyr_tty_ProgramCallbacks;
+    } ttyr_tty_InterfaceCallbacks;
     
-    typedef struct ttyr_tty_ProgramPrototype {
+    typedef struct ttyr_tty_Interface {
         nh_encoding_UTF32String Name;
         nh_encoding_UTF32String *CommandNames_p;
         int commands;
-        ttyr_tty_ProgramCallbacks Callbacks;
+        ttyr_tty_InterfaceCallbacks Callbacks;
         void *initArg_p;
-    } ttyr_tty_ProgramPrototype;
+    } ttyr_tty_Interface;
 
     typedef struct ttyr_tty_Program {
-        ttyr_tty_ProgramPrototype *Prototype_p;
+        ttyr_tty_Interface *Prototype_p;
         void *handle_p;
         bool refresh;
         bool close;
@@ -148,10 +148,12 @@
      * the user probably closed the TTY or there was an error. You can force-close the TTY with 
      * @ref ttyr_tty_closeTTY.
      *
+     * @param Interface_p Pointer to an interface or NULL. If NULL, shell interface will be used.
+     *
      * @return Pointer to a new TTY handle. NULL on failure.
      */
     ttyr_tty_TTY *ttyr_api_openTTY(
-        char *config_p
+        char *config_p, ttyr_tty_Interface *Interface_p
     );
 
     /**

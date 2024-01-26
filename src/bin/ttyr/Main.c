@@ -89,7 +89,7 @@ int main(int argc, char **argv_pp)
 
     nh_api_registerConfig("/etc/ttyr.conf", 14);
 
-    TTY_p = ttyr_api_openTTY(NULL);
+    TTY_p = ttyr_api_openTTY(NULL, NULL);
     if (!TTY_p) {return 1;}
 
     ttyr_terminal_Terminal *Terminal_p = ttyr_api_openTerminal(NULL, TTY_p);

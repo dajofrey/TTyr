@@ -76,9 +76,16 @@ ttyr_tty_Clipboard *ttyr_tty_getClipboard()
 // INIT/FREE =======================================================================================
 // The next functions comprise the in/exit points of nhtty.
 
+typedef struct ttyr_tty_OpenTTY {
+    char *config_p;
+    ttyr_tty_Interface *Interface_p;
+} ttyr_tty_OpenTTY;
+
 static void *ttyr_tty_initTTY(
     nh_core_Workload *Workload_p)
 {
+    ttyr_tty_OpenTTY *Args_p = Workload_p->args_p;
+
     static NH_BYTE *path_p = "nhtty/TTY/TTY.c";
     static NH_BYTE *name_p = "TTY Workload";
     Workload_p->path_p = path_p;
@@ -106,7 +113,6 @@ static void *ttyr_tty_initTTY(
     TTY_p->Topbars.on = NH_TRUE;
 
     TTY_p->Preview.blink = NH_TRUE;
-    TTY_p->Preview.blinkFrequency = 0.5;
     TTY_p->Preview.LastBlink = nh_core_getSystemTime();
 
     TTYR_CHECK_2(NULL, nh_core_initRingBuffer(
@@ -115,8 +121,10 @@ static void *ttyr_tty_initTTY(
 
     TTYR_CHECK_NULL_2(NULL, ttyr_tty_insertAndFocusWindow(TTY_p, 0))
 
-    ttyr_tty_ProgramPrototype *Prototype_p = ttyr_tty_createShellPrototype();
-    ttyr_tty_addProgram(TTY_p, Prototype_p, NH_FALSE);
+    if (Args_p->Interface_p == NULL) {
+        Args_p->Interface_p = ttyr_tty_createShellInterface();
+    }
+    ttyr_tty_addProgram(TTY_p, Args_p->Interface_p, NH_FALSE);
  
     return TTY_p;
 }
@@ -136,7 +144,7 @@ static void ttyr_tty_freeTTY(
     }
 
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-        ((ttyr_tty_ProgramPrototype*)TTY_p->Prototypes.pp[i])
+        ((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])
             ->Callbacks.destroyPrototype_f(TTY_p->Prototypes.pp[i]);
     }
     nh_core_freeList(&TTY_p->Prototypes, NH_FALSE);
@@ -286,11 +294,16 @@ static NH_SIGNAL ttyr_tty_runTTYCommand(
 // The next functions are called by lib/netzhaut/nhtty.h functions.
 
 ttyr_tty_TTY *ttyr_tty_openTTY(
-    NH_BYTE *config_p)
+    NH_BYTE *config_p, ttyr_tty_Interface *Interface_p)
 {
+    ttyr_tty_OpenTTY OpenTTY;
+    OpenTTY.config_p = config_p;
+    OpenTTY.Interface_p = Interface_p;
+
     ttyr_tty_TTY *TTY_p = nh_core_activateWorkload(
-        ttyr_tty_initTTY, ttyr_tty_runTTY, ttyr_tty_freeTTY, ttyr_tty_runTTYCommand, config_p, NH_TRUE
+        ttyr_tty_initTTY, ttyr_tty_runTTY, ttyr_tty_freeTTY, ttyr_tty_runTTYCommand, &OpenTTY, NH_TRUE
     );
+
     return TTY_p;
 }
 

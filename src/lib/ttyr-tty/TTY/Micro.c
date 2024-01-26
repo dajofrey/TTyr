@@ -61,7 +61,7 @@ TTYR_TTY_RESULT ttyr_tty_getMicroTiles(
 // MICRO TABS ======================================================================================
 
 static ttyr_tty_MicroTab *ttyr_tty_createMicroTab(
-    ttyr_tty_ProgramPrototype *Prototype_p, NH_BOOL once)
+    ttyr_tty_Interface *Prototype_p, NH_BOOL once)
 {
     ttyr_tty_MicroTab *Tab_p = nh_core_allocate(sizeof(ttyr_tty_MicroTab));
     TTYR_CHECK_MEM_2(NULL, Tab_p)
@@ -86,7 +86,7 @@ nh_List *ttyr_tty_createMicroTabs(
     *Tabs_p = nh_core_initList(8); // Don't change size to TTY_p->Prototypes.size, it might not be initialized.
 
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-        ttyr_tty_ProgramPrototype *Prototype_p = TTY_p->Prototypes.pp[i];
+        ttyr_tty_Interface *Prototype_p = TTY_p->Prototypes.pp[i];
         ttyr_tty_MicroTab *Tab_p = ttyr_tty_createMicroTab(Prototype_p, NH_FALSE);
         TTYR_CHECK_NULL_2(NULL, Tab_p)
         nh_core_appendToList(Tabs_p, Tab_p);
@@ -103,7 +103,7 @@ static void ttyr_tty_freeMicroTab(
 }
 
 TTYR_TTY_RESULT ttyr_tty_appendMicroTab(
-    ttyr_tty_MicroWindow *Window_p, ttyr_tty_ProgramPrototype *Prototype_p, NH_BOOL once)
+    ttyr_tty_MicroWindow *Window_p, ttyr_tty_Interface *Prototype_p, NH_BOOL once)
 {
     ttyr_tty_MicroTab *Tab_p = ttyr_tty_createMicroTab(Prototype_p, once);
     TTYR_CHECK_NULL(Tab_p)

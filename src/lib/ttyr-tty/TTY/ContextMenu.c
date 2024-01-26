@@ -438,12 +438,12 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
         nh_encoding_appendUTF32(&Menu, apps_p, sizeof(apps_p)/sizeof(apps_p[0]));
         int width = 0;
         for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-            if (((ttyr_tty_ProgramPrototype*)TTY_p->Prototypes.pp[i])->Name.length > width) {
-                width = ((ttyr_tty_ProgramPrototype*)TTY_p->Prototypes.pp[i])->Name.length;
+            if (((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Name.length > width) {
+                width = ((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Name.length;
             }
         }
         for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-            ttyr_tty_ProgramPrototype *Prototype_p = TTY_p->Prototypes.pp[i];
+            ttyr_tty_Interface *Prototype_p = TTY_p->Prototypes.pp[i];
             nh_encoding_appendUTF32(&Menu, Prototype_p->Name.p, Prototype_p->Name.length); 
             for (int j = width - Prototype_p->Name.length; j > 0; --j) {
                 nh_encoding_appendUTF32Codepoint(&Menu, ' '); 
