@@ -1,12 +1,15 @@
+# Defaults
+NETZHAUT_PATH ?= $(CURDIR)/external/Netzhaut
+
 # Define the compiler and compile flags
 CC = gcc
-CFLAGS = -fPIC -std=gnu99 -Wl,-rpath,$(CURDIR)/lib,-rpath,$(CURDIR)/external/Netzhaut/lib
+CFLAGS = -fPIC -std=gnu99 -Wl,-rpath,$(CURDIR)/lib,-rpath,$(NETZHAUT_PATH)/lib
 
 # Define the linker and linker flags
 LD = gcc
 LDFLAGS_TTYR_TTY = -lutil -Lexternal/st-0.8.5/ -l:libst.so
 LDFLAGS_TTYR_TERMINAL =
-LDFLAGS_TTYR = -Llib -lttyr-api -Lexternal/Netzhaut/lib -lnhapi
+LDFLAGS_TTYR = -Llib -lttyr-api -L$(NETZHAUT_PATH)/lib -lnhapi
 
 # Define the source file directory for each library
 SRC_DIR_TTYR_TTY = src/lib/ttyr-tty
@@ -88,7 +91,10 @@ LIB_ST = external/st-0.8.5/libst.so
 BIN_TTYR = bin/ttyr
 
 build_netzhaut:
+ifeq ($(NETZHAUT_PATH),$(CURDIR)/external/Netzhaut)
 	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/Makefile nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
+endif
+
 create_lib_dir:
 	mkdir -p lib
 create_bin_dir:
@@ -100,10 +106,10 @@ lib: build_netzhaut $(LIB_ST) $(LIB_TTYR_TTY) $(LIB_TTYR_TERMINAL) $(LIB_TTYR_AP
 bin: build_netzhaut $(BIN_TTYR)
 
 # Custom compiler flags
-$(OBJ_FILES_TTYR_TERMINAL): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib -Iexternal/Netzhaut/external/Vulkan-Headers/include -DINCLUDE_VOLK -DVK_VERSION_1_2 -DVK_USE_PLATFORM_XLIB_KHR -DVK_KHR_xlib_surface
-$(OBJ_FILES_TTYR_TTY): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib
-$(OBJ_FILES_TTYR_API): CFLAGS += -Iexternal/Netzhaut/external -Iexternal/Netzhaut/src/lib 
-$(OBJ_FILES_TTYR): CFLAGS += -Iexternal -Iexternal/Netzhaut/src/lib -Isrc/lib
+$(OBJ_FILES_TTYR_TERMINAL): CFLAGS += -I$(NETZHAUT_PATH)/external -I$(NETZHAUT_PATH)/src/lib -I$(NETZHAUT_PATH)/external/Vulkan-Headers/include -DINCLUDE_VOLK -DVK_VERSION_1_2 -DVK_USE_PLATFORM_XLIB_KHR -DVK_KHR_xlib_surface
+$(OBJ_FILES_TTYR_TTY): CFLAGS += -I$(NETZHAUT_PATH)/external -I$(NETZHAUT_PATH)/src/lib
+$(OBJ_FILES_TTYR_API): CFLAGS += -I$(NETZHAUT_PATH)/external -I$(NETZHAUT_PATH)/src/lib
+$(OBJ_FILES_TTYR): CFLAGS += -Iexternal -I$(NETZHAUT_PATH)/src/lib -Isrc/lib
 
 # Rule to compile source files into object files
 %.o: $(SRC_DIR_TTYR_TTY)/%.c
@@ -142,7 +148,7 @@ clean:
 	rm -f $(OBJ_FILES_TTYR_API) $(LIB_TTYR_API)
 	rm -f $(OBJ_FILES_ST) $(LIB_ST)
 	rm -f $(OBJ_FILES_TTYR) $(BIN_TTYR)
-	rm -rf bin
+	rm -rf bin lib
 	(cd external/Netzhaut && make -f build/automation/Makefile clean)
 
 .PHONY: all lib bin clean
