@@ -8,8 +8,8 @@
 
 // INCLUDES ========================================================================================
 
-#include "ttyr-api/ttyr-terminal.h"
-#include "Netzhaut/src/lib/nhapi/nhapi.h"
+#include "ttyr-api/ttyr-api.h"
+#include "nhapi/nhapi.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -85,9 +85,11 @@ static void handleInput(
 int main(int argc, char **argv_pp) 
 {
     if (handleArgs(argc, argv_pp)) {return 1;}
-    if (nh_api_initialize(NH_LOADER_SCOPE_SYSTEM, NULL, NULL, 0) != NH_CORE_SUCCESS) {return 1;}
+    if (nh_api_initialize(NULL, NULL, 0) != NH_CORE_SUCCESS) {return 1;}
 
     nh_api_registerConfig("/etc/ttyr.conf", 14);
+
+    ttyr_api_initialize();
 
     TTY_p = ttyr_api_openTTY(NULL, NULL);
     if (!TTY_p) {return 1;}
