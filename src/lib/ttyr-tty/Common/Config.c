@@ -13,9 +13,9 @@
 
 #include "../TTY/TTY.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Config/Config.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
+#include "nhcore/Config/Config.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Thread.h"
 
 #include <string.h>
 #include <stdlib.h>

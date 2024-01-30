@@ -11,9 +11,9 @@
 
 #include "../Common/Includes.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/GPU.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/Helper.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Fonts/FontManager.h"
+#include "nhgfx/Vulkan/GPU.h"
+#include "nhgfx/Vulkan/Helper.h"
+#include "nhgfx/Fonts/FontManager.h"
 
 #include <stdint.h>
 

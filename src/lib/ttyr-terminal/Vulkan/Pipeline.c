@@ -12,7 +12,7 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Common/Macros.h"
+#include "nhgfx/Common/Macros.h"
 
 // SDF TEXT ========================================================================================
 

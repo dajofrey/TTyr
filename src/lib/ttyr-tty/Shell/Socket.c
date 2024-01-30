@@ -15,9 +15,9 @@
 #include "../TTY/Program.h"
 #include "../TTY/TTY.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/File.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Thread.h"
+#include "nhcore/Util/File.h"
 
 #include <errno.h>
 #include <stdio.h>

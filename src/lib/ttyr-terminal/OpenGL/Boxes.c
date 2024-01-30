@@ -13,8 +13,8 @@
 #include "../Terminal/Graphics.h"
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Base/Viewport.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Common/Macros.h"
+#include "nhgfx/Base/Viewport.h"
+#include "nhgfx/Common/Macros.h"
 
 #include <stdlib.h>
 #include <unistd.h>

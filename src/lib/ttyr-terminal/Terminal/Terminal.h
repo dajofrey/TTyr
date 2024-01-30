@@ -16,7 +16,7 @@
 #include "../Common/Includes.h"
 #include "../../ttyr-tty/TTY/View.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/Time.h"
+#include "nhcore/Util/Time.h"
 
 #endif
 

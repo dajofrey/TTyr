@@ -19,10 +19,10 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Process.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
+#include "nhcore/System/Process.h"
+#include "nhcore/System/Memory.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF8.h"
+#include "nhencoding/Encodings/UTF8.h"
 
 #include <stddef.h>
 #include <unistd.h>

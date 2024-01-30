@@ -14,12 +14,12 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Common/Macros.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF8.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Common/Macros.h"
+#include "nhencoding/Encodings/UTF32.h"
+#include "nhencoding/Encodings/UTF8.h"
+#include "nhencoding/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>

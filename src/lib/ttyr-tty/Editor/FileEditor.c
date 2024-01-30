@@ -18,10 +18,10 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Process.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/LinkedList.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Common/Macros.h"
+#include "nhcore/System/Process.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/Util/LinkedList.h"
+#include "nhcore/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>

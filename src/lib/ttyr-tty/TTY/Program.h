@@ -10,7 +10,7 @@
  */
 
 #include "../Common/Includes.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/List.h"
+#include "nhcore/Util/List.h"
 
 typedef struct ttyr_tty_TTY ttyr_tty_TTY;
 

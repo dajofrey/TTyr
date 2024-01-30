@@ -17,13 +17,13 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Base/Viewport.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Fonts/HarfBuzz.h"
+#include "nhgfx/Base/Viewport.h"
+#include "nhgfx/Fonts/HarfBuzz.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/Math.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/Array.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/List.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/Util/Math.h"
+#include "nhcore/Util/Array.h"
+#include "nhcore/Util/List.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -23,8 +23,8 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Thread.h"
 
 #include <ctype.h>
 #include <errno.h>

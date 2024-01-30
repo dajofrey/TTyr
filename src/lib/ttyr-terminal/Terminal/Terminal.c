@@ -12,22 +12,22 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Process.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/RingBuffer.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/List.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Config/Config.h"
+#include "nhcore/System/Thread.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Process.h"
+#include "nhcore/Util/RingBuffer.h"
+#include "nhcore/Util/List.h"
+#include "nhcore/Config/Config.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF8.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
+#include "nhencoding/Encodings/UTF8.h"
+#include "nhencoding/Encodings/UTF32.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Base/Viewport.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Fonts/FontManager.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Fonts/Text.h"
+#include "nhgfx/Base/Viewport.h"
+#include "nhgfx/Fonts/FontManager.h"
+#include "nhgfx/Fonts/Text.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhwsi/Window/Window.h"
-#include "../../../../external/Netzhaut/src/lib/nhwsi/Window/WindowSettings.h"
+#include "nhwsi/Window/Window.h"
+#include "nhwsi/Window/WindowSettings.h"
 
 #include <string.h>
 #include <stdio.h>

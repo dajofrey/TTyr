@@ -11,8 +11,8 @@
 
 #include "../Common/Includes.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/Driver.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/Helper.h"
+#include "nhgfx/Vulkan/Driver.h"
+#include "nhgfx/Vulkan/Helper.h"
 
 #endif
 

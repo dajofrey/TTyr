@@ -13,10 +13,10 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF8.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Thread.h"
+#include "nhencoding/Encodings/UTF32.h"
+#include "nhencoding/Encodings/UTF8.h"
 
 #include <stdlib.h>
 #include <unistd.h>

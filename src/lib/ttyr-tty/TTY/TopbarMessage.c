@@ -14,8 +14,8 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
+#include "nhencoding/Encodings/UTF32.h"
+#include "nhcore/System/Thread.h"
 
 #include <stdio.h>
 #include <stdlib.h>

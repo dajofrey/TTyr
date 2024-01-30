@@ -14,9 +14,9 @@
 #include "../Common/Includes.h"
 #include "../TTY/Program.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/Time.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/List.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/String.h"
+#include "nhcore/Util/Time.h"
+#include "nhcore/Util/List.h"
+#include "nhcore/Util/String.h"
 
 #endif
 

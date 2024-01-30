@@ -13,7 +13,7 @@
 #include "../Common/Includes.h"
 #include "../Common/Config.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/System.h"
+#include "nhcore/System/System.h"
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 

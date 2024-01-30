@@ -11,10 +11,10 @@
 
 #include "../Common/Includes.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/OpenGL/CommandBuffer.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/OpenGL/Commands.h"
+#include "nhgfx/OpenGL/CommandBuffer.h"
+#include "nhgfx/OpenGL/Commands.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Fonts/FontManager.h"
+#include "nhgfx/Fonts/FontManager.h"
 
 #include <stdint.h>
 

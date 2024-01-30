@@ -11,8 +11,8 @@
 
 #include "../Common/Includes.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/Time.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Fonts/Text.h"
+#include "nhcore/Util/Time.h"
+#include "nhgfx/Fonts/Text.h"
 
 #endif
 

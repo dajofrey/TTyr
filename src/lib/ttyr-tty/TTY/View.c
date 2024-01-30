@@ -24,10 +24,10 @@
 
 #include "../../ttyr-terminal/Terminal/Grid.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/RingBuffer.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Common/Macros.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Thread.h"
+#include "nhcore/Util/RingBuffer.h"
+#include "nhcore/Common/Macros.h"
 
 #include <string.h>
 #include <stdio.h>

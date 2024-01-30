@@ -15,7 +15,7 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
+#include "nhcore/System/Memory.h"
 
 #include <stdio.h>
 #include <stdlib.h>

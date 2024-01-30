@@ -12,9 +12,9 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/Array.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/Texture.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Common/Macros.h"
+#include "nhcore/Util/Array.h"
+#include "nhgfx/Vulkan/Texture.h"
+#include "nhgfx/Common/Macros.h"
 
 #include <stdlib.h>
 #include <unistd.h>

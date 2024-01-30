@@ -15,11 +15,11 @@
 #include "../Shell/Shell.h"
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Loader/Loader.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
+#include "nhcore/Loader/Loader.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Thread.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
+#include "nhencoding/Encodings/UTF32.h"
 
 #include <string.h>
 #include <stdio.h>

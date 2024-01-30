@@ -11,7 +11,7 @@
 #include "Log.h"
 #include "Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Logger.h"
+#include "nhcore/System/Logger.h"
 
 #include <stdio.h>
 #include <stdlib.h>

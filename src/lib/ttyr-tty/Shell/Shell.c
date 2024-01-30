@@ -15,16 +15,16 @@
 #include "../Common/Config.h"
 #include "../TTY/Program.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/List.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/String.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Loader/Loader.h"
+#include "nhcore/Util/List.h"
+#include "nhcore/Util/String.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/Loader/Loader.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Common/Macros.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF8.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
+#include "nhencoding/Common/Macros.h"
+#include "nhencoding/Encodings/UTF8.h"
+#include "nhencoding/Encodings/UTF32.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhwsi/Window/Listener.h"
+#include "nhwsi/Window/Listener.h"
 
 #include "../../../../external/st-0.8.5/st.h"
 #include "../../../../external/st-0.8.5/config.h"

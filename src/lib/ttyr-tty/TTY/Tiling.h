@@ -10,7 +10,7 @@
  */
 
 #include "../Common/Includes.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/LinkedList.h"
+#include "nhcore/Util/LinkedList.h"
 
 typedef struct ttyr_tty_MacroWindow ttyr_tty_MacroWindow;
 

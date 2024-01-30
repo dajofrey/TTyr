@@ -14,8 +14,8 @@
 
 #include "../Common/Macros.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Process.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
+#include "nhcore/System/Process.h"
+#include "nhcore/System/Memory.h"
 
 #include <stddef.h>
 #include <unistd.h>

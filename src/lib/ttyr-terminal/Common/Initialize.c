@@ -14,12 +14,12 @@
 
 #include "../Vulkan/Pipeline.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/GPU.h"
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Vulkan/Vulkan.h"
+#include "nhgfx/Vulkan/GPU.h"
+#include "nhgfx/Vulkan/Vulkan.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Config/Config.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Logger.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
+#include "nhcore/Config/Config.h"
+#include "nhcore/System/Logger.h"
+#include "nhcore/System/Memory.h"
 
 #include <stdlib.h>
 #include <string.h>

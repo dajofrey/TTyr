@@ -16,7 +16,7 @@
 #include "../OpenGL/Background.h"
 #include "../OpenGL/Boxes.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Util/HashMap.h"
+#include "nhcore/Util/HashMap.h"
 
 #endif
 

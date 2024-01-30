@@ -16,15 +16,15 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Base/Viewport.h"
+#include "nhgfx/Base/Viewport.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Thread.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Process.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Logger.h"
+#include "nhcore/System/Thread.h"
+#include "nhcore/System/Memory.h"
+#include "nhcore/System/Process.h"
+#include "nhcore/System/Logger.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF8.h"
-#include "../../../../external/Netzhaut/src/lib/nhencoding/Encodings/UTF32.h"
+#include "nhencoding/Encodings/UTF8.h"
+#include "nhencoding/Encodings/UTF32.h"
 
 #include <string.h>
 #include <stdio.h>

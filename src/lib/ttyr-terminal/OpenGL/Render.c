@@ -13,7 +13,7 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "../../../../external/Netzhaut/src/lib/nhgfx/Base/Viewport.h"
+#include "nhgfx/Base/Viewport.h"
 
 #include <stdlib.h>
 #include <string.h>

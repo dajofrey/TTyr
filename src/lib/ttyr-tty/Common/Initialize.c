@@ -12,9 +12,9 @@
 #include "Macros.h"
 #include "Data/ttyr-tty.conf.inc"
 
-#include "../../../../external/Netzhaut/src/lib/nhcore/Config/Config.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Logger.h"
-#include "../../../../external/Netzhaut/src/lib/nhcore/System/Memory.h"
+#include "nhcore/Config/Config.h"
+#include "nhcore/System/Logger.h"
+#include "nhcore/System/Memory.h"
 
 #include <stdlib.h>
 #include <string.h>
