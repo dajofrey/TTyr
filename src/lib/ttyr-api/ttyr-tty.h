@@ -9,8 +9,8 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
-#include <stdbool.h>
 #include "nhapi/nhapi.h"
+#include <stdbool.h>
 
 #endif
 

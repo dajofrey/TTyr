@@ -1,12 +1,12 @@
 # Define the compiler and compile flags
 CC = gcc
-CFLAGS = -fPIC -std=gnu99 -Wl,-rpath,$(CURDIR)/external/Netzhaut/lib
+CFLAGS = -fPIC -std=gnu99 -Wl,-rpath,$(CURDIR)/lib,-rpath,$(CURDIR)/external/Netzhaut/lib
 
 # Define the linker and linker flags
 LD = gcc
 LDFLAGS_TTYR_TTY = -lutil -Lexternal/st-0.8.5/ -l:libst.so
 LDFLAGS_TTYR_TERMINAL =
-LDFLAGS_TTYR = -Lexternal/Netzhaut/lib -lttyr-api -lnhapi
+LDFLAGS_TTYR = -Llib -lttyr-api -Lexternal/Netzhaut/lib -lnhapi
 
 # Define the source file directory for each library
 SRC_DIR_TTYR_TTY = src/lib/ttyr-tty
@@ -65,6 +65,7 @@ SRC_FILES_TTYR_TERMINAL = \
     Common/Config.c \
 	
 SRC_FILES_TTYR_API = \
+    ttyr-api.c \
     ttyr-tty.c \
     ttyr-terminal.c \
  
@@ -80,14 +81,16 @@ OBJ_FILES_TTYR = $(patsubst %.c, %.o, $(addprefix $(SRC_DIR_TTYR)/, $(SRC_FILES_
 OBJ_FILES_ST = $(patsubst %.c, %.o, $(addprefix $(SRC_DIR_ST)/, $(SRC_FILES_ST)))
 
 # Name of the shared libraries and binaries
-LIB_TTYR_TTY = external/Netzhaut/lib/libttyr-tty.so
-LIB_TTYR_TERMINAL = external/Netzhaut/lib/libttyr-terminal.so
-LIB_TTYR_API = external/Netzhaut/lib/libttyr-api.so
+LIB_TTYR_TTY = lib/libttyr-tty.so
+LIB_TTYR_TERMINAL = lib/libttyr-terminal.so
+LIB_TTYR_API = lib/libttyr-api.so
 LIB_ST = external/st-0.8.5/libst.so
 BIN_TTYR = bin/ttyr
 
 build_netzhaut:
-	(cd external/Netzhaut && make -f build/automation/Makefile nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
+	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/Makefile nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
+create_lib_dir:
+	mkdir -p lib
 create_bin_dir:
 	mkdir -p bin
 
@@ -115,11 +118,11 @@ $(OBJ_FILES_TTYR): CFLAGS += -Iexternal -Iexternal/Netzhaut/src/lib -Isrc/lib
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 # Rule to link object files into the shared libraries
-$(LIB_TTYR_TTY): $(OBJ_FILES_TTYR_TTY)
+$(LIB_TTYR_TTY): create_lib_dir $(OBJ_FILES_TTYR_TTY)
 	$(LD) $(CFLAGS) -Wl,-rpath,':$(CURDIR)/external/st-0.8.5' -shared -o $@ $(OBJ_FILES_TTYR_TTY) $(LDFLAGS_TTYR_TTY)
-$(LIB_TTYR_TERMINAL): $(OBJ_FILES_TTYR_TERMINAL)
+$(LIB_TTYR_TERMINAL): create_lib_dir $(OBJ_FILES_TTYR_TERMINAL)
 	$(LD) $(CFLAGS) -shared -o $@ $(OBJ_FILES_TTYR_TERMINAL) $(LDFLAGS_TTYR_TERMINAL)
-$(LIB_TTYR_API): $(OBJ_FILES_TTYR_API)
+$(LIB_TTYR_API): create_lib_dir $(OBJ_FILES_TTYR_API)
 	$(LD) $(CFLAGS) -shared -o $@ $(OBJ_FILES_TTYR_API) $(LDFLAGS_TTYR_API)
 $(LIB_ST): $(OBJ_FILES_ST)
 	$(LD) $(CFLAGS) -shared -o $@ $(OBJ_FILES_ST) $(LDFLAGS_ST)
@@ -140,5 +143,6 @@ clean:
 	rm -f $(OBJ_FILES_ST) $(LIB_ST)
 	rm -f $(OBJ_FILES_TTYR) $(BIN_TTYR)
 	rm -rf bin
+	(cd external/Netzhaut && make -f build/automation/Makefile clean)
 
 .PHONY: all lib bin clean
