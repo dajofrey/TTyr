@@ -129,7 +129,7 @@ static TTYR_TTY_RESULT ttyr_tty_draw(
         cols--;
     }
 
-    if (topbar) {
+    if (topbar && !View_p->standardIO) {
         if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) { 
             return ttyr_tty_drawTopbarRow(
                 Tile_p, View_p->Row.Glyphs_p, cols, row, View_p->standardIO
@@ -147,7 +147,9 @@ static TTYR_TTY_RESULT ttyr_tty_draw(
         ))
     } else if (TTYR_TTY_MICRO_TILE(Tile_p)->Program_p) {
         TTYR_CHECK(TTYR_TTY_MICRO_TILE(Tile_p)->Program_p->Prototype_p->Callbacks.draw_f(
-            TTYR_TTY_MICRO_TILE(Tile_p)->Program_p, View_p->Row.Glyphs_p, cols, Tile_p->rowSize-1, row-1
+            TTYR_TTY_MICRO_TILE(Tile_p)->Program_p, View_p->Row.Glyphs_p, cols, 
+            View_p->standardIO ? Tile_p->rowSize : Tile_p->rowSize-1, 
+            View_p->standardIO ? row : row-1
         ))
     }
 

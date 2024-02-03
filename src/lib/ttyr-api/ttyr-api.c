@@ -27,6 +27,7 @@ void ttyr_api_initialize()
     const ElfW(Dyn) *rpath = NULL;
     const ElfW(Dyn) *runpath = NULL;
     const char *strtab = NULL;
+    char path_p[1024] = {};
 
     for (; dyn->d_tag != DT_NULL; ++dyn) {
         if (dyn->d_tag == DT_RPATH) {
@@ -44,12 +45,5 @@ void ttyr_api_initialize()
         sprintf(TTYR_API_PATH_P, strtab + rpath->d_un.d_val);
     } else if (runpath != NULL) {
         sprintf(TTYR_API_PATH_P, strtab + runpath->d_un.d_val);
-    }
-
-    for (int i = 0; i < strlen(TTYR_API_PATH_P); ++i) {
-        if (TTYR_API_PATH_P[i] == ':') {
-            TTYR_API_PATH_P[i] = 0;
-            break;
-        }
     }
 }

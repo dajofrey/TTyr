@@ -144,8 +144,9 @@ static void ttyr_tty_freeTTY(
     }
 
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-        ((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])
-            ->Callbacks.destroyPrototype_f(TTY_p->Prototypes.pp[i]);
+        if (((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Callbacks.destroyPrototype_f) {
+            ((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Callbacks.destroyPrototype_f(TTY_p->Prototypes.pp[i]);
+        }
     }
     nh_core_freeList(&TTY_p->Prototypes, NH_FALSE);
 

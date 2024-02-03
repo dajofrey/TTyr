@@ -28,7 +28,7 @@
 // PROGRAM INSTANCE ================================================================================
 
 ttyr_tty_Program *ttyr_tty_createProgramInstance(
-    ttyr_tty_Interface *Prototype_p, bool once)
+    ttyr_tty_Interface *Interface_p, bool once)
 {
     ttyr_tty_Program *Program_p = nh_core_allocate(sizeof(ttyr_tty_Program));
     TTYR_CHECK_MEM_2(NULL, Program_p)
@@ -36,9 +36,9 @@ ttyr_tty_Program *ttyr_tty_createProgramInstance(
     Program_p->once        = once;
     Program_p->refresh     = false;
     Program_p->close       = false;
-    Program_p->Prototype_p = Prototype_p;
-    Program_p->handle_p    = Prototype_p->Callbacks.init_f ? 
-        Prototype_p->Callbacks.init_f(Prototype_p->initArg_p) : NULL; 
+    Program_p->Prototype_p = Interface_p;
+    Program_p->handle_p    = Interface_p->Callbacks.init_f ? 
+        Interface_p->Callbacks.init_f(Interface_p->initArg_p) : NULL; 
  
     return Program_p;
 }
