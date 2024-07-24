@@ -197,6 +197,7 @@ static TTYR_TTY_RESULT ttyr_tty_handleWindowResize(
         if (TTY_p->Window_p->MouseMenu_p) {
             TTY_p->Window_p->MouseMenu_p = NULL;
         }
+
 	TTY_p->Window_p->refreshGrid1 = NH_TRUE;
 	TTY_p->Window_p->refreshGrid2 = NH_TRUE;
 	TTY_p->Window_p->refreshTitlebar = NH_TRUE;

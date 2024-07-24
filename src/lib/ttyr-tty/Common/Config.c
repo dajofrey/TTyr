@@ -119,7 +119,7 @@ static TTYR_TTY_RESULT ttyr_tty_getSetting(
     return TTYR_TTY_SUCCESS;
 }
 
-ttyr_tty_Config ttyr_tty_getConfig()
+static ttyr_tty_Config ttyr_tty_getStaticConfig()
 {
     ttyr_tty_Config Config;
     memset(&Config, 0, sizeof(ttyr_tty_Config));
@@ -131,6 +131,16 @@ ttyr_tty_Config ttyr_tty_getConfig()
         TTYR_CHECK_2(Config, ttyr_tty_getSetting(&Config, TTY_p->namespace_p, i))
     }
 
+    return Config;
+}
+
+ttyr_tty_Config ttyr_tty_getConfig()
+{
+    ttyr_tty_Config Config = ttyr_tty_getStaticConfig();
+    ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
+    if (((ttyr_tty_View*)TTY_p->Views.pp[0])->standardIO) {
+        Config.Titlebar.on = false;
+    }
     return Config;
 }
 

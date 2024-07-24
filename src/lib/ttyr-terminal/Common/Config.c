@@ -94,7 +94,7 @@ TTYR_TERMINAL_BEGIN()
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
-ttyr_terminal_Config ttyr_terminal_getConfig()
+static ttyr_terminal_Config ttyr_terminal_getStaticConfig()
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -109,5 +109,11 @@ TTYR_TERMINAL_BEGIN()
     }
 
 TTYR_TERMINAL_END(Config)
+}
+
+ttyr_terminal_Config ttyr_terminal_getConfig() 
+{ 
+    ttyr_terminal_Config Config = ttyr_terminal_getStaticConfig(); 
+    return Config; 
 }
 

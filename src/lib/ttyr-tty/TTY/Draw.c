@@ -76,7 +76,10 @@ TTYR_TTY_RESULT ttyr_tty_refreshCursor(
         TTYR_CHECK(ttyr_tty_getCursorPosition(TTY_p->Window_p->Tile_p, MicroTile_p, View_p->standardIO, &x, &y))
     }
 
-    TTYR_CHECK(ttyr_tty_forwardCursor(View_p, x, y))
+    if (x > -1 && y > -1) {
+        // Only forward cursor with valid position.
+        TTYR_CHECK(ttyr_tty_forwardCursor(View_p, x, y))
+    }
 
     return TTYR_TTY_SUCCESS;
 }
