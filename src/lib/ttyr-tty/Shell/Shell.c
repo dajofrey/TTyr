@@ -932,8 +932,14 @@ static TTYR_TTY_RESULT ttyr_tty_getShellCursor(
 {
     if (((ttyr_tty_Shell*)Program_p->handle_p)->scroll != 0) {return TTYR_TTY_SUCCESS;}
 
+    // MODE_HIDE is activated by for example: echo -e "\e[?25l"
+    if (((ttyr_tty_Shell*)Program_p->handle_p)->ST_p->windowMode & MODE_HIDE) {
+        *x_p = -1;
+        *y_p = -1;
+    }
+
     // ST_p is created late during first draw, which might not have happened before this is called.
-    if (((ttyr_tty_Shell*)Program_p->handle_p)->ST_p) {
+    else if (((ttyr_tty_Shell*)Program_p->handle_p)->ST_p) {
         *x_p = ((ttyr_tty_Shell*)Program_p->handle_p)->ST_p->ocx;
         *y_p = ((ttyr_tty_Shell*)Program_p->handle_p)->ST_p->ocy;
     }

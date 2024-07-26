@@ -188,19 +188,19 @@ static TTYR_TTY_RESULT ttyr_tty_handleInput(
 static TTYR_TTY_RESULT ttyr_tty_handleWindowResize(
     ttyr_tty_TTY *TTY_p, ttyr_tty_View *View_p)
 {
-    NH_BOOL updated = NH_FALSE;
+    bool updated = false;
 
     TTYR_CHECK(ttyr_tty_getViewSize(View_p))
-    TTYR_CHECK(ttyr_tty_updateView(View_p, &updated, NH_TRUE))
+    TTYR_CHECK(ttyr_tty_updateView(View_p, &updated, true))
 
     if (updated) {
         if (TTY_p->Window_p->MouseMenu_p) {
             TTY_p->Window_p->MouseMenu_p = NULL;
         }
 
-	TTY_p->Window_p->refreshGrid1 = NH_TRUE;
-	TTY_p->Window_p->refreshGrid2 = NH_TRUE;
-	TTY_p->Window_p->refreshTitlebar = NH_TRUE;
+	TTY_p->Window_p->refreshGrid1 = true;
+	TTY_p->Window_p->refreshGrid2 = true;
+	TTY_p->Window_p->refreshTitlebar = true;
     }
 
     return TTYR_TTY_SUCCESS;

@@ -163,7 +163,11 @@ TTYR_TTY_RESULT ttyr_tty_writeCursorToStandardOutput(
     nh_String String = nh_core_initString(255);
 
     NH_BYTE buf[32] = {'\0'};
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", y, x);
+    if (x > 0 && y > 0) {
+        snprintf(buf, sizeof(buf), "\x1b[?25h\x1b[%d;%dH", y, x);
+    } else {
+        snprintf(buf, sizeof(buf), "\x1b[?25l");
+    }
     nh_core_appendFormatToString(&String, buf);
 
 #ifdef __unix__
@@ -304,6 +308,9 @@ static TTYR_TTY_RESULT ttyr_tty_exitRawMode(
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &View_p->Termios) == -1) {
          return TTYR_TTY_ERROR_BAD_STATE;
     }
+
+    // Make cursor reappear just in case.
+    write(STDOUT_FILENO, "\033[?25h", 6);
 
     // https://stackoverflow.com/questions/43202800/when-exiting-terminal-rawmode-my-contents-stays-on-the-screen
     write(STDOUT_FILENO, "\033[2J\033[H\033[?1049l", 15);

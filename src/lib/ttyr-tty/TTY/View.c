@@ -71,6 +71,7 @@ TTYR_TTY_RESULT ttyr_tty_updateView(
 {
     if (View_p->cols == View_p->previousCols && View_p->rows == View_p->previousRows &&
         View_p->Size.width == View_p->PreviousSize.width && View_p->Size.height == View_p->PreviousSize.height) {
+        if (updated_p) {*updated_p = false;}
         return TTYR_TTY_SUCCESS;
     }
 
@@ -232,7 +233,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardCursor(
     Update.row = Config.Titlebar.on ? y : y - 1;
     Update.col = x - 1;
     Update.Glyph = Glyph;
-    Update.cursor = NH_TRUE;
+    Update.cursor = true;
 
     nh_core_appendToArray(Array_p, &Update, 1);
 
