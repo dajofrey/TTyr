@@ -92,7 +92,7 @@ BIN_TTYR = bin/ttyr
 
 build_netzhaut:
 ifeq ($(NETZHAUT_PATH),$(CURDIR)/external/Netzhaut)
-	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/Makefile nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
+	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
 endif
 
 create_lib_dir:
@@ -149,6 +149,6 @@ clean:
 	rm -f $(OBJ_FILES_ST) $(LIB_ST)
 	rm -f $(OBJ_FILES_TTYR) $(BIN_TTYR)
 	rm -rf bin lib
-	(cd external/Netzhaut && make -f build/automation/Makefile clean)
+	(cd external/Netzhaut && make -f build/automation/lib.mk clean)
 
 .PHONY: all lib bin clean
