@@ -24,10 +24,10 @@
 
 #include "../../ttyr-terminal/Terminal/Grid.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
-#include "nhcore/Util/RingBuffer.h"
-#include "nhcore/Common/Macros.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
+#include "nh-core/Util/RingBuffer.h"
+#include "nh-core/Common/Macros.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -45,7 +45,7 @@ TTYR_TTY_RESULT ttyr_tty_getViewSize(
 }
 
 TTYR_TTY_RESULT ttyr_tty_translateMousePosition(
-    ttyr_tty_View *View_p, nh_wsi_MouseEvent Mouse, int *col_p, int *row_p)
+    ttyr_tty_View *View_p, nh_api_MouseEvent Mouse, int *col_p, int *row_p)
 {
     if (View_p->standardIO) {
         TTYR_CHECK(TTYR_TTY_ERROR_BAD_STATE)
@@ -67,7 +67,7 @@ TTYR_TTY_RESULT ttyr_tty_translateMousePosition(
 }
 
 TTYR_TTY_RESULT ttyr_tty_updateView(
-    ttyr_tty_View *View_p, NH_BOOL *updated_p, NH_BOOL macro)
+    ttyr_tty_View *View_p, bool *updated_p, bool macro)
 {
     if (View_p->cols == View_p->previousCols && View_p->rows == View_p->previousRows &&
         View_p->Size.width == View_p->PreviousSize.width && View_p->Size.height == View_p->PreviousSize.height) {
@@ -99,13 +99,13 @@ TTYR_TTY_RESULT ttyr_tty_updateView(
     for (int i = 0; i < View_p->rows; ++i) {
         View_p->Grid1_p[i].Glyphs_p = nh_core_allocate(sizeof(ttyr_tty_Glyph)*View_p->cols);
         memset(View_p->Grid1_p[i].Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
-        View_p->Grid1_p[i].update_p = nh_core_allocate(sizeof(NH_BOOL)*View_p->cols);
-        memset(View_p->Grid1_p[i].update_p, NH_TRUE, sizeof(NH_BOOL)*View_p->cols);
+        View_p->Grid1_p[i].update_p = nh_core_allocate(sizeof(bool)*View_p->cols);
+        memset(View_p->Grid1_p[i].update_p, true, sizeof(bool)*View_p->cols);
 
         View_p->Grid2_p[i].Glyphs_p = nh_core_allocate(sizeof(ttyr_tty_Glyph)*View_p->cols);
         memset(View_p->Grid2_p[i].Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
-        View_p->Grid2_p[i].update_p = nh_core_allocate(sizeof(NH_BOOL)*View_p->cols);
-        memset(View_p->Grid2_p[i].update_p, NH_TRUE, sizeof(NH_BOOL)*View_p->cols);
+        View_p->Grid2_p[i].update_p = nh_core_allocate(sizeof(bool)*View_p->cols);
+        memset(View_p->Grid2_p[i].update_p, true, sizeof(bool)*View_p->cols);
     }
 
     View_p->previousCols = View_p->cols;
@@ -117,7 +117,7 @@ TTYR_TTY_RESULT ttyr_tty_updateView(
         View_p->rows--;
     }
 
-    if (updated_p) {*updated_p = NH_TRUE;}
+    if (updated_p) {*updated_p = true;}
 
     return TTYR_TTY_SUCCESS;
 }
@@ -125,25 +125,25 @@ TTYR_TTY_RESULT ttyr_tty_updateView(
 // CREATE/DESTROY ==================================================================================
 
 static void ttyr_tty_initTilesBuffer(
-    nh_RingBuffer *Buffer_p, int itemCount)
+    nh_core_RingBuffer *Buffer_p, int itemCount)
 {
     for (int i = 0; i < itemCount; ++i) {
-        nh_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
+        nh_core_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
         *Array_p = nh_core_initArray(sizeof(ttyr_terminal_TileUpdate), 255);
     }
 }
 
 static void ttyr_tty_initBoxesBuffer(
-    nh_RingBuffer *Buffer_p, int itemCount)
+    nh_core_RingBuffer *Buffer_p, int itemCount)
 {
     for (int i = 0; i < itemCount; ++i) {
-        nh_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
+        nh_core_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
         *Array_p = nh_core_initArray(sizeof(ttyr_terminal_Box), 16);
     }
 }
 
 ttyr_tty_View *ttyr_tty_createView(
-    ttyr_tty_TTY *TTY_p, void *p, NH_BOOL standardIO)
+    ttyr_tty_TTY *TTY_p, void *p, bool standardIO)
 {
     ttyr_tty_View View;
     memset(&View, 0, sizeof(ttyr_tty_View));
@@ -152,13 +152,13 @@ ttyr_tty_View *ttyr_tty_createView(
     View.p = p;
 
     NH_CORE_CHECK_2(NULL, nh_core_initRingBuffer(
-        &View.Forward.Tiles, 64, sizeof(nh_Array), ttyr_tty_initTilesBuffer
+        &View.Forward.Tiles, 64, sizeof(nh_core_Array), ttyr_tty_initTilesBuffer
     ))
     NH_CORE_CHECK_2(NULL, nh_core_initRingBuffer(
-        &View.Forward.Events, 64, sizeof(nh_wsi_Event), NULL 
+        &View.Forward.Events, 64, sizeof(nh_api_WSIEvent), NULL 
     ))
     NH_CORE_CHECK_2(NULL, nh_core_initRingBuffer(
-        &View.Forward.Boxes, 16, sizeof(nh_Array), ttyr_tty_initBoxesBuffer 
+        &View.Forward.Boxes, 16, sizeof(nh_core_Array), ttyr_tty_initBoxesBuffer 
     ))
 
     ttyr_tty_View *View_p = nh_core_allocate(sizeof(ttyr_tty_View));
@@ -177,11 +177,11 @@ TTYR_TTY_RESULT ttyr_tty_destroyView(
     ttyr_tty_TTY *TTY_p, ttyr_tty_View *View_p)
 {
     for (int i = 0; i < 64; ++i) {
-        nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+        nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
         nh_core_freeArray(Array_p);
     }
     for (int i = 0; i < 16; ++i) {
-        nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
+        nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
         nh_core_freeArray(Array_p);
     }
 
@@ -201,7 +201,7 @@ TTYR_TTY_RESULT ttyr_tty_destroyView(
     nh_core_free(View_p->Grid2_p);
 
     if (TTY_p) {
-        nh_core_removeFromList2(&TTY_p->Views, NH_TRUE, View_p);
+        nh_core_removeFromList2(&TTY_p->Views, true, View_p);
     } else {
         nh_core_free(View_p); 
     }
@@ -226,7 +226,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardCursor(
     memset(&Glyph, 0, sizeof(ttyr_tty_Glyph));
 
     // Write to nhterminal.
-    nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
 
     ttyr_terminal_TileUpdate Update;
@@ -241,7 +241,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardCursor(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_setContextMenus(
-    ttyr_tty_ContextMenu *Menu_p, nh_Array *Boxes_p)
+    ttyr_tty_ContextMenu *Menu_p, nh_core_Array *Boxes_p)
 {
     if (!Menu_p->active || Menu_p->Items.size == 0) {return TTYR_TTY_SUCCESS;}
 
@@ -276,8 +276,8 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
     ttyr_tty_Config Config = ttyr_tty_getConfig();
 
     // Write to nhterminal.
-    nh_Array *Boxes_p = nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
-    nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_Array *Boxes_p = nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
+    nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
     nh_core_freeArray(Boxes_p);
 
@@ -288,9 +288,9 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
             Update.row = 0;
             Update.col = col;
             Update.Glyph = View_p->Grid1_p[View_p->rows].Glyphs_p[col];
-            Update.cursor = NH_FALSE;
+            Update.cursor = false;
             nh_core_appendToArray(Array_p, &Update, 1);
-            View_p->Grid1_p[View_p->rows].update_p[col] = NH_FALSE;
+            View_p->Grid1_p[View_p->rows].update_p[col] = false;
         }
     }
 
@@ -302,10 +302,10 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
             Update.row = Config.Titlebar.on ? row+1 : row;
             Update.col = col;
             Update.Glyph = View_p->Grid1_p[row].Glyphs_p[col];
-            Update.cursor = NH_FALSE;
+            Update.cursor = false;
             nh_core_appendToArray(Array_p, &Update, 1);
 
-            View_p->Grid1_p[row].update_p[col] = NH_FALSE;
+            View_p->Grid1_p[row].update_p[col] = false;
         }
     }
 
@@ -316,7 +316,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
     }
 
     // Forward boxes: Inactive cursor outlines.
-    nh_List MacroTiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
+    nh_core_List MacroTiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
     for (int i = 0; i < MacroTiles.size; ++i) {
 
         // Skip macro tile without payload.
@@ -324,7 +324,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
         || TTYR_TTY_MACRO_TILE(MacroTiles.pp[i])->MacroTabs.size <= 0 
         || TTYR_TTY_MACRO_TAB(MacroTiles.pp[i])->MicroWindow.Tabs_p == NULL) {continue;}
 
-        nh_List MicroTiles = ttyr_tty_getTiles(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(MacroTiles.pp[i]))->RootTile_p);
+        nh_core_List MicroTiles = ttyr_tty_getTiles(TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(MacroTiles.pp[i]))->RootTile_p);
         for (int j = 0; j < MicroTiles.size; ++j) {
 
             // Skip micro tile without payload.
@@ -344,9 +344,9 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
             Box_p->LowerRight.x = x-2;
             Box_p->LowerRight.y = Config.Titlebar.on ? y : y-1;
         }
-        nh_core_freeList(&MicroTiles, NH_FALSE);
+        nh_core_freeList(&MicroTiles, false);
     }
-    nh_core_freeList(&MacroTiles, NH_FALSE);
+    nh_core_freeList(&MacroTiles, false);
 
     return TTYR_TTY_SUCCESS;
 }
@@ -355,7 +355,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid2(
     ttyr_tty_View *View_p)
 {
     // Write to nhterminal.
-    nh_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
 
     for (int row = 0; row < View_p->rows; ++row) {
@@ -365,7 +365,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid2(
             Update.col = col;
             Update.Glyph = View_p->Grid2_p[row].Glyphs_p[col];
             Update.Glyph.mark |= TTYR_TTY_MARK_ELEVATED | TTYR_TTY_MARK_ACCENT;
-            Update.cursor = NH_FALSE;
+            Update.cursor = false;
             nh_core_appendToArray(Array_p, &Update, 1);
         }
     }
@@ -374,14 +374,14 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid2(
 }
 
 TTYR_TTY_RESULT ttyr_tty_forwardEvent(
-    ttyr_tty_View *View_p, nh_wsi_Event Event)
+    ttyr_tty_View *View_p, nh_api_WSIEvent Event)
 {
     if (View_p->standardIO) {
         return TTYR_TTY_SUCCESS;
     }
 
     // Write to nhterminal.
-    nh_wsi_Event *Event_p = nh_core_advanceRingBuffer(&View_p->Forward.Events);
+    nh_api_WSIEvent *Event_p = nh_core_advanceRingBuffer(&View_p->Forward.Events);
     TTYR_CHECK_MEM(Event_p)
     *Event_p = Event;
 

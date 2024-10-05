@@ -12,7 +12,7 @@
 
 #include "../Common/Macros.h"
 
-#include "nhgfx/Common/Macros.h"
+#include "nh-gfx/Common/Macros.h"
 
 // SDF TEXT ========================================================================================
 
@@ -177,7 +177,7 @@ TTYR_TERMINAL_BEGIN()
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_createVulkanSDFPipeline(Driver_p, &Pipelines_p[TTYR_TERMINAL_VULKAN_PIPELINE_SDF], &Info))
 
-TTYR_TERMINAL_DIAGNOSTIC_END(NH_GFX_SUCCESS)
+TTYR_TERMINAL_DIAGNOSTIC_END(NH_API_SUCCESS)
 }
 
 void ttyr_terminal_destroyVulkanPipelines(

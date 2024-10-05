@@ -15,7 +15,7 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Memory.h"
+#include "nh-core/System/Memory.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,14 +45,14 @@ void ttyr_tty_destroyMicroTile(
 }
 
 TTYR_TTY_RESULT ttyr_tty_getMicroTiles(
-    ttyr_tty_MicroWindow *Window_p, nh_List *List_p)
+    ttyr_tty_MicroWindow *Window_p, nh_core_List *List_p)
 {
     *List_p = nh_core_initList(4);
 
     for (int i = 0; Window_p->Tabs_p && i < Window_p->Tabs_p->size; ++i) {
-        nh_List List = ttyr_tty_getTiles(((ttyr_tty_MicroTab*)Window_p->Tabs_p->pp[i])->RootTile_p);
+        nh_core_List List = ttyr_tty_getTiles(((ttyr_tty_MicroTab*)Window_p->Tabs_p->pp[i])->RootTile_p);
         nh_core_appendItemsToList(List_p, &List);
-        nh_core_freeList(&List, NH_FALSE);
+        nh_core_freeList(&List, false);
     }
 
     return TTYR_TTY_SUCCESS;
@@ -61,7 +61,7 @@ TTYR_TTY_RESULT ttyr_tty_getMicroTiles(
 // MICRO TABS ======================================================================================
 
 static ttyr_tty_MicroTab *ttyr_tty_createMicroTab(
-    ttyr_tty_Interface *Prototype_p, NH_BOOL once)
+    ttyr_tty_Interface *Prototype_p, bool once)
 {
     ttyr_tty_MicroTab *Tab_p = nh_core_allocate(sizeof(ttyr_tty_MicroTab));
     TTYR_CHECK_MEM_2(NULL, Tab_p)
@@ -77,17 +77,17 @@ static ttyr_tty_MicroTab *ttyr_tty_createMicroTab(
     return Tab_p;
 }
 
-nh_List *ttyr_tty_createMicroTabs(
+nh_core_List *ttyr_tty_createMicroTabs(
     ttyr_tty_TTY *TTY_p)
 {
-    nh_List *Tabs_p = nh_core_allocate(sizeof(nh_List));
+    nh_core_List *Tabs_p = nh_core_allocate(sizeof(nh_core_List));
     TTYR_CHECK_MEM_2(NULL, Tabs_p)
 
     *Tabs_p = nh_core_initList(8); // Don't change size to TTY_p->Prototypes.size, it might not be initialized.
 
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
         ttyr_tty_Interface *Prototype_p = TTY_p->Prototypes.pp[i];
-        ttyr_tty_MicroTab *Tab_p = ttyr_tty_createMicroTab(Prototype_p, NH_FALSE);
+        ttyr_tty_MicroTab *Tab_p = ttyr_tty_createMicroTab(Prototype_p, false);
         TTYR_CHECK_NULL_2(NULL, Tab_p)
         nh_core_appendToList(Tabs_p, Tab_p);
     }
@@ -103,7 +103,7 @@ static void ttyr_tty_freeMicroTab(
 }
 
 TTYR_TTY_RESULT ttyr_tty_appendMicroTab(
-    ttyr_tty_MicroWindow *Window_p, ttyr_tty_Interface *Prototype_p, NH_BOOL once)
+    ttyr_tty_MicroWindow *Window_p, ttyr_tty_Interface *Prototype_p, bool once)
 {
     ttyr_tty_MicroTab *Tab_p = ttyr_tty_createMicroTab(Prototype_p, once);
     TTYR_CHECK_NULL(Tab_p)
@@ -115,13 +115,13 @@ TTYR_TTY_RESULT ttyr_tty_appendMicroTab(
 // MICRO WINDOW ====================================================================================
 
 ttyr_tty_MicroWindow ttyr_tty_initMicroWindow(
-    nh_List *MicroTabs_p)
+    nh_core_List *MicroTabs_p)
 {
     ttyr_tty_MicroWindow Window;
 
     Window.Tabs_p = MicroTabs_p;
     Window.current = 0;
-    Window.View_p = ttyr_tty_createView(NULL, NULL, NH_FALSE);
+    Window.View_p = ttyr_tty_createView(NULL, NULL, false);
     return Window;
 }
 
@@ -132,7 +132,7 @@ TTYR_TTY_RESULT ttyr_tty_destroyMicroWindow(
         for (int i = 0; i < Window_p->Tabs_p->size; ++i) {
             ttyr_tty_freeMicroTab(Window_p->Tabs_p->pp[i]);
         }
-        nh_core_freeList(Window_p->Tabs_p, NH_FALSE);
+        nh_core_freeList(Window_p->Tabs_p, false);
         nh_core_free(Window_p->Tabs_p);
         Window_p->Tabs_p = NULL;
     }
@@ -142,7 +142,7 @@ TTYR_TTY_RESULT ttyr_tty_destroyMicroWindow(
 }
 
 TTYR_TTY_RESULT ttyr_tty_drawMicroWindow(
-    ttyr_tty_MicroWindow *Window_p, ttyr_tty_Glyph *Glyphs_p, int cols, int rows, int row, NH_BOOL standardIO)
+    ttyr_tty_MicroWindow *Window_p, ttyr_tty_Glyph *Glyphs_p, int cols, int rows, int row, bool standardIO)
 {
     if (!Window_p->Tabs_p || Window_p->Tabs_p->size == 0) {return TTYR_TTY_SUCCESS;}
 
@@ -152,13 +152,13 @@ TTYR_TTY_RESULT ttyr_tty_drawMicroWindow(
 
     ttyr_tty_Tile *RootTile_p = ((ttyr_tty_MicroTab*)Window_p->Tabs_p->pp[Window_p->current])->RootTile_p;
     ttyr_tty_updateTiling(RootTile_p, Window_p->View_p->rows, Window_p->View_p->cols);
-    nh_List Tiles = ttyr_tty_getTiles(RootTile_p);
+    nh_core_List Tiles = ttyr_tty_getTiles(RootTile_p);
 
-    TTYR_CHECK(ttyr_tty_updateView(Window_p->View_p, NULL, NH_FALSE))
+    TTYR_CHECK(ttyr_tty_updateView(Window_p->View_p, NULL, false))
     TTYR_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, Window_p->View_p, row))
 
     memcpy(Glyphs_p, Window_p->View_p->Grid1_p[row].Glyphs_p, sizeof(ttyr_tty_Glyph)*cols);
-    nh_core_freeList(&Tiles, NH_FALSE);
+    nh_core_freeList(&Tiles, false);
  
     return TTYR_TTY_SUCCESS;
 }

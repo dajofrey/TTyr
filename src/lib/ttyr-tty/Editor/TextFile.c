@@ -18,18 +18,18 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Process.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/Util/File.h"
-#include "nhcore/Common/Macros.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/Util/File.h"
+#include "nh-core/Common/Macros.h"
 
-#include "nhcss/Parser/Parser.h"
-#include "nhhtml/Parser/Parser.h"
-#include "nhwebidl/Runtime/Parser.h"
+#include "nh-css/Parser/Parser.h"
+#include "nh-html/Parser/Parser.h"
+#include "nh-webidl/Runtime/Parser.h"
 
-#include "nhencoding/Encodings/UTF32.h"
-#include "nhencoding/Encodings/UTF8.h"
-#include "nhencoding/Common/Macros.h"
+#include "nh-encoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
+#include "nh-encoding/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -48,10 +48,10 @@ ttyr_tty_TextFileLine *ttyr_tty_newTextFileLine(
 {
     ttyr_tty_TextFileLine *New_p = nh_core_allocate(sizeof(ttyr_tty_TextFileLine));
     TTYR_CHECK_MEM_2(NULL, New_p)
-    New_p->copy = NH_FALSE;
-    New_p->Copy = nh_core_initArray(sizeof(NH_BOOL), 128);
-    New_p->Unsaved = nh_core_initArray(sizeof(NH_BOOL), 128);
-    New_p->Search = nh_core_initArray(sizeof(NH_BOOL), 128);
+    New_p->copy = false;
+    New_p->Copy = nh_core_initArray(sizeof(bool), 128);
+    New_p->Unsaved = nh_core_initArray(sizeof(bool), 128);
+    New_p->Search = nh_core_initArray(sizeof(bool), 128);
     New_p->Codepoints = nh_encoding_initUTF32(128);
     New_p->RenderCodepoints = nh_encoding_initUTF32(128);
     NH_CORE_CHECK_2(NULL, nh_core_insertIntoList(&TextFile_p->Lines, New_p, index))
@@ -60,10 +60,10 @@ ttyr_tty_TextFileLine *ttyr_tty_newTextFileLine(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_appendToTextFileLine(
-    ttyr_tty_TextFileLine *Line_p, NH_ENCODING_UTF32 *codepoints_p, int length)
+    ttyr_tty_TextFileLine *Line_p, NH_API_UTF32 *codepoints_p, int length)
 {
     NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Line_p->Codepoints, codepoints_p, length))
-    NH_BOOL b = NH_FALSE;
+    bool b = false;
     for (int i = 0; i < length; ++i) {
         nh_core_appendToArray(&Line_p->Copy, &b, 1);
         nh_core_appendToArray(&Line_p->Unsaved, &b, 1);
@@ -74,13 +74,13 @@ static TTYR_TTY_RESULT ttyr_tty_appendToTextFileLine(
 }
 
 TTYR_TTY_RESULT ttyr_tty_insertIntoTextFileLine(
-    ttyr_tty_TextFileLine *Line_p, int index, NH_ENCODING_UTF32 c)
+    ttyr_tty_TextFileLine *Line_p, int index, NH_API_UTF32 c)
 {
     NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_insertUTF32(&Line_p->Codepoints, index, &c, 1))
-    NH_BOOL b = NH_FALSE;
+    bool b = false;
     nh_core_insertIntoArray(&Line_p->Copy, index, &b, 1);
     nh_core_insertIntoArray(&Line_p->Search, index, &b, 1);
-    b = NH_TRUE;
+    b = true;
     nh_core_insertIntoArray(&Line_p->Unsaved, index, &b, 1);
 
     return TTYR_TTY_SUCCESS;
@@ -112,12 +112,12 @@ static ttyr_tty_TextFile *ttyr_tty_createTextFile()
     return TextFile_p;
 }
 
-static NH_BYTE *ttyr_tty_readFile(
+static char *ttyr_tty_readFile(
     nh_encoding_UTF32String *Path_p)
 {
     nh_encoding_UTF8String Path = nh_encoding_encodeUTF8(Path_p->p, Path_p->length);
 
-    NH_BYTE *buffer_p = NULL;
+    char *buffer_p = NULL;
     long length;
     FILE *f = fopen(Path.p, "r");
 
@@ -134,8 +134,8 @@ static NH_BYTE *ttyr_tty_readFile(
             if (buffer_p) {fread(buffer_p, 1, length, f);}
         }
         else { // maybe we can read it
-            nh_String String = nh_core_initString(1024);
-            NH_BYTE str_p[1024];
+            nh_core_String String = nh_core_initString(1024);
+            char str_p[1024];
             memset(str_p, 0, 1024);
             read(fileno(f), str_p, 1023);
             nh_core_appendToString(&String, str_p, strlen(str_p));
@@ -155,7 +155,7 @@ ttyr_tty_TextFile *ttyr_tty_openTextFile(
     ttyr_tty_TextFile *TextFile_p = ttyr_tty_createTextFile();
     TTYR_CHECK_MEM_2(NULL, TextFile_p)
 
-    NH_BYTE *p = ttyr_tty_readFile(Path_p);
+    char *p = ttyr_tty_readFile(Path_p);
     if (p) 
     {
         TextFile_p->textType = ttyr_tty_getTextType(Path_p);
@@ -198,7 +198,7 @@ TTYR_TTY_RESULT ttyr_tty_closeTextFile(
         nh_encoding_freeUTF32(&Line_p->RenderCodepoints); 
     }
 
-    nh_core_freeList(&TextFile_p->Lines, NH_TRUE);
+    nh_core_freeList(&TextFile_p->Lines, true);
     nh_core_free(TextFile_p);
 
     return TTYR_TTY_SUCCESS;
@@ -211,10 +211,10 @@ TTYR_TTY_RESULT ttyr_tty_clearTextFileSearch(
 {
     for (int i = 0; i < TextFile_p->Lines.size; ++i) {
         ttyr_tty_TextFileLine *Line_p = TextFile_p->Lines.pp[i];
-        NH_BOOL render = NH_FALSE;
+        bool render = false;
         for (int j = 0; j < Line_p->Codepoints.length; ++j) {
-            if (((NH_BOOL*)Line_p->Search.p)[j]) {render = NH_TRUE;}
-            ((NH_BOOL*)Line_p->Search.p)[j] = NH_FALSE;
+            if (((bool*)Line_p->Search.p)[j]) {render = true;}
+            ((bool*)Line_p->Search.p)[j] = false;
         }
         TTYR_CHECK(ttyr_tty_renderTextFileLine(TextFile_p, i))
     }
@@ -223,7 +223,7 @@ TTYR_TTY_RESULT ttyr_tty_clearTextFileSearch(
 }
 
 TTYR_TTY_RESULT ttyr_tty_searchTextFile(
-    ttyr_tty_TextFile *TextFile_p, NH_ENCODING_UTF32 *str_p, int length)
+    ttyr_tty_TextFile *TextFile_p, NH_API_UTF32 *str_p, int length)
 {
     for (int i = 0; i < TextFile_p->Lines.size; ++i) {
         ttyr_tty_TextFileLine *Line_p = TextFile_p->Lines.pp[i];
@@ -237,7 +237,7 @@ TTYR_TTY_RESULT ttyr_tty_searchTextFile(
                 }
                 if (tmp == 0) {
                     for (int k = j, l = 0; l < length; ++k, ++l) {
-                        ((NH_BOOL*)Line_p->Search.p)[k] = NH_TRUE;
+                        ((bool*)Line_p->Search.p)[k] = true;
                     }
                     TTYR_CHECK(ttyr_tty_renderTextFileLine(TextFile_p, i))
                 }
@@ -258,12 +258,12 @@ TTYR_TTY_RESULT ttyr_tty_writeTextFile(
     for (int i = 0; i < File_p->Lines.size; ++i) 
     {
         ttyr_tty_TextFileLine *Line_p = File_p->Lines.pp[i];
-        NH_BOOL render = NH_FALSE;
+        bool render = false;
 
         for (int j = 0; j < Line_p->Unsaved.length; ++j) {
-            if (((NH_BOOL*)Line_p->Unsaved.p)[j]) {
-                render = NH_TRUE;
-                ((NH_BOOL*)Line_p->Unsaved.p)[j] = NH_FALSE;
+            if (((bool*)Line_p->Unsaved.p)[j]) {
+                render = true;
+                ((bool*)Line_p->Unsaved.p)[j] = false;
             }
         }
 
@@ -294,35 +294,35 @@ TTYR_TTY_RESULT ttyr_tty_renderTextFileLine(
     nh_encoding_freeUTF32(&Line_p->RenderCodepoints);
     Line_p->RenderCodepoints = nh_encoding_initUTF32(128);
 
-    NH_BOOL selection = NH_FALSE, unsaved = NH_FALSE, search = NH_FALSE;
+    bool selection = false, unsaved = false, search = false;
 
     for (int i = 0; i < Line_p->Codepoints.length; ++i) 
     {
-        if (((NH_BOOL*)Line_p->Unsaved.p)[i] && !unsaved) {
-            unsaved = NH_TRUE;
+        if (((bool*)Line_p->Unsaved.p)[i] && !unsaved) {
+            unsaved = true;
         }
-        else if (!((NH_BOOL*)Line_p->Unsaved.p)[i] && unsaved) {
-            unsaved = NH_FALSE;
-            selection = NH_FALSE;
-            search = NH_FALSE;
-        }
-
-        if (((NH_BOOL*)Line_p->Copy.p)[i] && !selection) {
-            selection = NH_TRUE;
-        }
-        else if (!((NH_BOOL*)Line_p->Copy.p)[i] && selection) {
-            selection = NH_FALSE;
-            unsaved = NH_FALSE;
-            search = NH_FALSE;
+        else if (!((bool*)Line_p->Unsaved.p)[i] && unsaved) {
+            unsaved = false;
+            selection = false;
+            search = false;
         }
 
-        if (((NH_BOOL*)Line_p->Search.p)[i] && !search) {
-            search = NH_TRUE;
+        if (((bool*)Line_p->Copy.p)[i] && !selection) {
+            selection = true;
         }
-        else if (!((NH_BOOL*)Line_p->Search.p)[i] && search) {
-            selection = NH_FALSE;
-            unsaved = NH_FALSE;
-            search = NH_FALSE;
+        else if (!((bool*)Line_p->Copy.p)[i] && selection) {
+            selection = false;
+            unsaved = false;
+            search = false;
+        }
+
+        if (((bool*)Line_p->Search.p)[i] && !search) {
+            search = true;
+        }
+        else if (!((bool*)Line_p->Search.p)[i] && search) {
+            selection = false;
+            unsaved = false;
+            search = false;
         }
 
         if (Line_p->Codepoints.p[i] == 9) {
@@ -332,7 +332,7 @@ TTYR_TTY_RESULT ttyr_tty_renderTextFileLine(
             }
         }
         else {
-            NH_ENCODING_UTF32 c = Line_p->Codepoints.p[i];
+            NH_API_UTF32 c = Line_p->Codepoints.p[i];
             if (Line_p->Codepoints.p[i] == '\r') {c = 0xFFFD;}
             nh_encoding_appendUTF32(&Line_p->RenderCodepoints, &c, 1);
         }
@@ -344,7 +344,7 @@ TTYR_TTY_RESULT ttyr_tty_renderTextFileLine(
 // DRAW ============================================================================================
 
 static ttyr_tty_Glyph *ttyr_tty_setNextGlyph(
-    ttyr_tty_Glyph **Glyphs_pp, NH_ENCODING_UTF32 codepoint)
+    ttyr_tty_Glyph **Glyphs_pp, NH_API_UTF32 codepoint)
 {
     ttyr_tty_Glyph Glyph;
     memset(&Glyph, 0, sizeof(ttyr_tty_Glyph));
@@ -360,22 +360,22 @@ static ttyr_tty_Glyph *ttyr_tty_setNextGlyph(
 static int ttyr_tty_renderTextFileLineNumber(
     ttyr_tty_Program *Program_p, ttyr_tty_TextFile *TextFile_p, ttyr_tty_Glyph **Glyphs_pp, int line)
 {
-    NH_BYTE maxX_p[16] = {'\0'};
+    char maxX_p[16] = {'\0'};
     sprintf(maxX_p, "%d", TextFile_p->fileCursorXTarget);
 
-    NH_BYTE maxY_p[16] = {'\0'};
+    char maxY_p[16] = {'\0'};
     sprintf(maxY_p, "%d", TextFile_p->Lines.size);
 
-    NH_BYTE maxXY_p[16] = {'\0'};
+    char maxXY_p[16] = {'\0'};
     sprintf(maxXY_p, "%s %s", maxX_p, maxY_p);
 
-    NH_BYTE x_p[16] = {'\0'};
+    char x_p[16] = {'\0'};
     sprintf(x_p, "%d", TextFile_p->fileCursorX);
 
-    NH_BYTE y_p[16] = {'\0'};
+    char y_p[16] = {'\0'};
     sprintf(y_p, "%d", line);
 
-    NH_BYTE xy_p[16] = {'\0'};
+    char xy_p[16] = {'\0'};
     memset(xy_p, 0, 16);
     memset(xy_p, ' ', strlen(maxXY_p));
 
@@ -393,7 +393,7 @@ static int ttyr_tty_renderTextFileLineNumber(
         if (xy_p[i] != ' ') {
             Glyph_p->Attributes.reverse = TextFile_p->fileCursorY == line;
             if (TextFile_p->fileCursorY != line) {
-                Glyph_p->Foreground.custom = NH_TRUE;
+                Glyph_p->Foreground.custom = true;
                 Glyph_p->Foreground.Color.r = 0.6f;
                 Glyph_p->Foreground.Color.g = 0.3f;
                 Glyph_p->Foreground.Color.b = 0.2f;
@@ -409,14 +409,14 @@ static int ttyr_tty_renderTextFileLineNumber(
 static int ttyr_tty_computeRenderSegmentOffset(
     nh_encoding_UTF32String *RenderLine_p, int offset)
 {
-    NH_BOOL esc = NH_FALSE;
+    bool esc = false;
     int length = 0;
 
     for (int i = 0; i < RenderLine_p->length; ++i) {
         if (offset == 0) {break;}
-        if (RenderLine_p->p[i] == '\x1b') {esc = NH_TRUE;}
+        if (RenderLine_p->p[i] == '\x1b') {esc = true;}
         if (!esc) {--offset;}
-        if (RenderLine_p->p[i] == 'm') {esc = NH_FALSE;}
+        if (RenderLine_p->p[i] == 'm') {esc = false;}
         length++;
     }
 
@@ -426,14 +426,14 @@ static int ttyr_tty_computeRenderSegmentOffset(
 static int ttyr_tty_computeRenderSegment(
     nh_encoding_UTF32String *RenderLine_p, int offset, int width)
 {
-    NH_BOOL esc = NH_FALSE;
+    bool esc = false;
     int length = 0;
 
     for (int i = offset; i < RenderLine_p->length; ++i) {
         if (width == 0) {break;}
-        if (RenderLine_p->p[i] == '\x1b') {esc = NH_TRUE;}
+        if (RenderLine_p->p[i] == '\x1b') {esc = true;}
         if (!esc) {--width;}
-        if (RenderLine_p->p[i] == 'm') {esc = NH_FALSE;}
+        if (RenderLine_p->p[i] == 'm') {esc = false;}
         length++;
     }
 
@@ -463,7 +463,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTextFileLine(
         }
     }
     else {
-        NH_BYTE maxX_p[16] = {'\0'};
+        char maxX_p[16] = {'\0'};
         sprintf(maxX_p, "%d ~", TextFile_p->fileCursorXTarget);
         ttyr_tty_Glyph *Glyph_p = NULL;
         for (int i = 0; i < strlen(maxX_p); ++i) {

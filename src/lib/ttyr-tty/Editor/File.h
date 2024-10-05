@@ -9,6 +9,10 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
+#include "nh-core/Util/LinkedList.h"
+#include "nh-core/Util/Array.h"
+#include "nh-encoding/Encodings/UTF32.h"
+
 #include "../TTY/Program.h"
 #include "../Common/Includes.h"
 
@@ -39,7 +43,7 @@ typedef struct ttyr_tty_FileEditorView ttyr_tty_FileEditorView;
         ttyr_tty_TreeListingNode *Node_p;
         TTYR_TTY_FILE type;
         void *handle_p;
-        NH_BOOL readOnly;
+        bool readOnly;
     } ttyr_tty_File;
 
     typedef struct ttyr_tty_TextFileView {
@@ -78,7 +82,7 @@ typedef struct ttyr_tty_FileEditorView ttyr_tty_FileEditorView;
         ttyr_tty_EditorView *View_p, ttyr_tty_File *File_p
     );
     
-    nh_List ttyr_tty_getFileViews(
+    nh_core_List ttyr_tty_getFileViews(
         ttyr_tty_Program *Program_p, ttyr_tty_File *File_p
     );
     
@@ -103,12 +107,12 @@ typedef struct ttyr_tty_FileEditorView ttyr_tty_FileEditorView;
     );
     
     TTYR_TTY_RESULT ttyr_tty_searchFile(
-        ttyr_tty_File *File_p, NH_ENCODING_UTF32 *str_p, int length
+        ttyr_tty_File *File_p, NH_API_UTF32 *str_p, int length
     );
     
     TTYR_TTY_RESULT ttyr_tty_handleFileInput(
-        ttyr_tty_Program *Program_p, ttyr_tty_File *File_p, NH_ENCODING_UTF32 c, NH_BOOL insertMode, 
-        NH_BOOL *refresh_p
+        ttyr_tty_Program *Program_p, ttyr_tty_File *File_p, NH_API_UTF32 c, bool insertMode, 
+        bool *refresh_p
     );
 
     TTYR_TTY_RESULT ttyr_tty_drawFileRow(

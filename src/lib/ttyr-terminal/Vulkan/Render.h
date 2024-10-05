@@ -14,7 +14,7 @@
 
 #endif
 
-/** @addtogroup lib_nhcss_functions 
+/** @addtogroup lib_nh-css_functions 
  *  @{
  */
 

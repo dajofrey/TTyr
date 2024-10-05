@@ -12,22 +12,22 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Thread.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Process.h"
-#include "nhcore/Util/RingBuffer.h"
-#include "nhcore/Util/List.h"
-#include "nhcore/Config/Config.h"
+#include "nh-core/System/Thread.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/Util/RingBuffer.h"
+#include "nh-core/Util/List.h"
+#include "nh-core/Config/Config.h"
 
-#include "nhencoding/Encodings/UTF8.h"
-#include "nhencoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF32.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Fonts/FontManager.h"
-#include "nhgfx/Fonts/Text.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Fonts/FontManager.h"
+#include "nh-gfx/Fonts/Text.h"
 
-#include "nhwsi/Window/Window.h"
-#include "nhwsi/Window/WindowSettings.h"
+#include "nh-wsi/Window/Window.h"
+#include "nh-wsi/Window/WindowSettings.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -37,7 +37,7 @@
 
 typedef struct ttyr_terminal_Args {
     ttyr_tty_TTY *TTY_p;
-    NH_BYTE *namespace_p;
+    char *namespace_p;
 } ttyr_terminal_Args;
 
 static void *ttyr_terminal_initTerminal(
@@ -45,8 +45,8 @@ static void *ttyr_terminal_initTerminal(
 {
 TTYR_TERMINAL_BEGIN()
 
-    static NH_BYTE *name_p = "Terminal Emulator";
-    static NH_BYTE *path_p = "nhterminal/Terminal/Terminal.c";
+    static char *name_p = "Terminal Emulator";
+    static char *path_p = "nhterminal/Terminal/Terminal.c";
 
     Workload_p->name_p = name_p;
     Workload_p->path_p = path_p;
@@ -57,10 +57,10 @@ TTYR_TERMINAL_BEGIN()
 
     memset(Terminal_p, 0, sizeof(ttyr_terminal_Terminal));
 
-    Terminal_p->ctrl = NH_FALSE;
-    Terminal_p->leftMouse = NH_FALSE;
+    Terminal_p->ctrl = false;
+    Terminal_p->leftMouse = false;
     Terminal_p->TTY_p = ((ttyr_terminal_Args*)Workload_p->args_p)->TTY_p;
-    Terminal_p->View_p = ttyr_tty_createView(Terminal_p->TTY_p, Terminal_p, NH_FALSE);
+    Terminal_p->View_p = ttyr_tty_createView(Terminal_p->TTY_p, Terminal_p, false);
     TTYR_TERMINAL_CHECK_MEM_2(NULL, Terminal_p->View_p)
 
     if (((ttyr_terminal_Args*)Workload_p->args_p)->namespace_p) {
@@ -109,9 +109,9 @@ TTYR_TERMINAL_BEGIN()
     );
 
     nh_gfx_Text Text;
-    NH_ENCODING_UTF32 c = 'e';
+    NH_API_UTF32 c = 'e';
 
-    NH_GFX_RESULT failure = 1;
+    NH_API_RESULT failure = 1;
     for (int i = 0; i < Terminal_p->Graphics.State.Fonts.size; ++i) {
         failure = nh_gfx_createTextFromFont(&Text, &c, 1, Config.fontSize,
             Terminal_p->Graphics.State.Fonts.pp[i]);
@@ -144,7 +144,7 @@ TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateSizeIfRequired(
-    ttyr_terminal_Terminal *Terminal_p, NH_BOOL *update_p)
+    ttyr_terminal_Terminal *Terminal_p, bool *update_p)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -155,21 +155,21 @@ TTYR_TERMINAL_BEGIN()
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateSize(Terminal_p))
 
-    *update_p = NH_TRUE;
+    *update_p = true;
 
 TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_handleEvent(
-    ttyr_terminal_Terminal *Terminal_p, nh_wsi_Event *Event_p)
+    ttyr_terminal_Terminal *Terminal_p, nh_api_WSIEvent *Event_p)
 {
 TTYR_TERMINAL_BEGIN()
 
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
-    if (Event_p->type == NH_WSI_EVENT_MOUSE) {
-        if (Event_p->Mouse.type == NH_WSI_MOUSE_SCROLL && Terminal_p->ctrl) {
-            int newFontSize = Config.fontSize + (Event_p->Mouse.trigger == NH_WSI_TRIGGER_UP ? 1 : -1);
+    if (Event_p->type == NH_API_WSI_EVENT_MOUSE) {
+        if (Event_p->Mouse.type == NH_API_MOUSE_SCROLL && Terminal_p->ctrl) {
+            int newFontSize = Config.fontSize + (Event_p->Mouse.trigger == NH_API_TRIGGER_UP ? 1 : -1);
 
             if (newFontSize < 10 || newFontSize > 60) {
                 // Out of bounds.
@@ -185,9 +185,9 @@ TTYR_TERMINAL_BEGIN()
 
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateSize(Terminal_p))
         }
-        if (Event_p->Mouse.type == NH_WSI_MOUSE_LEFT && Event_p->Mouse.trigger == NH_WSI_TRIGGER_PRESS) {
-            Terminal_p->leftMouse = NH_TRUE;
-            nh_SystemTime Now = nh_core_getSystemTime();
+        if (Event_p->Mouse.type == NH_API_MOUSE_LEFT && Event_p->Mouse.trigger == NH_API_TRIGGER_PRESS) {
+            Terminal_p->leftMouse = true;
+            nh_core_SystemTime Now = nh_core_getSystemTime();
             if (nh_core_getSystemTimeDiffInSeconds(Terminal_p->LastClick, Now) <= 0.3f) {
                 nh_wsi_toggleWindowSize_f toggleWindowSize_f = nh_core_loadExistingSymbol(NH_MODULE_WSI, 0, "nh_wsi_toggleWindowSize");
                 if (toggleWindowSize_f && Event_p->Mouse.Position.y < Terminal_p->Grid.TileSize.height) {
@@ -196,51 +196,51 @@ TTYR_TERMINAL_BEGIN()
             }
             Terminal_p->LastClick = Now;
         } 
-        if (Event_p->Mouse.type == NH_WSI_MOUSE_LEFT && Event_p->Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
-            Terminal_p->leftMouse = NH_FALSE;
+        if (Event_p->Mouse.type == NH_API_MOUSE_LEFT && Event_p->Mouse.trigger == NH_API_TRIGGER_RELEASE) {
+            Terminal_p->leftMouse = false;
         } 
-        if (Event_p->Mouse.type == NH_WSI_MOUSE_MOVE && Terminal_p->leftMouse) {
+        if (Event_p->Mouse.type == NH_API_MOUSE_MOVE && Terminal_p->leftMouse) {
             nh_wsi_moveWindow_f moveWindow_f = nh_core_loadExistingSymbol(NH_MODULE_WSI, 0, "nh_wsi_moveWindow");
             if (moveWindow_f && Event_p->Mouse.Position.y < Terminal_p->Grid.TileSize.height) {
                 moveWindow_f(Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p);
                 if (Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p->type == NH_WSI_TYPE_X11) {
-                    Terminal_p->leftMouse = NH_FALSE;
+                    Terminal_p->leftMouse = false;
                 }
             } 
         }
     }
 
-    if (Event_p->type == NH_WSI_EVENT_KEYBOARD) {
-        if (Event_p->Keyboard.special == NH_WSI_KEY_CONTROL_L || Event_p->Keyboard.special == NH_WSI_KEY_CONTROL_R) {
-            if (Event_p->Keyboard.trigger == NH_WSI_TRIGGER_PRESS) {
-                Terminal_p->ctrl = NH_TRUE;
+    if (Event_p->type == NH_API_WSI_EVENT_KEYBOARD) {
+        if (Event_p->Keyboard.special == NH_API_KEY_CONTROL_L || Event_p->Keyboard.special == NH_API_KEY_CONTROL_R) {
+            if (Event_p->Keyboard.trigger == NH_API_TRIGGER_PRESS) {
+                Terminal_p->ctrl = true;
             }
-            if (Event_p->Keyboard.trigger == NH_WSI_TRIGGER_RELEASE) {
-                Terminal_p->ctrl = NH_FALSE;
+            if (Event_p->Keyboard.trigger == NH_API_TRIGGER_RELEASE) {
+                Terminal_p->ctrl = false;
             }
         }
     }
 
-    if (Event_p->type == NH_WSI_EVENT_WINDOW) {
-        Terminal_p->leftMouse = NH_FALSE;
+    if (Event_p->type == NH_API_WSI_EVENT_WINDOW) {
+        Terminal_p->leftMouse = false;
     }
 
 TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_handleInputIfRequired(
-    ttyr_terminal_Terminal *Terminal_p, NH_BOOL *update_p)
+    ttyr_terminal_Terminal *Terminal_p, bool *update_p)
 {
 TTYR_TERMINAL_BEGIN()
 
-    nh_Array *Array_p = NULL;
-    nh_wsi_Event *Event_p = NULL;
+    nh_core_Array *Array_p = NULL;
+    nh_api_WSIEvent *Event_p = NULL;
 
     for (int row = 0; row < Terminal_p->Grid.rows; ++row) {
-        memset(Terminal_p->Grid.updates_pp[row], NH_FALSE, Terminal_p->Grid.cols*sizeof(NH_BOOL));
+        memset(Terminal_p->Grid.updates_pp[row], false, Terminal_p->Grid.cols*sizeof(bool));
     }
     for (int row = 0; row < Terminal_p->Grid2.rows; ++row) {
-        memset(Terminal_p->Grid2.updates_pp[row], NH_FALSE, Terminal_p->Grid2.cols*sizeof(NH_BOOL));
+        memset(Terminal_p->Grid2.updates_pp[row], false, Terminal_p->Grid2.cols*sizeof(bool));
     }
 
     do {
@@ -260,10 +260,10 @@ TTYR_TERMINAL_BEGIN()
                     &Terminal_p->Grid, &Terminal_p->Graphics.State, Update_p, update_p))
             } else if (Update_p->Glyph.mark & TTYR_TTY_MARK_ELEVATED) {
                 Terminal_p->Grid2.Updates_pp[Update_p->row][Update_p->col] = *Update_p;
-                Terminal_p->Grid2.updates_pp[Update_p->row][Update_p->col] = NH_TRUE;
+                Terminal_p->Grid2.updates_pp[Update_p->row][Update_p->col] = true;
             } else {
                 Terminal_p->Grid.Updates_pp[Update_p->row][Update_p->col] = *Update_p;
-                Terminal_p->Grid.updates_pp[Update_p->row][Update_p->col] = NH_TRUE;
+                Terminal_p->Grid.updates_pp[Update_p->row][Update_p->col] = true;
             }
         }
 
@@ -272,14 +272,14 @@ TTYR_TERMINAL_BEGIN()
     // Update tiles.
     for (int row = 0; row < Terminal_p->Grid.rows; ++row) {
         for (int col = 0; col < Terminal_p->Grid.cols; ++col) {
-            if (Terminal_p->Grid.updates_pp[row][col] == NH_FALSE) {continue;}
+            if (Terminal_p->Grid.updates_pp[row][col] == false) {continue;}
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(
                 &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Grid.Updates_pp[row][col], update_p))
         }
     }
     for (int row = 0; row < Terminal_p->Grid2.rows; ++row) {
         for (int col = 0; col < Terminal_p->Grid2.cols; ++col) {
-            if (Terminal_p->Grid2.updates_pp[row][col] == NH_FALSE) {continue;}
+            if (Terminal_p->Grid2.updates_pp[row][col] == false) {continue;}
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(
                 &Terminal_p->Grid2, &Terminal_p->Graphics.State, &Terminal_p->Grid2.Updates_pp[row][col], update_p))
         }
@@ -318,14 +318,14 @@ TTYR_TERMINAL_BEGIN()
 
     if (!Terminal_p->Graphics.State.Viewport_p) {TTYR_TERMINAL_END(NH_SIGNAL_IDLE)}
 
-    NH_BOOL update = NH_FALSE;
+    bool update = false;
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
     Terminal_p->Graphics.State.Viewport_p->Settings.borderWidth = Config.border;
 
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateSizeIfRequired(Terminal_p, &update))
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_handleInputIfRequired(Terminal_p, &update))
     if (ttyr_terminal_updateBlinkOrGradient(&Terminal_p->Graphics.State)) {
-        update = NH_TRUE;
+        update = true;
     }
 
     Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor = Terminal_p->Graphics.State.Gradient.Color;
@@ -340,7 +340,7 @@ TTYR_TERMINAL_BEGIN()
         TTYR_TERMINAL_END(NH_SIGNAL_OK)
     }
 
-TTYR_TERMINAL_END(update == NH_TRUE ? NH_SIGNAL_OK : NH_SIGNAL_IDLE)
+TTYR_TERMINAL_END(update == true ? NH_SIGNAL_OK : NH_SIGNAL_IDLE)
 }
 
 // COMMANDS ========================================================================================
@@ -363,7 +363,7 @@ TTYR_TERMINAL_BEGIN()
     switch (Command_p->type)
     {
         case TTYR_TERMINAL_COMMAND_SET_VIEWPORT :
-            if (nh_gfx_claimViewport(Command_p->p, NH_GFX_VIEWPORT_OWNER_TERMINAL, Terminal_p) != NH_GFX_SUCCESS) {
+            if (nh_gfx_claimViewport(Command_p->p, NH_GFX_VIEWPORT_OWNER_TERMINAL, Terminal_p) != NH_API_SUCCESS) {
                 TTYR_TERMINAL_END(NH_SIGNAL_ERROR)
             }
             ttyr_terminal_handleViewportChange(&Terminal_p->Graphics, Command_p->p);
@@ -378,7 +378,7 @@ TTYR_TERMINAL_END(NH_SIGNAL_OK)
 // The next functions are called by lib/netzhaut/nhterminal.h functions.
 
 ttyr_terminal_Terminal *ttyr_terminal_openTerminal(
-    NH_BYTE *namespace_p, ttyr_tty_TTY *TTY_p)
+    char *namespace_p, ttyr_tty_TTY *TTY_p)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -388,7 +388,7 @@ TTYR_TERMINAL_BEGIN()
 
     ttyr_terminal_Terminal *Terminal_p = nh_core_activateWorkload(
         ttyr_terminal_initTerminal, ttyr_terminal_runTerminal, ttyr_terminal_freeTerminal,
-        ttyr_terminal_runTerminalCommand, &Args, NH_TRUE);
+        ttyr_terminal_runTerminalCommand, &Args, true);
 
 TTYR_TERMINAL_END(Terminal_p)
 }

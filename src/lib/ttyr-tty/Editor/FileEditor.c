@@ -18,10 +18,10 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Process.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/Util/LinkedList.h"
-#include "nhcore/Common/Macros.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/Util/LinkedList.h"
+#include "nh-core/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -42,7 +42,7 @@ ttyr_tty_FileEditor ttyr_tty_initFileEditor()
     Editor.current = 0;
     Editor.minCols = 60;
     Editor.tabSpaces = 4;
-    Editor.tabToSpaces = NH_TRUE;
+    Editor.tabToSpaces = true;
 
     return Editor;
 }
@@ -56,7 +56,7 @@ TTYR_TTY_RESULT ttyr_tty_freeFileEditor(
         ttyr_tty_closeFile(FileEditor_p, File_p);
     }
 
-    nh_core_destroyLinkedList(&FileEditor_p->Files, NH_TRUE);
+    nh_core_destroyLinkedList(&FileEditor_p->Files, true);
 
     return TTYR_TTY_SUCCESS;
 }
@@ -77,15 +77,15 @@ static TTYR_TTY_RESULT ttyr_tty_renderFileEditor(
 
 // FILE ============================================================================================
 
-static NH_BOOL ttyr_tty_hasFile(
+static bool ttyr_tty_hasFile(
     ttyr_tty_FileEditor *Editor_p, ttyr_tty_File *File_p)
 {
-    NH_BOOL hasFile = NH_FALSE;
+    bool hasFile = false;
 
     for (int i = 0; i < Editor_p->Files.count; ++i) {
         ttyr_tty_File *Compare_p = nh_core_getFromLinkedList(&Editor_p->Files, i);
         if (File_p == Compare_p) {
-            hasFile = NH_TRUE;
+            hasFile = true;
             break;
         }
     }
@@ -95,7 +95,7 @@ static NH_BOOL ttyr_tty_hasFile(
 
 // TODO Fix possible memory leaks.
 ttyr_tty_File *ttyr_tty_openFile(
-    ttyr_tty_Program *Program_p, ttyr_tty_TreeListingNode *Node_p, NH_BOOL readOnly)
+    ttyr_tty_Program *Program_p, ttyr_tty_TreeListingNode *Node_p, bool readOnly)
 {
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Program_p->handle_p)->FileEditor;
     ttyr_tty_FileEditorView *FileEditorView_p = &((ttyr_tty_Editor*)Program_p->handle_p)->View.FileEditor;
@@ -147,14 +147,14 @@ TTYR_TTY_RESULT ttyr_tty_closeFile(
             break;
     }
 
-    nh_core_removeFromLinkedList2(&Editor_p->Files, File_p, NH_TRUE);
+    nh_core_removeFromLinkedList2(&Editor_p->Files, File_p, true);
 
     return TTYR_TTY_SUCCESS;
 }
 
 // HELP TEXT =======================================================================================
 
-static const NH_BYTE *help_pp[] =
+static const char *help_pp[] =
 {
     "General Controls                                       ",
     "                                                       ",
@@ -214,7 +214,7 @@ static const NH_BYTE *help_pp[] =
 // INPUT ===========================================================================================
 
 TTYR_TTY_RESULT ttyr_tty_cycleThroughFiles(
-    ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Program *Program_p, NH_API_UTF32 c)
 {
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Program_p->handle_p)->FileEditor;
 
@@ -275,7 +275,7 @@ TTYR_TTY_RESULT ttyr_tty_cycleThroughFiles(
 }
 
 TTYR_TTY_RESULT ttyr_tty_handleFileEditorInput(
-    ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Program *Program_p, NH_API_UTF32 c)
 {
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Editor_p)->FileEditor;
@@ -286,7 +286,7 @@ TTYR_TTY_RESULT ttyr_tty_handleFileEditorInput(
 
         switch (c) {
             case 'l' :
-            case 'h' : Editor_p->treeListing = NH_FALSE; break;
+            case 'h' : Editor_p->treeListing = false; break;
         }
     }
 
@@ -300,7 +300,7 @@ static TTYR_TTY_RESULT ttyr_tty_drawHelp(
 {
     line += scroll;
 
-//    NH_BYTE *text_p = "No file opened.";
+//    char *text_p = "No file opened.";
 //    if (lines/2 == line) {
 //        for (int i = (width-strlen(text_p))/2, j = 0; j < strlen(text_p); ++i, ++j) {
 //            Glyphs_p[i].codepoint = text_p[j];

@@ -14,9 +14,9 @@
 #include "../Common/Includes.h"
 #include "../TTY/Program.h"
 
-#include "nhcore/Util/Time.h"
-#include "nhcore/Util/List.h"
-#include "nhcore/Util/String.h"
+#include "nh-core/Util/Time.h"
+#include "nh-core/Util/List.h"
+#include "nh-core/Util/String.h"
 
 #endif
 
@@ -26,27 +26,27 @@
 
     typedef struct ttyr_tty_TreeListingNodeOverflow {
         int offset;
-        nh_SystemTime LastShift;
+        nh_core_SystemTime LastShift;
     } ttyr_tty_TreeListingNodeOverflow;
 
     typedef struct ttyr_tty_TreeListingNode {
-        NH_BOOL open;
-        NH_BOOL unsaved;
+        bool open;
+        bool unsaved;
         ttyr_tty_File *File_p;
         nh_encoding_UTF32String Path;
-        nh_List Children; 
+        nh_core_List Children; 
         struct ttyr_tty_TreeListingNode *Parent_p;
         ttyr_tty_TreeListingNodeOverflow Overflow;
     } ttyr_tty_TreeListingNode;
  
     typedef struct ttyr_tty_TreeListing {
         ttyr_tty_TreeListingNode *Root_p;
-        NH_BOOL preview;
-        NH_BOOL dirty;
+        bool preview;
+        bool dirty;
         ttyr_tty_TreeListingNode *Preview_p;
         int current;
-        nh_Array RenderLines;
-        NH_BYTE wrkDir_p[2048];
+        nh_core_Array RenderLines;
+        char wrkDir_p[2048];
     } ttyr_tty_TreeListing;
 
     typedef struct ttyr_tty_TreeListingView {
@@ -70,7 +70,7 @@
     );
 
     TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
-        ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c
+        ttyr_tty_Program *Program_p, NH_API_UTF32 c
     );
 
     TTYR_TTY_RESULT ttyr_tty_drawTreeListingRow(
@@ -82,7 +82,7 @@
     );
 
     ttyr_tty_TreeListingNode *ttyr_tty_insertTreeListingNode(
-        ttyr_tty_TreeListing *Listing_p, NH_ENCODING_UTF32 *name_p, int length
+        ttyr_tty_TreeListing *Listing_p, NH_API_UTF32 *name_p, int length
     );
 
 /** @} */

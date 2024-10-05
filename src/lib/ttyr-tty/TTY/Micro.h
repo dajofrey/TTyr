@@ -34,7 +34,7 @@
 
     typedef struct ttyr_tty_MicroWindow {
         int current;     /**<Current focused micro tab.*/
-        nh_List *Tabs_p; /**<Pointer to micro tabs.*/
+        nh_core_List *Tabs_p; /**<Pointer to micro tabs.*/
         ttyr_tty_View *View_p;
     } ttyr_tty_MicroWindow;
 
@@ -52,20 +52,20 @@
         ttyr_tty_MicroTile *Tile_p
     );
 
-    nh_List *ttyr_tty_createMicroTabs(
+    nh_core_List *ttyr_tty_createMicroTabs(
         ttyr_tty_TTY *TTY_p
     );
     
     TTYR_TTY_RESULT ttyr_tty_appendMicroTab(
-        ttyr_tty_MicroWindow *Window_p, ttyr_tty_Interface *Prototype_p, NH_BOOL once
+        ttyr_tty_MicroWindow *Window_p, ttyr_tty_Interface *Prototype_p, bool once
     );
 
     TTYR_TTY_RESULT ttyr_tty_getMicroTiles(
-        ttyr_tty_MicroWindow *Window_p, nh_List *List_p
+        ttyr_tty_MicroWindow *Window_p, nh_core_List *List_p
     );
 
     ttyr_tty_MicroWindow ttyr_tty_initMicroWindow(
-        nh_List *MicroTabs_p
+        nh_core_List *MicroTabs_p
     );
 
     TTYR_TTY_RESULT ttyr_tty_destroyMicroWindow(
@@ -73,7 +73,7 @@
     );
 
     TTYR_TTY_RESULT ttyr_tty_drawMicroWindow(
-        ttyr_tty_MicroWindow *Window_p, ttyr_tty_Glyph *Glyphs_p, int cols, int rows, int row, NH_BOOL standardIO
+        ttyr_tty_MicroWindow *Window_p, ttyr_tty_Glyph *Glyphs_p, int cols, int rows, int row, bool standardIO
     );
 
     ttyr_tty_Program *ttyr_tty_getCurrentProgram(

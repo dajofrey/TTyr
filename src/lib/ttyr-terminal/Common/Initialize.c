@@ -14,12 +14,12 @@
 
 #include "../Vulkan/Pipeline.h"
 
-#include "nhgfx/Vulkan/GPU.h"
-#include "nhgfx/Vulkan/Vulkan.h"
+#include "nh-gfx/Vulkan/GPU.h"
+#include "nh-gfx/Vulkan/Vulkan.h"
 
-#include "nhcore/Config/Config.h"
-#include "nhcore/System/Logger.h"
-#include "nhcore/System/Memory.h"
+#include "nh-core/Config/Config.h"
+#include "nh-core/System/Logger.h"
+#include "nh-core/System/Memory.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,7 +31,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_initialize()
 {
 TTYR_TERMINAL_BEGIN()
 
-    nh_core_appendConfig(ttyr_terminal_conf_inc, ttyr_terminal_conf_inc_len, NH_FALSE);
+    nh_core_appendConfig(ttyr_terminal_conf_inc, ttyr_terminal_conf_inc_len, false);
 
     for (int i = 0; i < NH_VULKAN.GPUs.size; ++i) 
     {

@@ -9,6 +9,7 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
+#include "nh-encoding/Encodings/UTF32.h"
 #include "../Common/Includes.h"
 
 typedef struct ttyr_tty_Topbar ttyr_tty_Topbar;
@@ -62,10 +63,10 @@ typedef struct ttyr_tty_Topbar ttyr_tty_Topbar;
  */
 
     typedef struct ttyr_tty_TopbarMessage {
-        NH_BOOL block;
+        bool block;
         nh_encoding_UTF32String Text;
         void *args_p;
-        TTYR_TTY_RESULT (*callback_f)(nh_wsi_KeyboardEvent Event, NH_BOOL *continue_p);
+        TTYR_TTY_RESULT (*callback_f)(nh_api_KeyboardEvent Event, bool *continue_p);
     } ttyr_tty_TopbarMessage;
 
 /** @} */
@@ -74,7 +75,7 @@ typedef struct ttyr_tty_Topbar ttyr_tty_Topbar;
  *  @{
  */
 
-    NH_ENCODING_UTF32 *ttyr_tty_getMessage(
+    NH_API_UTF32 *ttyr_tty_getMessage(
         TTYR_TTY_MESSAGE message, int *length_p
     );
 
@@ -87,17 +88,17 @@ typedef struct ttyr_tty_Topbar ttyr_tty_Topbar;
     );
     
     TTYR_TTY_RESULT ttyr_tty_setCustomMessage(
-        ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *suffix_p, int suffixLength
+        ttyr_tty_Topbar *Topbar_p, NH_API_UTF32 *suffix_p, int suffixLength
     );
 
     TTYR_TTY_RESULT ttyr_tty_setCustomSuffixMessage(
-        ttyr_tty_Topbar *Topbar_p, TTYR_TTY_MESSAGE prefix, NH_ENCODING_UTF32 *suffix_p, 
+        ttyr_tty_Topbar *Topbar_p, TTYR_TTY_MESSAGE prefix, NH_API_UTF32 *suffix_p, 
         int suffixLength
     );
 
     TTYR_TTY_RESULT ttyr_tty_setBinaryQueryMessage(
-        ttyr_tty_Topbar *Topbar_p, NH_ENCODING_UTF32 *query_p, int length, void *args_p, 
-        TTYR_TTY_RESULT (*callback_f)(nh_wsi_KeyboardEvent Event, NH_BOOL *continue_p)
+        ttyr_tty_Topbar *Topbar_p, NH_API_UTF32 *query_p, int length, void *args_p, 
+        TTYR_TTY_RESULT (*callback_f)(nh_api_KeyboardEvent Event, bool *continue_p)
     );
 
 /** @} */

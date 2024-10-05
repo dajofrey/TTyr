@@ -13,10 +13,10 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
-#include "nhencoding/Encodings/UTF32.h"
-#include "nhencoding/Encodings/UTF8.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
+#include "nh-encoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,7 +35,7 @@
 // ACTION ==========================================================================================
 
 static bool ttyr_tty_pathMatchesContextMenu(
-    ttyr_tty_ContextMenu *Menu_p, const NH_ENCODING_UTF32 **pp, int count)
+    ttyr_tty_ContextMenu *Menu_p, const NH_API_UTF32 **pp, int count)
 {
     for (int i = count-1; i >= 0; --i) {
         if (!Menu_p || Menu_p->Name.length == 0) {
@@ -55,12 +55,12 @@ static bool ttyr_tty_pathMatchesContextMenu(
 static int ttyr_tty_isContextMenuTiling(
     ttyr_tty_ContextMenu *Menu_p)
 {
-    static const NH_ENCODING_UTF32 append_p[] = {'A', 'p', 'p', 'e', 'n', 'd', 0};
-    static const NH_ENCODING_UTF32 split_p[] = {'S', 'p', 'l', 'i', 't', 0};
-    static const NH_ENCODING_UTF32 window_p[] = {'W', 'i', 'n', 'd', 'o', 'w', 0};
-    static const NH_ENCODING_UTF32 tab_p[] = {'T', 'a', 'b', 0};
+    static const NH_API_UTF32 append_p[] = {'A', 'p', 'p', 'e', 'n', 'd', 0};
+    static const NH_API_UTF32 split_p[] = {'S', 'p', 'l', 'i', 't', 0};
+    static const NH_API_UTF32 window_p[] = {'W', 'i', 'n', 'd', 'o', 'w', 0};
+    static const NH_API_UTF32 tab_p[] = {'T', 'a', 'b', 0};
 
-    static const NH_ENCODING_UTF32 *paths_ppp[][4] = {
+    static const NH_API_UTF32 *paths_ppp[][4] = {
         {append_p, tab_p},
         {append_p, window_p},
         {split_p, tab_p},
@@ -79,19 +79,19 @@ static int ttyr_tty_isContextMenuTiling(
 static int ttyr_tty_isContextMenuWindowOrTabSelect(
     ttyr_tty_ContextMenu *Menu_p)
 {
-    static const NH_ENCODING_UTF32 window_p[] = {'W', 'i', 'n', 'd', 'o', 'w', 0};
-    static const NH_ENCODING_UTF32 tab_p[] = {'T', 'a', 'b', 0};
-    static const NH_ENCODING_UTF32 p1[] = {'1', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p2[] = {'2', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p3[] = {'3', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p4[] = {'4', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p5[] = {'5', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p6[] = {'6', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p7[] = {'7', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p8[] = {'8', 1, ' ', 0};
-    static const NH_ENCODING_UTF32 p9[] = {'9', 1, ' ', 0};
+    static const NH_API_UTF32 window_p[] = {'W', 'i', 'n', 'd', 'o', 'w', 0};
+    static const NH_API_UTF32 tab_p[] = {'T', 'a', 'b', 0};
+    static const NH_API_UTF32 p1[] = {'1', 1, ' ', 0};
+    static const NH_API_UTF32 p2[] = {'2', 1, ' ', 0};
+    static const NH_API_UTF32 p3[] = {'3', 1, ' ', 0};
+    static const NH_API_UTF32 p4[] = {'4', 1, ' ', 0};
+    static const NH_API_UTF32 p5[] = {'5', 1, ' ', 0};
+    static const NH_API_UTF32 p6[] = {'6', 1, ' ', 0};
+    static const NH_API_UTF32 p7[] = {'7', 1, ' ', 0};
+    static const NH_API_UTF32 p8[] = {'8', 1, ' ', 0};
+    static const NH_API_UTF32 p9[] = {'9', 1, ' ', 0};
  
-    static const NH_ENCODING_UTF32 *paths_ppp[][18] = {
+    static const NH_API_UTF32 *paths_ppp[][18] = {
         {window_p, p1},
         {window_p, p2},
         {window_p, p3},
@@ -124,17 +124,17 @@ static int ttyr_tty_isContextMenuWindowOrTabSelect(
 static int ttyr_tty_handleContextMenuTiling(
     int action, ttyr_tty_Tile *Tile_p, int cCol, int cRow)
 {
-    nh_wsi_KeyboardEvent Event;
+    nh_api_KeyboardEvent Event;
     ttyr_tty_MacroWindow *Window_p = ((ttyr_tty_TTY*)nh_core_getWorkloadArg())->Window_p;
 
     int direction = 0;
     
     float col = (((float)cCol)/((float)Tile_p->colSize))-0.5f;
-    NH_BOOL right = col > 0.0f;
+    bool right = col > 0.0f;
     col = fabs(col);
 
     float row = (((float)cRow)/((float)Tile_p->rowSize))-0.5f;
-    NH_BOOL bottom = row > 0.0f;
+    bool bottom = row > 0.0f;
     row = fabs(row);
    
     if (col > row) {
@@ -147,9 +147,9 @@ static int ttyr_tty_handleContextMenuTiling(
     {
         // Handle tab append.
         case 0 :
-            Event.trigger = NH_WSI_TRIGGER_PRESS;
+            Event.trigger = NH_API_TRIGGER_PRESS;
             Event.codepoint = TTYR_TTY_TILING_KEY;
-            Event.state |= NH_WSI_MODIFIER_CONTROL;
+            Event.state |= NH_API_MODIFIER_CONTROL;
             ttyr_tty_handleTilingInput(Window_p, Event); 
 
             if (direction == 0) {
@@ -168,9 +168,9 @@ static int ttyr_tty_handleContextMenuTiling(
 
         // Handle tab split.
         case 2 :
-            Event.trigger = NH_WSI_TRIGGER_PRESS;
+            Event.trigger = NH_API_TRIGGER_PRESS;
             Event.codepoint = TTYR_TTY_TILING_KEY;
-            Event.state |= NH_WSI_MODIFIER_CONTROL;
+            Event.state |= NH_API_MODIFIER_CONTROL;
             ttyr_tty_handleTilingInput(Window_p, Event); 
 
             Event.state = 0;
@@ -192,9 +192,9 @@ static int ttyr_tty_handleContextMenuTiling(
  
         // Handle window append.
         case 1 :
-            Event.trigger = NH_WSI_TRIGGER_PRESS;
+            Event.trigger = NH_API_TRIGGER_PRESS;
             Event.codepoint = TTYR_TTY_TILING_KEY;
-            Event.state |= NH_WSI_MODIFIER_CONTROL;
+            Event.state |= NH_API_MODIFIER_CONTROL;
             ttyr_tty_handleTilingInput(Window_p, Event); 
             ttyr_tty_handleTilingInput(Window_p, Event); 
 
@@ -214,9 +214,9 @@ static int ttyr_tty_handleContextMenuTiling(
 
         // Handle window split.
         case 3 :
-            Event.trigger = NH_WSI_TRIGGER_PRESS;
+            Event.trigger = NH_API_TRIGGER_PRESS;
             Event.codepoint = TTYR_TTY_TILING_KEY;
-            Event.state |= NH_WSI_MODIFIER_CONTROL;
+            Event.state |= NH_API_MODIFIER_CONTROL;
             ttyr_tty_handleTilingInput(Window_p, Event); 
             ttyr_tty_handleTilingInput(Window_p, Event); 
 
@@ -244,20 +244,20 @@ static int ttyr_tty_handleContextMenuTiling(
 // CREATE/FREE =====================================================================================
 
 static ttyr_tty_ContextMenu *ttyr_tty_parseContextMenu(
-    NH_ENCODING_UTF32 **menu_pp, ttyr_tty_ContextMenu *Parent_p)
+    NH_API_UTF32 **menu_pp, ttyr_tty_ContextMenu *Parent_p)
 {
     ttyr_tty_ContextMenu *Menu_p = nh_core_allocate(sizeof(ttyr_tty_ContextMenu));
     TTYR_CHECK_MEM_2(NULL, Menu_p)
 
     Menu_p->Parent_p = Parent_p;
-    Menu_p->active = NH_FALSE;
-    Menu_p->hit = NH_FALSE;
+    Menu_p->active = false;
+    Menu_p->hit = false;
     Menu_p->Name = nh_encoding_initUTF32(16); 
     Menu_p->Position.x = 0;
     Menu_p->Position.y = 0;
     Menu_p->Items = nh_core_initList(8);
 
-    NH_BOOL curly = NH_FALSE;
+    bool curly = false;
 
     while (**menu_pp != 0) {
         if (**menu_pp == '{' || (**menu_pp == ',' && curly)) {
@@ -265,12 +265,12 @@ static ttyr_tty_ContextMenu *ttyr_tty_parseContextMenu(
             ttyr_tty_ContextMenu *Child_p = ttyr_tty_parseContextMenu(menu_pp, Menu_p);
             TTYR_CHECK_NULL_2(NULL, Child_p)
             nh_core_appendToList(&Menu_p->Items, Child_p);
-            curly = NH_TRUE;
+            curly = true;
             continue;
         }
         else if (**menu_pp == '}') {
             if (curly) {
-                curly = NH_FALSE;
+                curly = false;
                 (*menu_pp)++;
                 continue;
             }
@@ -294,7 +294,7 @@ void ttyr_tty_freeContextMenu(
     for (int i = 0; i < Menu_p->Items.size; ++i) {
         ttyr_tty_freeContextMenu(Menu_p->Items.pp[i]);
     }
-    nh_core_freeList(&Menu_p->Items, NH_FALSE);
+    nh_core_freeList(&Menu_p->Items, false);
     nh_encoding_freeUTF32(&Menu_p->Name);
     nh_core_free(Menu_p);
     return;
@@ -337,17 +337,17 @@ static void ttyr_tty_computeContextMenuPosition(
     return;
 }
 
-static NH_BOOL ttyr_tty_compareContextMenuName(
-    ttyr_tty_ContextMenu *Menu_p, NH_BYTE *name_p)
+static bool ttyr_tty_compareContextMenuName(
+    ttyr_tty_ContextMenu *Menu_p, char *name_p)
 {
     nh_encoding_UTF8String Name = nh_encoding_encodeUTF8(Menu_p->Name.p, Menu_p->Name.length);
-    NH_BOOL result = !strcmp(Name.p, name_p);
+    bool result = !strcmp(Name.p, name_p);
     nh_encoding_freeUTF8(&Name);
     return result;
 }
 
 ttyr_tty_ContextMenu *ttyr_tty_isContextMenuHit(
-    ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, NH_BOOL recursive, int x, int y)
+    ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, bool recursive, int x, int y)
 {
     int x2 = x;
     int y2 = Menu_p->Position.y;
@@ -381,13 +381,13 @@ ttyr_tty_ContextMenu *ttyr_tty_isContextMenuHit(
 }
 
 void ttyr_tty_updateContextMenuHit(
-    ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, int x, int y, NH_BOOL activate)
+    ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, int x, int y, bool activate)
 {
-    NH_BOOL newHit = !Menu_p->hit;
-    Menu_p->hit = ttyr_tty_isContextMenuHit(Menu_p, Parent_p, NH_FALSE, x, y) != NULL && Menu_p->Name.length > 0;
+    bool newHit = !Menu_p->hit;
+    Menu_p->hit = ttyr_tty_isContextMenuHit(Menu_p, Parent_p, false, x, y) != NULL && Menu_p->Name.length > 0;
 
     if (Menu_p->hit) {
-        Menu_p->active = NH_TRUE;
+        Menu_p->active = true;
     }
     if (Menu_p->active && Parent_p) {
         for (int i = 0; i < Parent_p->Items.size; ++i) {
@@ -401,7 +401,7 @@ void ttyr_tty_updateContextMenuHit(
 
     for (int i = 0; (Menu_p->active || Menu_p->hit) && i < Menu_p->Items.size; ++i) {
         ttyr_tty_updateContextMenuHit(Menu_p->Items.pp[i], Menu_p, x, y, activate);
-        if (((ttyr_tty_ContextMenu*)Menu_p->Items.pp[i])->hit) {Menu_p->hit = NH_TRUE;}
+        if (((ttyr_tty_ContextMenu*)Menu_p->Items.pp[i])->hit) {Menu_p->hit = true;}
     }
 
     return;
@@ -423,8 +423,8 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
     // Generate command menu.
     if (Program_p && Program_p->Prototype_p && Program_p->Prototype_p->commands > 0) {
         for (int i = 0; i < Program_p->Prototype_p->commands; ++i) {
-            nh_encoding_UTF32String *Name_p = Program_p->Prototype_p->CommandNames_p+i;
-            nh_encoding_appendUTF32(&Menu, Name_p->p, Name_p->length); 
+            NH_API_UTF32 *name_p = Program_p->Prototype_p->commands_pp[i];
+            nh_encoding_appendUTF32(&Menu, name_p, nh_encoding_getUTF32Length(name_p)); 
             if (i < Program_p->Prototype_p->commands-1) {nh_encoding_appendUTF32Codepoint(&Menu, ',');}
         }
     }
@@ -434,18 +434,18 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
 
     if (Config.Menu.program && TTY_p->Prototypes.size > 1) {
         ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
-        NH_ENCODING_UTF32 apps_p[] = {PROGRAM_NAME '{'};
+        NH_API_UTF32 apps_p[] = {PROGRAM_NAME '{'};
         nh_encoding_appendUTF32(&Menu, apps_p, sizeof(apps_p)/sizeof(apps_p[0]));
         int width = 0;
         for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-            if (((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Name.length > width) {
-                width = ((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Name.length;
+            if (nh_encoding_getUTF32Length(((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->name_p) > width) {
+                width = nh_encoding_getUTF32Length(((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->name_p);
             }
         }
         for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
             ttyr_tty_Interface *Prototype_p = TTY_p->Prototypes.pp[i];
-            nh_encoding_appendUTF32(&Menu, Prototype_p->Name.p, Prototype_p->Name.length); 
-            for (int j = width - Prototype_p->Name.length; j > 0; --j) {
+            nh_encoding_appendUTF32(&Menu, Prototype_p->name_p, nh_encoding_getUTF32Length(Prototype_p->name_p)); 
+            for (int j = width - nh_encoding_getUTF32Length(Prototype_p->name_p); j > 0; --j) {
                 nh_encoding_appendUTF32Codepoint(&Menu, ' '); 
             }
             nh_encoding_appendUTF32Codepoint(&Menu, 1); 
@@ -461,7 +461,7 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
         if (border) {
             nh_encoding_appendUTF32Codepoint(&Menu, ',');
         } 
-        NH_ENCODING_UTF32 tiling_p[] = {
+        NH_API_UTF32 tiling_p[] = {
             'S', 'p', 'l', 'i', 't', '{',
                  'W', 'i', 'n', 'd', 'o', 'w', ',',
                  'T', 'a', 'b',
@@ -475,7 +475,7 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
         if (border && !Config.Menu.split) {
             nh_encoding_appendUTF32Codepoint(&Menu, ',');
         } 
-        NH_ENCODING_UTF32 tiling_p[] = {
+        NH_API_UTF32 tiling_p[] = {
             'A', 'p', 'p', 'e', 'n', 'd', '{',
                  'W', 'i', 'n', 'd', 'o', 'w', ',',
                  'T', 'a', 'b',
@@ -486,10 +486,10 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
     }
 
 //    if (Config.Menu.window) {
-//        NH_ENCODING_UTF32 tmp1_p[] = {',', 'W', 'i', 'n', 'd', 'o', 'w', '{'};
+//        NH_API_UTF32 tmp1_p[] = {',', 'W', 'i', 'n', 'd', 'o', 'w', '{'};
 //        nh_encoding_appendUTF32(&Menu, tmp1_p, 7);
 //        for (int i = 0; i < Config.windows; ++i) {
-//            NH_ENCODING_UTF32 tmp2_p[] = {i + '1', 1, ' '};
+//            NH_API_UTF32 tmp2_p[] = {i + '1', 1, ' '};
 //            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i) {
 //                tmp2_p[2] = 0x2022;
 //            }
@@ -504,10 +504,10 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
 //    }
 //
 //    if (Config.Menu.tab) {
-//        NH_ENCODING_UTF32 tmp3_p[] = {',', 'T', 'a', 'b', '{'};
+//        NH_API_UTF32 tmp3_p[] = {',', 'T', 'a', 'b', '{'};
 //        nh_encoding_appendUTF32(&Menu, Config.Menu.window ? tmp3_p+1 : tmp3_p , Config.Menu.window ? 3 : 4);
 //        for (int i = 0; i < Config.tabs; ++i) {
-//            NH_ENCODING_UTF32 tmp2_p[] = {i + '1', 1, ' '};
+//            NH_API_UTF32 tmp2_p[] = {i + '1', 1, ' '};
 //            if (((ttyr_tty_MacroTile*)TTY_p->Window_p->Tile_p->p)->current == i) {
 //                tmp2_p[2] = 0x2022;
 //            }
@@ -525,7 +525,7 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
         if (border) {
             nh_encoding_appendUTF32Codepoint(&Menu, ',');
         } 
-        NH_ENCODING_UTF32 close_p[] = {'C', 'l', 'o', 's', 'e', ','};
+        NH_API_UTF32 close_p[] = {'C', 'l', 'o', 's', 'e', ','};
         nh_encoding_appendUTF32(&Menu, close_p, sizeof(close_p)/sizeof(close_p[0]));
         border = true;
     }
@@ -535,11 +535,11 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
             nh_encoding_appendUTF32Codepoint(&Menu, ',');
         } 
  
-        NH_ENCODING_UTF32 debug_p[] = {'D', 'e', 'b', 'u', 'g', '{', 0};
+        NH_API_UTF32 debug_p[] = {'D', 'e', 'b', 'u', 'g', '{', 0};
         nh_encoding_appendUTF32(&Menu, debug_p, sizeof(debug_p)/sizeof(debug_p[0]));
      
-        NH_ENCODING_UTF32 x_p[16];
-        NH_ENCODING_UTF32 y_p[16];
+        NH_API_UTF32 x_p[16];
+        NH_API_UTF32 y_p[16];
     
         int xLength = nh_encoding_integerToUTF32(x, x_p, 64);
         int yLength = nh_encoding_integerToUTF32(y, y_p, 64);
@@ -574,7 +574,7 @@ ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(
         nh_encoding_appendUTF32Codepoint(&Menu, '}');
     }
 
-    NH_ENCODING_UTF32 *p = Menu.p;
+    NH_API_UTF32 *p = Menu.p;
     if (Menu.length) {
         p[Menu.length-1] = 0; // Remove the last ','
     }
@@ -604,8 +604,8 @@ TTYR_TTY_RESULT ttyr_tty_handleMouseMenuPress(
         } else {
             ttyr_tty_handleContextMenuTiling(tiling, TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p, Root_p->cCol, Root_p->cRow);
         }
-        nh_wsi_KeyboardEvent Event;
-        Event.trigger = NH_WSI_TRIGGER_PRESS;
+        nh_api_KeyboardEvent Event;
+        Event.trigger = NH_API_TRIGGER_PRESS;
         Event.codepoint = 13;
         return ttyr_tty_handleTilingInput(TTY_p->Window_p, Event);
     }
@@ -621,8 +621,8 @@ TTYR_TTY_RESULT ttyr_tty_handleMouseMenuPress(
     }
 
     // Handle program switch if necessary.
-    NH_ENCODING_UTF32 program_p[] = {PROGRAM_NAME 0};
-    NH_ENCODING_UTF32 close_p[] = {'C', 'l', 'o', 's', 'e', 0};
+    NH_API_UTF32 program_p[] = {PROGRAM_NAME 0};
+    NH_API_UTF32 close_p[] = {'C', 'l', 'o', 's', 'e', 0};
     if (nh_encoding_compareUTF32(Menu_p->Parent_p->Name.p, program_p)) {
         for (int i = 0; i < Menu_p->Parent_p->Items.size; ++i) {
             ttyr_tty_ContextMenu *Prog_p = Menu_p->Parent_p->Items.pp[i];
@@ -631,7 +631,7 @@ TTYR_TTY_RESULT ttyr_tty_handleMouseMenuPress(
             } 
         }
     } else if (nh_encoding_compareUTF32(Menu_p->Name.p, close_p)) {
-        TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p->close = NH_TRUE;
+        TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p->close = true;
     } else {
         // Handle command execution if necessary.
         for (int i = 0; i < Menu_p->Parent_p->Items.size; ++i) {
@@ -640,7 +640,7 @@ TTYR_TTY_RESULT ttyr_tty_handleMouseMenuPress(
                 ttyr_tty_Program *Program_p = ttyr_tty_getCurrentProgram(&TTYR_TTY_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
                 if (Program_p->Prototype_p->Callbacks.handleCommand_f) {
                     Program_p->command = i;
-                    Program_p->Prototype_p->Callbacks.handleCommand_f(Program_p, NULL);
+                    Program_p->Prototype_p->Callbacks.handleCommand_f(Program_p);
                 }
             } 
         }
@@ -654,7 +654,7 @@ TTYR_TTY_RESULT ttyr_tty_handleMouseMenuPress(
 TTYR_TTY_RESULT ttyr_tty_drawContextMenuRecursively(
     ttyr_tty_ContextMenu *Menu_p, ttyr_tty_Row *Grid_p)
 {
-    if (Menu_p == NULL || Menu_p->Items.size == 0 || Menu_p->hit == NH_FALSE && Menu_p->active == NH_FALSE) {
+    if (Menu_p == NULL || Menu_p->Items.size == 0 || Menu_p->hit == false && Menu_p->active == false) {
         return TTYR_TTY_SUCCESS;
     }
 
@@ -672,7 +672,7 @@ TTYR_TTY_RESULT ttyr_tty_drawContextMenuRecursively(
         ttyr_tty_ContextMenu *Child_p = Menu_p->Items.pp[i];
         if (Child_p->hit) {
             for (int col = Menu_p->Position.x, j = 0; j < width && Child_p->Name.p[j] != 1; ++col, ++j) {
-                Grid_p[row].Glyphs_p[col].Attributes.reverse = NH_TRUE;
+                Grid_p[row].Glyphs_p[col].Attributes.reverse = true;
             }
         }
         for (int col = Menu_p->Position.x, j = 0; col < Menu_p->Position.x+width; ++col, ++j) {

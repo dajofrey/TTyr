@@ -15,8 +15,8 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Vulkan/GPU.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Vulkan/GPU.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -82,7 +82,7 @@ TTYR_TERMINAL_BEGIN()
         );
     }
 
-    nh_gfx_endRecording(Graphics_p->State.Viewport_p, NH_FALSE);
+    nh_gfx_endRecording(Graphics_p->State.Viewport_p, false);
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }

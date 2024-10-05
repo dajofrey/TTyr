@@ -19,11 +19,11 @@
  */
 
     void ttyr_tty_handleTitlebarHit( 
-        nh_wsi_MouseEvent Event, int cCol
+        nh_api_MouseEvent Event, int cCol
     );
 
     void ttyr_tty_checkTitlebar(
-        ttyr_tty_Titlebar *Titlebar_p, NH_BOOL *refresh_p
+        ttyr_tty_Titlebar *Titlebar_p, bool *refresh_p
     );
 
     TTYR_TTY_RESULT ttyr_tty_drawTitlebar(

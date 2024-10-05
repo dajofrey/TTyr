@@ -24,19 +24,19 @@
 //    );
 //
 //    TTYR_TTY_RESULT ttyr_tty_logCSI(
-//        ttyr_tty_Shell *Shell_p, NH_BYTE type
+//        ttyr_tty_Shell *Shell_p, char type
 //    );
 
     TTYR_TTY_RESULT _ttyr_tty_logBegin(
-        const NH_BYTE *file_p, const NH_BYTE *function_p
+        const char *file_p, const char *function_p
     );
 
     TTYR_TTY_RESULT _ttyr_tty_logEnd(
-        const NH_BYTE *file_p, const NH_BYTE *function_p
+        const char *file_p, const char *function_p
     );
 
     TTYR_TTY_RESULT _ttyr_tty_logDiagnosticEnd(
-        const NH_BYTE *file_p, const NH_BYTE *function_p, TTYR_TTY_RESULT result, int line
+        const char *file_p, const char *function_p, TTYR_TTY_RESULT result, int line
     );
 
 /** @} */

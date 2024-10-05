@@ -13,16 +13,16 @@
 
 #include "../TTY/TTY.h"
 
-#include "nhcore/Config/Config.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
+#include "nh-core/Config/Config.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
 
 #include <string.h>
 #include <stdlib.h>
 
 // NAMES ===========================================================================================
 
-static const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
+static const char *TTYR_TTY_SETTING_NAMES_PP[] = {
     "ttyr.tty.shell.maxScroll",
     "ttyr.tty.windows",
     "ttyr.tty.tabs",
@@ -41,7 +41,7 @@ static const NH_BYTE *TTYR_TTY_SETTING_NAMES_PP[] = {
 static size_t TTYR_TTY_SETTING_NAMES_PP_COUNT = 
     sizeof(TTYR_TTY_SETTING_NAMES_PP) / sizeof(TTYR_TTY_SETTING_NAMES_PP[0]);
 
-const NH_BYTE *ttyr_tty_getSettingName(
+const char *ttyr_tty_getSettingName(
     unsigned int setting)
 {
     return TTYR_TTY_SETTING_NAMES_PP[setting];
@@ -50,9 +50,9 @@ const NH_BYTE *ttyr_tty_getSettingName(
 // FUNCTIONS =======================================================================================
 
 static TTYR_TTY_RESULT ttyr_tty_getSetting(
-    ttyr_tty_Config *Config_p, NH_BYTE *namespace_p, int index)
+    ttyr_tty_Config *Config_p, char *namespace_p, int index)
 {
-    nh_List *Values_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TTY_SETTING_NAMES_PP[index]);
+    nh_core_List *Values_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TTY_SETTING_NAMES_PP[index]);
     TTYR_CHECK_NULL(Values_p)
 
     switch (index) {

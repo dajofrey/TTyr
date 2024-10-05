@@ -12,9 +12,9 @@
 #include "Macros.h"
 #include "Data/ttyr-tty.conf.inc"
 
-#include "nhcore/Config/Config.h"
-#include "nhcore/System/Logger.h"
-#include "nhcore/System/Memory.h"
+#include "nh-core/Config/Config.h"
+#include "nh-core/System/Logger.h"
+#include "nh-core/System/Memory.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +24,7 @@
 
 TTYR_TTY_RESULT ttyr_tty_initialize()
 {
-    nh_core_appendConfig(ttyr_tty_conf_inc, ttyr_tty_conf_inc_len, NH_FALSE);
+    nh_core_appendConfig(ttyr_tty_conf_inc, ttyr_tty_conf_inc_len, false);
     return TTYR_TTY_SUCCESS;
 }
 

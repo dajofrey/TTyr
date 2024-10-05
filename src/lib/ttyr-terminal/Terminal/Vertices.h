@@ -24,11 +24,11 @@
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(
-        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, NH_BOOL inner
+        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getOutlineVertices(
-        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, NH_BOOL inner
+        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVertices(

@@ -10,7 +10,9 @@
  */
 
 #include "../Common/Includes.h"
-#include "nhcore/Util/LinkedList.h"
+
+#include "nh-core/Util/LinkedList.h"
+#include "nh-core/Util/List.h"
 
 typedef struct ttyr_tty_MacroWindow ttyr_tty_MacroWindow;
 
@@ -56,9 +58,9 @@ typedef struct ttyr_tty_MacroWindow ttyr_tty_MacroWindow;
         TTYR_TTY_TILE_TYPE_E type;
         void *p;
         TTYR_TTY_TILE_ORIENTATION orientation;
-        NH_BOOL rightSeparator; 
-        NH_BOOL refresh;
-        NH_BOOL close;
+        bool rightSeparator; 
+        bool refresh;
+        bool close;
         int rowPosition, colPosition;
         int rowSize, colSize;
         nh_LinkedList Children;
@@ -93,10 +95,10 @@ typedef struct ttyr_tty_MacroWindow ttyr_tty_MacroWindow;
     );
 
     TTYR_TTY_RESULT ttyr_tty_handleTilingInput(
-        ttyr_tty_MacroWindow *Tab_p, nh_wsi_KeyboardEvent Event 
+        ttyr_tty_MacroWindow *Tab_p, nh_api_KeyboardEvent Event 
     );
 
-    nh_List ttyr_tty_getTiles(
+    nh_core_List ttyr_tty_getTiles(
         ttyr_tty_Tile *Root_p
     );
     

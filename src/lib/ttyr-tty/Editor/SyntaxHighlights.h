@@ -9,6 +9,7 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
+#include "nh-encoding/Encodings/UTF32.h"
 #include "../Common/Includes.h"
 
 #endif

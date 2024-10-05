@@ -20,13 +20,13 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Thread.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Process.h"
-#include "nhcore/Util/RingBuffer.h"
+#include "nh-core/System/Thread.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/Util/RingBuffer.h"
 
-#include "nhencoding/Encodings/UTF8.h"
-#include "nhencoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF32.h"
 
 #include <unistd.h>
 #include <sys/wait.h>
@@ -99,7 +99,7 @@ TTYR_TTY_RESULT ttyr_tty_getStandardOutputWindowSize(
 // KEYS ============================================================================================
 
 static TTYR_TTY_RESULT ttyr_tty_readLinuxStandardInput(
-    NH_ENCODING_UTF32 codepoints_p[4], int *count_p)
+    NH_API_UTF32 codepoints_p[4], int *count_p)
 {
 #ifdef __unix__
 
@@ -114,7 +114,7 @@ static TTYR_TTY_RESULT ttyr_tty_readLinuxStandardInput(
     int rv = select(fileno(stdin) + 1, &set, NULL, NULL, &timeout);
     if (rv == -1 || rv == 0) {return TTYR_TTY_SUCCESS;}
 
-    NH_BYTE p[4];
+    char p[4];
     int nread = read(STDIN_FILENO, p, 4);
 
     for (int i = 0, offset = 0; nread - offset > 0; ++i) {
@@ -137,17 +137,17 @@ TTYR_TTY_RESULT ttyr_tty_readStandardInput(
     do {
 
     count = 0;
-    NH_ENCODING_UTF32 codepoints_p[4];
+    NH_API_UTF32 codepoints_p[4];
 
 #ifdef __unix__
     TTYR_CHECK(ttyr_tty_readLinuxStandardInput(codepoints_p, &count))
 #endif
 
     for (int i = 0; i < count; ++i) {
-        nh_wsi_Event *Event_p = nh_core_advanceRingBuffer(&TTY_p->Events);
-        Event_p->type = NH_WSI_EVENT_KEYBOARD;
+        nh_api_WSIEvent *Event_p = nh_core_advanceRingBuffer(&TTY_p->Events);
+        Event_p->type = NH_API_WSI_EVENT_KEYBOARD;
         Event_p->Keyboard.codepoint = codepoints_p[i];
-        Event_p->Keyboard.trigger = NH_WSI_TRIGGER_PRESS;
+        Event_p->Keyboard.trigger = NH_API_TRIGGER_PRESS;
     }
 
     }  while (count);
@@ -160,9 +160,9 @@ TTYR_TTY_RESULT ttyr_tty_readStandardInput(
 TTYR_TTY_RESULT ttyr_tty_writeCursorToStandardOutput(
     int x, int y)
 {
-    nh_String String = nh_core_initString(255);
+    nh_core_String String = nh_core_initString(255);
 
-    NH_BYTE buf[32] = {'\0'};
+    char buf[32] = {'\0'};
     if (x > 0 && y > 0) {
         snprintf(buf, sizeof(buf), "\x1b[?25h\x1b[%d;%dH", y, x);
     } else {
@@ -182,7 +182,7 @@ TTYR_TTY_RESULT ttyr_tty_writeCursorToStandardOutput(
 TTYR_TTY_RESULT ttyr_tty_writeToStandardOutput(
     ttyr_tty_Row *Rows_p, int cols, int rows)
 {
-    nh_String String = nh_core_initString(255);
+    nh_core_String String = nh_core_initString(255);
 
     // Move cursor to home.
     nh_core_appendFormatToString(&String, "\x1b[H");
@@ -193,8 +193,8 @@ TTYR_TTY_RESULT ttyr_tty_writeToStandardOutput(
             nh_core_appendToString(&String, "\e[0m", 4);
 
             // Set foreground color if necessary, use TrueColor notation for that.
-            if (Rows_p[row].Glyphs_p[col].Foreground.custom == NH_TRUE) {
-                NH_BYTE foreground_p[64] = {0};
+            if (Rows_p[row].Glyphs_p[col].Foreground.custom == true) {
+                char foreground_p[64] = {0};
                 sprintf(foreground_p, "\e[38;2;%d;%d;%dm", 
                     (int)(Rows_p[row].Glyphs_p[col].Foreground.Color.r*255.0f), 
                     (int)(Rows_p[row].Glyphs_p[col].Foreground.Color.g*255.0f), 
@@ -203,8 +203,8 @@ TTYR_TTY_RESULT ttyr_tty_writeToStandardOutput(
             }
  
             // Set background color if necessary, use TrueColor notation for that.
-            if (Rows_p[row].Glyphs_p[col].Background.custom == NH_TRUE) {
-                NH_BYTE background_p[64] = {0};
+            if (Rows_p[row].Glyphs_p[col].Background.custom == true) {
+                char background_p[64] = {0};
                 sprintf(background_p, "\e[48;2;%d;%d;%dm", 
                     (int)(Rows_p[row].Glyphs_p[col].Background.Color.r*255.0f), 
                     (int)(Rows_p[row].Glyphs_p[col].Background.Color.g*255.0f), 
@@ -242,7 +242,7 @@ TTYR_TTY_RESULT ttyr_tty_writeToStandardOutput(
             }
 
             // Get codepoint in UTF8 format.
-            NH_BYTE codepoint_p[4] = {0};
+            char codepoint_p[4] = {0};
             int length = nh_encoding_encodeUTF8Single(Rows_p[row].Glyphs_p[col].codepoint, codepoint_p);
 
             // If the glyph is used for line graphics, we need to wrap the codepoint up.
@@ -322,14 +322,14 @@ static TTYR_TTY_RESULT ttyr_tty_exitRawMode(
 
 // CLAIM STDOUT ====================================================================================
 
-static NH_BOOL claimed = NH_FALSE;
+static bool claimed = false;
 
 TTYR_TTY_RESULT ttyr_tty_claimStandardIO(
     ttyr_tty_TTY *TTY_p)
 {
     if (claimed) {return TTYR_TTY_ERROR_BAD_STATE;}
 
-    ttyr_tty_View *View_p = ttyr_tty_createView(TTY_p, NULL, NH_TRUE);
+    ttyr_tty_View *View_p = ttyr_tty_createView(TTY_p, NULL, true);
     TTYR_CHECK_NULL(View_p)
 
     TTYR_TTY_RESULT error = ttyr_tty_enterRawMode(View_p);
@@ -338,7 +338,7 @@ TTYR_TTY_RESULT ttyr_tty_claimStandardIO(
         return error;
     }
 
-    claimed = NH_TRUE;
+    claimed = true;
 
     return TTYR_TTY_SUCCESS;
 }
@@ -360,17 +360,17 @@ TTYR_TTY_RESULT ttyr_tty_unclaimStandardIO(
     TTYR_CHECK(ttyr_tty_exitRawMode(View_p))
     ttyr_tty_destroyView(TTY_p, View_p);
 
-    claimed = NH_FALSE;
+    claimed = false;
 
     return TTYR_TTY_SUCCESS;
 }
 
-NH_BOOL ttyr_tty_claimsStandardIO(
+bool ttyr_tty_claimsStandardIO(
     ttyr_tty_TTY *TTY_p)
 {
     for (int i = 0; i < TTY_p->Views.size; ++i) {
-        if (((ttyr_tty_View*)TTY_p->Views.pp[i])->standardIO) {return NH_TRUE;}
+        if (((ttyr_tty_View*)TTY_p->Views.pp[i])->standardIO) {return true;}
     }
-    return NH_FALSE;
+    return false;
 }
 

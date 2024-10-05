@@ -18,15 +18,15 @@
  */
 
     TTYR_TERMINAL_RESULT _ttyr_terminal_logBegin(
-        const NH_BYTE *file_p, const NH_BYTE *function_p
+        const char *file_p, const char *function_p
     );
 
     TTYR_TERMINAL_RESULT _ttyr_terminal_logEnd(
-        const NH_BYTE *file_p, const NH_BYTE *function_p
+        const char *file_p, const char *function_p
     );
 
     TTYR_TERMINAL_RESULT _ttyr_terminal_logDiagnosticEnd(
-        const NH_BYTE *file_p, const NH_BYTE *function_p, TTYR_TERMINAL_RESULT result, int line
+        const char *file_p, const char *function_p, TTYR_TERMINAL_RESULT result, int line
     );
 
 /** @} */

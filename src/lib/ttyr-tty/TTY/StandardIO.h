@@ -43,7 +43,7 @@
         ttyr_tty_TTY *TTY_p
     );
 
-    NH_BOOL ttyr_tty_claimsStandardIO(
+    bool ttyr_tty_claimsStandardIO(
         ttyr_tty_TTY *TTY_p
     );
 

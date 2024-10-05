@@ -17,15 +17,15 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Fonts/HarfBuzz.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Fonts/HarfBuzz.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/Util/Math.h"
-#include "nhcore/Util/Array.h"
-#include "nhcore/Util/List.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/Util/Math.h"
+#include "nh-core/Util/Array.h"
+#include "nh-core/Util/List.h"
 
-#include "nhencoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF8.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -47,7 +47,7 @@ TTYR_TERMINAL_BEGIN()
     );
 
     float depth = Glyph_p->mark & TTYR_TTY_MARK_ELEVATED ? 0.15f : 0.5f;
-    NH_PIXEL pixel = row * Grid_p->TileSize.height;
+    int pixel = row * Grid_p->TileSize.height;
 
     float x = (float)((float)(col * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
     float y = (float)((float)(pixel) / (float)Grid_p->Size.height) * 2.0f - 1.0f;
@@ -57,7 +57,7 @@ TTYR_TERMINAL_BEGIN()
     float y1 = y;
     float y2 = y + height;
 
-    if (State_p->Viewport_p->Surface_p->api == NH_GFX_API_OPENGL) {
+    if (State_p->Viewport_p->Surface_p->api == NH_API_GRAPHICS_BACKEND_OPENGL) {
         y1 = -y1;
         y2 = -y2;
     }
@@ -78,25 +78,25 @@ TTYR_TERMINAL_BEGIN()
     Vertices_p[3].y = y1;
     Vertices_p[3].z = depth;
 
-    nh_verticesToArray(Vertices_p, vertices_p, 4, NH_FALSE, 0);
+    nh_verticesToArray(Vertices_p, vertices_p, 4, false, 0);
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, NH_BOOL inner)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner)
 {
 TTYR_TERMINAL_BEGIN()
 
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
-    nh_Array Vertices = nh_core_initArray(sizeof(nh_Vertex), 8);
+    nh_core_Array Vertices = nh_core_initArray(sizeof(nh_Vertex), 8);
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
         State_p->Fonts.pp[State_p->font], Config.fontSize
     );
 
     float depth = 0.2f;
-    NH_PIXEL pixel = Box_p->UpperLeft.y * Grid_p->TileSize.height;
+    int pixel = Box_p->UpperLeft.y * Grid_p->TileSize.height;
 
     float x = (float)((float)(Box_p->UpperLeft.x * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
     float y = (float)((float)(pixel) / (float)Grid_p->Size.height) * 2.0f - 1.0f;
@@ -110,7 +110,7 @@ TTYR_TERMINAL_BEGIN()
     float y1 = y;
     float y2 = y + height;
 
-    if (State_p->Viewport_p->Surface_p->api == NH_GFX_API_OPENGL) {
+    if (State_p->Viewport_p->Surface_p->api == NH_API_GRAPHICS_BACKEND_OPENGL) {
         y1 = -y1;
         y2 = -y2;
     }
@@ -145,14 +145,14 @@ TTYR_TERMINAL_BEGIN()
     Vertex_p->y = y1 + h;
     Vertex_p->z = depth;
 
-    nh_verticesToArray(Vertices.p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, Vertices.length, NH_FALSE, 0);
+    nh_verticesToArray(Vertices.p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, Vertices.length, false, 0);
     nh_core_freeArray(&Vertices);
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getOutlineVertices(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, NH_BOOL inner)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -164,7 +164,7 @@ TTYR_TERMINAL_BEGIN()
     );
 
     float depth = inner ? 0.4f : 0.45f;
-    NH_PIXEL pixel = Box_p->UpperLeft.y * Grid_p->TileSize.height;
+    int pixel = Box_p->UpperLeft.y * Grid_p->TileSize.height;
 
     float x = (float)((float)(Box_p->UpperLeft.x * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
     float y = (float)((float)(pixel) / (float)Grid_p->Size.height) * 2.0f - 1.0f;
@@ -182,7 +182,7 @@ TTYR_TERMINAL_BEGIN()
     float y1 = y;
     float y2 = y + height;
 
-    if (State_p->Viewport_p->Surface_p->api == NH_GFX_API_OPENGL) {
+    if (State_p->Viewport_p->Surface_p->api == NH_API_GRAPHICS_BACKEND_OPENGL) {
         y1 = -y1;
         y2 = -y2;
     }
@@ -211,18 +211,18 @@ TTYR_TERMINAL_BEGIN()
     Vertices_p[5].y = y1;
     Vertices_p[5].z = depth;
 
-    nh_verticesToArray(Vertices_p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, 6, NH_FALSE, 0);
+    nh_verticesToArray(Vertices_p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, 6, false, 0);
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesDefault(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_ENCODING_UTF32 codepoint, int col, 
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col, 
     int row, float depth, float vertices_p[20])
 {
 TTYR_TERMINAL_BEGIN()
 
-    NH_BYTE p[4] = {0};
+    char p[4] = {0};
     nh_encoding_encodeUTF8Single(codepoint, p);
     nh_gfx_Glyph *Glyph_p = nh_core_getFromHashMap(&State_p->Map, p);
 
@@ -241,7 +241,7 @@ TTYR_TERMINAL_BEGIN()
 
         Glyph_p = nh_core_allocate(sizeof(nh_gfx_Glyph));
         TTYR_TERMINAL_CHECK_MEM(Glyph_p)
-        NH_BYTE *codepoint_p = nh_core_allocate(sizeof(NH_BYTE)*4);
+        char *codepoint_p = nh_core_allocate(sizeof(char)*4);
         TTYR_TERMINAL_CHECK_MEM(codepoint_p)
         memcpy(codepoint_p, p, 4);
 
@@ -254,7 +254,7 @@ TTYR_TERMINAL_BEGIN()
         nh_gfx_destroyHarfBuzzBuffer(Buffer);
     }
 
-    NH_PIXEL pixel = row * Grid_p->TileSize.height + abs(State_p->FontInstance_p->descender);
+    int pixel = row * Grid_p->TileSize.height + abs(State_p->FontInstance_p->descender);
     pixel += State_p->FontInstance_p->ascender + State_p->FontInstance_p->descender;
     pixel -= Glyph_p->yOffset;
 
@@ -266,7 +266,7 @@ TTYR_TERMINAL_BEGIN()
     float y1 = y;
     float y2 = y + height;
 
-    if (State_p->Viewport_p->Surface_p->api == NH_GFX_API_OPENGL) {
+    if (State_p->Viewport_p->Surface_p->api == NH_API_GRAPHICS_BACKEND_OPENGL) {
         y1 = -y1;
         y2 = -y2;
     }
@@ -297,13 +297,13 @@ TTYR_TERMINAL_BEGIN()
     Vertices_p[3].u = Glyph_p->u1;
     Vertices_p[3].v = Glyph_p->v0;
 
-    nh_verticesToArray(Vertices_p, vertices_p, 4, NH_TRUE, 0);
+    nh_verticesToArray(Vertices_p, vertices_p, 4, true, 0);
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_ENCODING_UTF32 codepoint, int col,
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col,
     int row, float depth, float vertices_p[24])
 {
 TTYR_TERMINAL_BEGIN()
@@ -316,7 +316,7 @@ TTYR_TERMINAL_BEGIN()
 
     nh_Vertex Vertices_p[8];
 
-    NH_PIXEL tmp = row * Grid_p->TileSize.height;
+    int tmp = row * Grid_p->TileSize.height;
 
     float x = (float)((float)(col * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
     float y = (float)((float)(tmp) / (float)Grid_p->Size.height) * 2.0f - 1.0f;
@@ -528,7 +528,7 @@ TTYR_TERMINAL_BEGIN()
             break;
     }
 
-    if (State_p->Viewport_p->Surface_p->api == NH_GFX_API_OPENGL) {
+    if (State_p->Viewport_p->Surface_p->api == NH_API_GRAPHICS_BACKEND_OPENGL) {
         y1 = -y1;
         y2 = -y2;
         y3 = -y3;
@@ -567,7 +567,7 @@ TTYR_TERMINAL_BEGIN()
     Vertices_p[7].y = y3;
     Vertices_p[7].z = depth;
 
-    nh_verticesToArray(Vertices_p, vertices_p, 8, NH_FALSE, 0);
+    nh_verticesToArray(Vertices_p, vertices_p, 8, false, 0);
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }

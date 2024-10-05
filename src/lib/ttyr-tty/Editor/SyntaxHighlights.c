@@ -14,8 +14,8 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Process.h"
-#include "nhcore/System/Memory.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/System/Memory.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -29,7 +29,7 @@
 
 // WORDS ===========================================================================================
 
-static NH_BYTE *cTypeKeywords_pp[] = {
+static char *cTypeKeywords_pp[] = {
     "auto",
     "char",
     "const",
@@ -63,7 +63,7 @@ static NH_BYTE *cTypeKeywords_pp[] = {
     "_Thread_local",
 };
 
-static NH_BYTE *cControlKeywords_pp[] = {
+static char *cControlKeywords_pp[] = {
     "break",
     "case",
     "continue",
@@ -85,7 +85,7 @@ static NH_BYTE *cControlKeywords_pp[] = {
 //// INIT ============================================================================================
 //
 //static TTYR_TTY_RESULT ttyr_tty_insertHighlightWord(
-//    nh_encoding_UTF32String *String_p, nh_encoding_UTF32String Word, NH_BYTE *prefix_p, NH_BYTE *suffix_p)
+//    nh_encoding_UTF32String *String_p, nh_encoding_UTF32String Word, char *prefix_p, char *suffix_p)
 //{
 //TTYR_TTY_BEGIN()
 //
@@ -103,22 +103,22 @@ static NH_BYTE *cControlKeywords_pp[] = {
 //}
 //
 //nh_encoding_UTF32String ttyr_tty_highlightWord(
-//    nh_encoding_UTF32String Word, nh_encoding_UTF32String *String_p, NH_BYTE *prefix_p, NH_BYTE *suffix_p)
+//    nh_encoding_UTF32String Word, nh_encoding_UTF32String *String_p, char *prefix_p, char *suffix_p)
 //{
 //TTYR_TTY_BEGIN()
 //
-//    nh_encoding_UTF32String NewString = nh_core_initArray(sizeof(NH_ENCODING_UTF32), 64);
+//    nh_encoding_UTF32String NewString = nh_core_initArray(sizeof(NH_API_UTF32), 64);
 //
 //    for (int i = 0; i < String_p->length; ++i) 
 //    {
-//        NH_ENCODING_UTF32 *codepoint_p = &((NH_ENCODING_UTF32*)String_p->p)[i];
+//        NH_API_UTF32 *codepoint_p = &((NH_API_UTF32*)String_p->p)[i];
 //
-//        if (*codepoint_p == ((NH_ENCODING_UTF32*)Word.p)[0]) 
+//        if (*codepoint_p == ((NH_API_UTF32*)Word.p)[0]) 
 //        {
-//            NH_BOOL match = NH_TRUE;
+//            bool match = true;
 //            for (int j = 1; j < Word.length; ++j) {
-//                if (((NH_ENCODING_UTF32*)Word.p)[j] != codepoint_p[j] || j + i >= String_p->length) {
-//                    match = NH_FALSE;
+//                if (((NH_API_UTF32*)Word.p)[j] != codepoint_p[j] || j + i >= String_p->length) {
+//                    match = false;
 //                    break;
 //                }
 //            }
@@ -137,15 +137,15 @@ static NH_BYTE *cControlKeywords_pp[] = {
 //}
 //
 //nh_encoding_UTF32String ttyr_tty_highlightWords(
-//    NH_BYTE *words_pp[], size_t words, nh_encoding_UTF32String *String_p, NH_BYTE *prefix_p, NH_BYTE *suffix_p)
+//    char *words_pp[], size_t words, nh_encoding_UTF32String *String_p, char *prefix_p, char *suffix_p)
 //{
 //TTYR_TTY_BEGIN()
 //
-//    nh_encoding_UTF32String String = nh_core_initArray(sizeof(NH_ENCODING_UTF32), 64);
+//    nh_encoding_UTF32String String = nh_core_initArray(sizeof(NH_API_UTF32), 64);
 //
 //    for (int i = 0; i < words; ++i) 
 //    {
-//        NH_BYTE p[255] = {'\0'};
+//        char p[255] = {'\0'};
 //        nh_encoding_UTF32String Word = nh_decodeUTF8Text(words_pp[i]);
 //        nh_encoding_UTF32String NewString = ttyr_tty_highlightWord(Word, String_p, prefix_p, suffix_p);
 //        nh_core_freeArray(&String);

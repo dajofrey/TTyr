@@ -10,9 +10,11 @@
  */
 
 #include "View.h"
-#include "../Common/Includes.h"
 
-#include "nhcore/Util/List.h"
+#include "nh-core/Util/List.h"
+#include "nh-encoding/Encodings/UTF32.h"
+
+#include "../Common/Includes.h"
 
 #endif
 
@@ -23,11 +25,11 @@
     typedef struct ttyr_tty_ContextMenu {
         struct ttyr_tty_ContextMenu *Parent_p;
         nh_encoding_UTF32String Name;
-        NH_BOOL active;
-        NH_BOOL hit;
-        nh_PixelPosition Position;
+        bool active;
+        bool hit;
+        nh_api_PixelPosition Position;
         int cCol, cRow;
-        nh_List Items;
+        nh_core_List Items;
     } ttyr_tty_ContextMenu;
 
 /** @} */
@@ -41,11 +43,11 @@
     );
 
     void ttyr_tty_updateContextMenuHit(
-        ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, int x, int y, NH_BOOL activate
+        ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, int x, int y, bool activate
     );
 
     ttyr_tty_ContextMenu *ttyr_tty_isContextMenuHit(
-        ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, NH_BOOL recursive, int x, int y
+        ttyr_tty_ContextMenu *Menu_p, ttyr_tty_ContextMenu *Parent_p, bool recursive, int x, int y
     );
 
     ttyr_tty_ContextMenu *ttyr_tty_createMouseMenu(

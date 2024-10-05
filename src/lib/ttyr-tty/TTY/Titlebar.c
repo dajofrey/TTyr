@@ -14,12 +14,12 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
-#include "nhcore/System/System.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
+#include "nh-core/System/System.h"
 
-#include "nhencoding/Encodings/UTF32.h"
-#include "nhencoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -35,17 +35,17 @@
 //// INPUT ===========================================================================================
 //
 //TTYR_TTY_RESULT ttyr_tty_handleSideBarHit(
-//    NH_WSI_MOUSE_E mouse, int row)
+//    NH_API_MOUSE_E mouse, int row)
 //{
 //TTYR_TTY_BEGIN()
 //
 //    ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 //
 //    switch (mouse) {
-//        case NH_WSI_MOUSE_LEFT :
+//        case NH_API_MOUSE_LEFT :
 //            ttyr_tty_insertAndFocusWindow(TTY_p, row);
 //            break;
-//        case NH_WSI_MOUSE_RIGHT :
+//        case NH_API_MOUSE_RIGHT :
 //            TTYR_TTY_MACRO_TILE(TTY_p->Window_p->Tile_p)->current = row;
 //            break;
 //    }
@@ -56,28 +56,28 @@
 // INPUT =========================================================================================== 
 
 void ttyr_tty_handleTitlebarHit( 
-    nh_wsi_MouseEvent Event, int cCol) 
+    nh_api_MouseEvent Event, int cCol) 
 {
     ttyr_tty_Config Config = ttyr_tty_getConfig(); 
-    if (Event.trigger == NH_WSI_TRIGGER_PRESS && cCol-1 < Config.windows) { 
+    if (Event.trigger == NH_API_TRIGGER_PRESS && cCol-1 < Config.windows) { 
         ttyr_tty_MacroWindow *Window_p = ttyr_tty_insertAndFocusWindow(nh_core_getWorkloadArg(), cCol-1);
-        Window_p->refreshGrid2 = NH_TRUE; 
-        Window_p->refreshTitlebar = NH_TRUE; 
-        Window_p->Tile_p->refresh = NH_TRUE; 
+        Window_p->refreshGrid2 = true; 
+        Window_p->refreshTitlebar = true; 
+        Window_p->Tile_p->refresh = true; 
     } 
 } 
 
 // CHECK ===========================================================================================
 
 void ttyr_tty_checkTitlebar(
-    ttyr_tty_Titlebar *Titlebar_p, NH_BOOL *refresh_p)
+    ttyr_tty_Titlebar *Titlebar_p, bool *refresh_p)
 {
     ttyr_tty_Config Config = ttyr_tty_getConfig();
     if (Config.Titlebar.on == false) {return;}
 
     if (NH_SYSTEM.LocalTime.days != Titlebar_p->Time.days || NH_SYSTEM.LocalTime.hours != Titlebar_p->Time.hours
     ||  NH_SYSTEM.LocalTime.minutes != Titlebar_p->Time.minutes || NH_SYSTEM.RAM.free != Titlebar_p->RAM.free) {
-        *refresh_p = NH_TRUE;
+        *refresh_p = true;
     }
 }
 
@@ -94,7 +94,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
 
     for (int i = 1; i < (Config.windows+1) && i < cols ; ++i) {
         Row_p->Glyphs_p[i].codepoint = 0x25a1;
-        Row_p->update_p[i] = NH_TRUE;
+        Row_p->update_p[i] = true;
         if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
             Row_p->Glyphs_p[i].codepoint = 0x25a0;
         }
@@ -118,7 +118,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         Row_p->Glyphs_p[i].Background.custom = true; 
     }
 
-    NH_BYTE rightSide_p[255] = {};
+    char rightSide_p[255] = {};
     sprintf(rightSide_p+strlen(rightSide_p), "RAM:%.1f%%", fabs((((float)NH_SYSTEM.RAM.free)/((float)NH_SYSTEM.RAM.total))*100.0f-100.0f));
 
     for (int i = 0; i < strlen(rightSide_p); ++i) {
@@ -129,7 +129,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         Row_p->update_p[(cols-strlen(rightSide_p))+i-3] = 1;
     }
 
-//    NH_BYTE ram_p[255] = {};
+//    char ram_p[255] = {};
 //    sprintf(ram_p, "xHelpxSettingsx", (((float)NH_SYSTEM.RAM.free)/((float)NH_SYSTEM.RAM.total))*100.0f);
 //
 //    for (int i = 0; i < strlen(ram_p); ++i) {
@@ -140,7 +140,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
 //        Row_p->update_p[Config.windows+2+i] = 1;
 //    }
 
-    NH_BYTE month_p[6] = {};
+    char month_p[6] = {};
     switch (NH_SYSTEM.LocalTime.months) {
         case 1 : sprintf(month_p, "Jan"); break;
         case 2 : sprintf(month_p, "Feb"); break;
@@ -156,7 +156,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         case 12 : sprintf(month_p, "Dec"); break;
     }
 
-    NH_BYTE middle_p[255] = {};
+    char middle_p[255] = {};
     sprintf(middle_p, "%s.%.2d %.2d:%.2d", month_p, NH_SYSTEM.LocalTime.days, NH_SYSTEM.LocalTime.hours, NH_SYSTEM.LocalTime.minutes);
     int offset = (cols/2)-(strlen(middle_p)/2);
     for (int i = 0; i <  strlen(middle_p); ++i) {

@@ -21,7 +21,7 @@
  */
 
     typedef struct ttyr_tty_FileEditorView {
-        nh_List FileViews;
+        nh_core_List FileViews;
         int currentOffset;
         int maxOnScreen;
         int fromLeft;
@@ -31,11 +31,11 @@
 
     typedef struct ttyr_tty_FileEditor {
         nh_LinkedList Files;
-        nh_Array Copies;
+        nh_core_Array Copies;
         int current;
         int minCols;
         int tabSpaces;
-        NH_BOOL tabToSpaces;
+        bool tabToSpaces;
     } ttyr_tty_FileEditor;
 
 /** @} */
@@ -52,7 +52,7 @@
     );
 
     ttyr_tty_File *ttyr_tty_openFile(
-        ttyr_tty_Program *Program_p, ttyr_tty_TreeListingNode *Node_p, NH_BOOL readOnly
+        ttyr_tty_Program *Program_p, ttyr_tty_TreeListingNode *Node_p, bool readOnly
     );
 
     TTYR_TTY_RESULT ttyr_tty_closeFile(
@@ -60,11 +60,11 @@
     );
 
     TTYR_TTY_RESULT ttyr_tty_cycleThroughFiles(
-        ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c
+        ttyr_tty_Program *Program_p, NH_API_UTF32 c
     );
 
     TTYR_TTY_RESULT ttyr_tty_handleFileEditorInput(
-        ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c
+        ttyr_tty_Program *Program_p, NH_API_UTF32 c
     );
 
     TTYR_TTY_RESULT ttyr_tty_drawFileEditorRow(

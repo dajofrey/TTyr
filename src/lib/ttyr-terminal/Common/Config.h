@@ -50,7 +50,7 @@
  *  @{
  */
 
-    extern const NH_BYTE *TTYR_TERMINAL_SETTING_NAMES_PP[];
+    extern const char *TTYR_TERMINAL_SETTING_NAMES_PP[];
     extern size_t TTYR_TERMINAL_SETTING_NAMES_PP_COUNT;
 
 /** @} */
@@ -59,7 +59,7 @@
  *  @{
  */
 
-    const NH_BYTE *ttyr_terminal_getSettingName(
+    const char *ttyr_terminal_getSettingName(
         TTYR_TERMINAL_SETTING_E setting
     );
 

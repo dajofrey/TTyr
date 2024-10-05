@@ -48,7 +48,7 @@ For building.
 The following dependencies **are automatically compiled** during the build process.
 
  * [Netzhaut](https://github.com/dajofrey/netzhaut)  
-TTýr is companion project to [Netzhaut](https://github.com/dajofrey/netzhaut), from which it requires nhapi, nhcore, nhencoding, nhwsi and nhgfx modules.
+TTýr is companion project to [Netzhaut](https://github.com/dajofrey/netzhaut), from which it requires nh-api, nh-core, nh-encoding, nh-wsi and nh-gfx modules.
  * [st](https://st.suckless.org/)  
 For shell functionality, TTýr uses parts of the great [st](https://st.suckless.org/).   
 

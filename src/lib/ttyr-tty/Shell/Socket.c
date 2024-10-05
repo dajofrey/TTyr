@@ -15,9 +15,9 @@
 #include "../TTY/Program.h"
 #include "../TTY/TTY.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
-#include "nhcore/Util/File.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
+#include "nh-core/Util/File.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -31,7 +31,7 @@
 // SOCKET ==========================================================================================
 
 static void ttyr_tty_setUDSFilePath(
-    NH_BYTE path_p[255], int pid)
+    char path_p[255], int pid)
 {
     memset(path_p, 0, 255);
     sprintf(path_p, "/tmp/nhtty_%d.uds", pid); // UNIX Domain Socket file.
@@ -41,7 +41,7 @@ static void ttyr_tty_setUDSFilePath(
 TTYR_TTY_RESULT ttyr_tty_createShellSocket(
     ttyr_tty_ShellSocket *Socket_p, int pid)
 {
-    NH_BYTE path_p[255] = {0};
+    char path_p[255] = {0};
     ttyr_tty_setUDSFilePath(path_p, pid);
 
     if ((Socket_p->fd = socket(AF_LOCAL, SOCK_STREAM | SOCK_NONBLOCK, 0)) <= 0) {
@@ -66,7 +66,7 @@ TTYR_TTY_RESULT ttyr_tty_createShellSocket(
 void ttyr_tty_closeShellSocket(
     ttyr_tty_ShellSocket *Socket_p, int pid)
 {
-    NH_BYTE path_p[255] = {0};
+    char path_p[255] = {0};
     ttyr_tty_setUDSFilePath(path_p, pid);
 
     close(Socket_p->fd);
@@ -84,12 +84,12 @@ TTYR_TTY_RESULT ttyr_tty_handleShellSocket(
     }
 
     int buffer = 255;
-    NH_BYTE buffer_p[buffer];
+    char buffer_p[buffer];
     memset(buffer_p, 0, buffer);
     int size = recv(new_socket, buffer_p, buffer-1, 0);
     if (size > 0) {
         TTYR_TTY_PROGRAM_E type = atoi(buffer_p);
-//        ttyr_tty_addProgram(nh_core_getWorkloadArg(), ttyr_tty_createProgramPrototype(type), NH_TRUE);
+//        ttyr_tty_addProgram(nh_core_getWorkloadArg(), ttyr_tty_createProgramPrototype(type), true);
     }
 
     close(new_socket);
@@ -100,7 +100,7 @@ TTYR_TTY_RESULT ttyr_tty_handleShellSocket(
 TTYR_TTY_RESULT ttyr_tty_sendCommandToShell(
     int pid, TTYR_TTY_PROGRAM_E type)
 {
-    NH_BYTE path_p[255] = {0};
+    char path_p[255] = {0};
     ttyr_tty_setUDSFilePath(path_p, pid);
 
     if (!nh_fileExistsOnMachine(path_p, NULL)) {return TTYR_TTY_ERROR_BAD_STATE;}
@@ -118,7 +118,7 @@ TTYR_TTY_RESULT ttyr_tty_sendCommandToShell(
         return TTYR_TTY_ERROR_BAD_STATE;
     }
 
-    NH_BYTE type_p[255] = {0};
+    char type_p[255] = {0};
     sprintf(type_p, "%d", type);
 
     send(fd, type_p, strlen(type_p), 0);

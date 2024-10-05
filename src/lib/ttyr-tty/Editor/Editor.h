@@ -15,7 +15,7 @@
 #include "../TTY/Program.h"
 #include "../Common/Includes.h"
 
-#include "nhcore/Util/String.h"
+#include "nh-core/Util/String.h"
 
 #endif
 
@@ -32,11 +32,11 @@
     typedef struct ttyr_tty_Editor {
         ttyr_tty_EditorView View;
         int focus;
-        NH_BOOL insertMode;
-        NH_BOOL treeListing;
+        bool insertMode;
+        bool treeListing;
         ttyr_tty_TreeListing TreeListing;
         ttyr_tty_FileEditor FileEditor;
-        nh_SystemTime LastUpdate;
+        nh_core_SystemTime LastUpdate;
         double updateIntervalInSeconds;
     } ttyr_tty_Editor;
 

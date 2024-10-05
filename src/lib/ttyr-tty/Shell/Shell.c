@@ -15,16 +15,16 @@
 #include "../Common/Config.h"
 #include "../TTY/Program.h"
 
-#include "nhcore/Util/List.h"
-#include "nhcore/Util/String.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/Loader/Loader.h"
+#include "nh-core/Util/List.h"
+#include "nh-core/Util/String.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/Loader/Loader.h"
 
-#include "nhencoding/Common/Macros.h"
-#include "nhencoding/Encodings/UTF8.h"
-#include "nhencoding/Encodings/UTF32.h"
+#include "nh-encoding/Common/Macros.h"
+#include "nh-encoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF32.h"
 
-#include "nhwsi/Window/Listener.h"
+#include "nh-wsi/Window/Listener.h"
 
 #include "../../../../external/st-0.8.5/st.h"
 #include "../../../../external/st-0.8.5/config.h"
@@ -38,11 +38,11 @@
 
 // DECLARE =========================================================================================
 
-#define PASTE_KEY (Event.Keyboard.codepoint == 'V' && (Event.Keyboard.state & NH_WSI_MODIFIER_SHIFT) && (Event.Keyboard.state & NH_WSI_MODIFIER_CONTROL))
-#define COPY_KEY (Event.Keyboard.codepoint == 'C' && (Event.Keyboard.state & NH_WSI_MODIFIER_SHIFT) && (Event.Keyboard.state & NH_WSI_MODIFIER_CONTROL))
+#define PASTE_KEY (Event.Keyboard.codepoint == 'V' && (Event.Keyboard.state & NH_API_MODIFIER_SHIFT) && (Event.Keyboard.state & NH_API_MODIFIER_CONTROL))
+#define COPY_KEY (Event.Keyboard.codepoint == 'C' && (Event.Keyboard.state & NH_API_MODIFIER_SHIFT) && (Event.Keyboard.state & NH_API_MODIFIER_CONTROL))
 
 typedef struct ttyr_tty_ShellKey{
-    NH_WSI_KEY_E key;
+    NH_API_KEY_E key;
     char *s;
     /* three-valued logic variables: 0 indifferent, 1 on, -1 off */
     signed char appkey;    /* application keypad */
@@ -56,224 +56,224 @@ typedef struct ttyr_tty_ShellKey{
  */
 static ttyr_tty_ShellKey KEYS_P[] = {
 	/* keysym                   mask            string      appkey appcursor */
-	{NH_WSI_KEY_KP_HOME,       "\033[2J",       0,   -1, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_HOME,       "\033[1;2H",     0,   +1, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_HOME,       "\033[H",        0,   -1, -1},
-	{NH_WSI_KEY_KP_HOME,       "\033[1~",       0,   +1, -1},
-	{NH_WSI_KEY_KP_UP,         "\033Ox",       +1,    0, -1},
-	{NH_WSI_KEY_KP_UP,         "\033[A",        0,   -1, -1},
-	{NH_WSI_KEY_KP_UP,         "\033OA",        0,   +1, -1},
-	{NH_WSI_KEY_KP_DOWN,       "\033Or",       +1,    0, -1},
-	{NH_WSI_KEY_KP_DOWN,       "\033[B",        0,   -1, -1},
-	{NH_WSI_KEY_KP_DOWN,       "\033OB",        0,   +1, -1},
-	{NH_WSI_KEY_KP_LEFT,       "\033Ot",       +1,    0, -1},
-	{NH_WSI_KEY_KP_LEFT,       "\033[D",        0,   -1, -1},
-	{NH_WSI_KEY_KP_LEFT,       "\033OD",        0,   +1, -1},
-	{NH_WSI_KEY_KP_RIGHT,      "\033Ov",       +1,    0, -1},
-	{NH_WSI_KEY_KP_RIGHT,      "\033[C",        0,   -1, -1},
-	{NH_WSI_KEY_KP_RIGHT,      "\033OC",        0,   +1, -1},
-	{NH_WSI_KEY_KP_PRIOR,      "\033[5;2~",     0,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_PRIOR,      "\033[5~",       0,    0, -1},
-	{NH_WSI_KEY_KP_BEGIN,      "\033[E",        0,    0, -1},
-	{NH_WSI_KEY_KP_END,        "\033[J",       -1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_KP_END,        "\033[1;5F",    +1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_KP_END,        "\033[K",       -1,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_END,        "\033[1;2F",    +1,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_END,        "\033[4~",       0,    0, -1},
-	{NH_WSI_KEY_KP_NEXT,       "\033[6;2~",     0,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_NEXT,       "\033[6~",       0,    0, -1},
-	{NH_WSI_KEY_KP_INSERT,     "\033[2;2~",    +1,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_INSERT,     "\033[4l",      -1,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_INSERT,     "\033[L",       -1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_KP_INSERT,     "\033[2;5~",    +1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_KP_INSERT,     "\033[4h",      -1,    0, -1},
-	{NH_WSI_KEY_KP_INSERT,     "\033[2~",      +1,    0, -1},
-	{NH_WSI_KEY_KP_DELETE,     "\033[M",       -1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_KP_DELETE,     "\033[3;5~",    +1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_KP_DELETE,     "\033[2K",      -1,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_DELETE,     "\033[3;2~",    +1,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_KP_DELETE,     "\033[P",       -1,    0, -1},
-	{NH_WSI_KEY_KP_DELETE,     "\033[3~",      +1,    0, -1},
-	{NH_WSI_KEY_KP_MULTIPLY,   "\033Oj",       +2,    0, -1},
-	{NH_WSI_KEY_KP_ADD,        "\033Ok",       +2,    0, -1},
-	{NH_WSI_KEY_KP_ENTER,      "\033OM",       +2,    0, -1},
-	{NH_WSI_KEY_KP_ENTER,      "\r",           -1,    0, -1},
-	{NH_WSI_KEY_KP_SUBTRACT,   "\033Om",       +2,    0, -1},
-	{NH_WSI_KEY_KP_DECIMAL,    "\033On",       +2,    0, -1},
-	{NH_WSI_KEY_KP_DIVIDE,     "\033Oo",       +2,    0, -1},
-	{NH_WSI_KEY_KP_0,          "\033Op",       +2,    0, -1},
-	{NH_WSI_KEY_KP_1,          "\033Oq",       +2,    0, -1},
-	{NH_WSI_KEY_KP_2,          "\033Or",       +2,    0, -1},
-	{NH_WSI_KEY_KP_3,          "\033Os",       +2,    0, -1},
-	{NH_WSI_KEY_KP_4,          "\033Ot",       +2,    0, -1},
-	{NH_WSI_KEY_KP_5,          "\033Ou",       +2,    0, -1},
-	{NH_WSI_KEY_KP_6,          "\033Ov",       +2,    0, -1},
-	{NH_WSI_KEY_KP_7,          "\033Ow",       +2,    0, -1},
-	{NH_WSI_KEY_KP_8,          "\033Ox",       +2,    0, -1},
-	{NH_WSI_KEY_KP_9,          "\033Oy",       +2,    0, -1},
-	{NH_WSI_KEY_UP,            "\033[1;2A",     0,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_UP,            "\033[1;3A",     0,    0, NH_WSI_MODIFIER_MOD1}, 
-	{NH_WSI_KEY_UP,            "\033[1;4A",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_UP,            "\033[1;5A",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_UP,            "\033[1;6A",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_UP,            "\033[1;7A",     0,    0, NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_UP,            "\033[1;8A",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_UP,            "\033[A",        0,   -1, -1},
-	{NH_WSI_KEY_UP,            "\033OA",        0,   +1, -1},
-	{NH_WSI_KEY_DOWN,          "\033[1;2B",     0,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_DOWN,          "\033[1;3B",     0,    0, NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_DOWN,          "\033[1;4B",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_DOWN,          "\033[1;5B",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_DOWN,          "\033[1;6B",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_DOWN,          "\033[1;7B",     0,    0, NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_DOWN,          "\033[1;8B",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_DOWN,          "\033[B",        0,   -1, -1},
-	{NH_WSI_KEY_DOWN,          "\033OB",        0,   +1, -1},
-	{NH_WSI_KEY_LEFT,          "\033[1;2D",     0,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_LEFT,          "\033[1;3D",     0,    0, NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_LEFT,          "\033[1;4D",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_LEFT,          "\033[1;5D",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_LEFT,          "\033[1;6D",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_LEFT,          "\033[1;7D",     0,    0, NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_LEFT,          "\033[1;8D",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_LEFT,          "\033[D",        0,   -1, -1},
-	{NH_WSI_KEY_LEFT,          "\033OD",        0,   +1, -1},
-	{NH_WSI_KEY_RIGHT,         "\033[1;2C",     0,    0, NH_WSI_MODIFIER_SHIFT},
-	{NH_WSI_KEY_RIGHT,         "\033[1;3C",     0,    0, NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_RIGHT,         "\033[1;4C",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_RIGHT,         "\033[1;5C",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_RIGHT,         "\033[1;6C",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_RIGHT,         "\033[1;7C",     0,    0, NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_RIGHT,         "\033[1;8C",     0,    0, NH_WSI_MODIFIER_SHIFT|NH_WSI_MODIFIER_CONTROL|NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_RIGHT,         "\033[C",        0,   -1, -1},                     
-	{NH_WSI_KEY_RIGHT,         "\033OC",        0,   +1, -1},                     
-//	{NH_WSI_KEY_ISO_LEFT_TAB,  "\033[Z",        0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_RETURN,        "\033\r",        0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_RETURN,        "\r",            0,    0, -1},                     
-	{NH_WSI_KEY_INSERT,        "\033[4l",      -1,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_INSERT,        "\033[2;2~",    +1,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_INSERT,        "\033[L",       -1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_INSERT,        "\033[2;5~",    +1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_INSERT,        "\033[4h",      -1,    0, -1},                     
-	{NH_WSI_KEY_INSERT,        "\033[2~",      +1,    0, -1},                     
-	{NH_WSI_KEY_DELETE,        "\033[M",       -1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_DELETE,        "\033[3;5~",    +1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_DELETE,        "\033[2K",      -1,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_DELETE,        "\033[3;2~",    +1,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_DELETE,        "\033[P",       -1,    0, -1},                     
-	{NH_WSI_KEY_DELETE,        "\033[3~",      +1,    0, -1},                     
-	{NH_WSI_KEY_BACKSPACE,     "\177",          0,    0, 0},                      
-	{NH_WSI_KEY_BACKSPACE,     "\033\177",      0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_HOME,          "\033[2J",       0,   -1, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_HOME,          "\033[1;2H",     0,   +1, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_HOME,          "\033[H",        0,   -1, -1},                     
-	{NH_WSI_KEY_HOME,          "\033[1~",       0,   +1, -1},                     
-	{NH_WSI_KEY_END,           "\033[J",       -1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_END,           "\033[1;5F",    +1,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_END,           "\033[K",       -1,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_END,           "\033[1;2F",    +1,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_END,           "\033[4~",       0,    0, -1},                     
-	{NH_WSI_KEY_PRIOR,         "\033[5;5~",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_PRIOR,         "\033[5;2~",     0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_PRIOR,         "\033[5~",       0,    0, -1},                     
-	{NH_WSI_KEY_NEXT,          "\033[6;5~",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_NEXT,          "\033[6;2~",     0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_NEXT,          "\033[6~",       0,    0, -1},                     
-	{NH_WSI_KEY_F1,            "\033OP" ,       0,    0, 0},                      
-	{NH_WSI_KEY_F1, /* F13 */  "\033[1;2P",     0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F1, /* F25 */  "\033[1;5P",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F1, /* F37 */  "\033[1;6P",     0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F1, /* F49 */  "\033[1;3P",     0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F1, /* F61 */  "\033[1;4P",     0,    0, NH_WSI_MODIFIER_MOD3},   
-	{NH_WSI_KEY_F2,            "\033OQ" ,       0,    0, 0},                      
-	{NH_WSI_KEY_F2, /* F14 */  "\033[1;2Q",     0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F2, /* F26 */  "\033[1;5Q",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F2, /* F38 */  "\033[1;6Q",     0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F2, /* F50 */  "\033[1;3Q",     0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F2, /* F62 */  "\033[1;4Q",     0,    0, NH_WSI_MODIFIER_MOD3},   
-	{NH_WSI_KEY_F3,            "\033OR" ,       0,    0, 0},                      
-	{NH_WSI_KEY_F3, /* F15 */  "\033[1;2R",     0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F3, /* F27 */  "\033[1;5R",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F3, /* F39 */  "\033[1;6R",     0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F3, /* F51 */  "\033[1;3R",     0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F3, /* F63 */  "\033[1;4R",     0,    0, NH_WSI_MODIFIER_MOD3},   
-	{NH_WSI_KEY_F4,            "\033OS" ,       0,    0, 0},                      
-	{NH_WSI_KEY_F4, /* F16 */  "\033[1;2S",     0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F4, /* F28 */  "\033[1;5S",     0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F4, /* F40 */  "\033[1;6S",     0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F4, /* F52 */  "\033[1;3S",     0,    0, NH_WSI_MODIFIER_MOD1},
-	{NH_WSI_KEY_F5,            "\033[15~",      0,    0, 0},                      
-	{NH_WSI_KEY_F5, /* F17 */  "\033[15;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F5, /* F29 */  "\033[15;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F5, /* F41 */  "\033[15;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F5, /* F53 */  "\033[15;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F6,            "\033[17~",      0,    0, 0},                      
-	{NH_WSI_KEY_F6, /* F18 */  "\033[17;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F6, /* F30 */  "\033[17;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F6, /* F42 */  "\033[17;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F6, /* F54 */  "\033[17;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F7,            "\033[18~",      0,    0, 0},                      
-	{NH_WSI_KEY_F7, /* F19 */  "\033[18;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F7, /* F31 */  "\033[18;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F7, /* F43 */  "\033[18;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F7, /* F55 */  "\033[18;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F8,            "\033[19~",      0,    0, 0},                      
-	{NH_WSI_KEY_F8, /* F20 */  "\033[19;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F8, /* F32 */  "\033[19;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F8, /* F44 */  "\033[19;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F8, /* F56 */  "\033[19;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F9,            "\033[20~",      0,    0, 0},                      
-	{NH_WSI_KEY_F9, /* F21 */  "\033[20;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F9, /* F33 */  "\033[20;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F9, /* F45 */  "\033[20;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F9, /* F57 */  "\033[20;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F10,           "\033[21~",      0,    0, 0},                      
-	{NH_WSI_KEY_F10, /* F22 */ "\033[21;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F10, /* F34 */ "\033[21;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F10, /* F46 */ "\033[21;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F10, /* F58 */ "\033[21;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F11,           "\033[23~",      0,    0, 0},                      
-	{NH_WSI_KEY_F11, /* F23 */ "\033[23;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F11, /* F35 */ "\033[23;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F11, /* F47 */ "\033[23;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F11, /* F59 */ "\033[23;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F12,           "\033[24~",      0,    0, 0},                      
-	{NH_WSI_KEY_F12, /* F24 */ "\033[24;2~",    0,    0, NH_WSI_MODIFIER_SHIFT},  
-	{NH_WSI_KEY_F12, /* F36 */ "\033[24;5~",    0,    0, NH_WSI_MODIFIER_CONTROL},
-	{NH_WSI_KEY_F12, /* F48 */ "\033[24;6~",    0,    0, NH_WSI_MODIFIER_MOD4},   
-	{NH_WSI_KEY_F12, /* F60 */ "\033[24;3~",    0,    0, NH_WSI_MODIFIER_MOD1},   
-	{NH_WSI_KEY_F13,           "\033[1;2P",     0,    0, 0},                      
-	{NH_WSI_KEY_F14,           "\033[1;2Q",     0,    0, 0},                      
-	{NH_WSI_KEY_F15,           "\033[1;2R",     0,    0, 0},                      
-	{NH_WSI_KEY_F16,           "\033[1;2S",     0,    0, 0},                      
-	{NH_WSI_KEY_F17,           "\033[15;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F18,           "\033[17;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F19,           "\033[18;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F20,           "\033[19;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F21,           "\033[20;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F22,           "\033[21;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F23,           "\033[23;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F24,           "\033[24;2~",    0,    0, 0},                      
-	{NH_WSI_KEY_F25,           "\033[1;5P",     0,    0, 0},                      
-	{NH_WSI_KEY_F26,           "\033[1;5Q",     0,    0, 0},                      
-	{NH_WSI_KEY_F27,           "\033[1;5R",     0,    0, 0},                      
-	{NH_WSI_KEY_F28,           "\033[1;5S",     0,    0, 0},                      
-	{NH_WSI_KEY_F29,           "\033[15;5~",    0,    0, 0},                      
-	{NH_WSI_KEY_F30,           "\033[17;5~",    0,    0, 0},                      
-	{NH_WSI_KEY_F31,           "\033[18;5~",    0,    0, 0},                      
-	{NH_WSI_KEY_F32,           "\033[19;5~",    0,    0, 0},                      
-	{NH_WSI_KEY_F33,           "\033[20;5~",    0,    0, 0},                      
-	{NH_WSI_KEY_F34,           "\033[21;5~",    0,    0, 0},                      
-	{NH_WSI_KEY_F35,           "\033[23;5~",    0,    0, 0},                      
+	{NH_API_KEY_KP_HOME,       "\033[2J",       0,   -1, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_HOME,       "\033[1;2H",     0,   +1, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_HOME,       "\033[H",        0,   -1, -1},
+	{NH_API_KEY_KP_HOME,       "\033[1~",       0,   +1, -1},
+	{NH_API_KEY_KP_UP,         "\033Ox",       +1,    0, -1},
+	{NH_API_KEY_KP_UP,         "\033[A",        0,   -1, -1},
+	{NH_API_KEY_KP_UP,         "\033OA",        0,   +1, -1},
+	{NH_API_KEY_KP_DOWN,       "\033Or",       +1,    0, -1},
+	{NH_API_KEY_KP_DOWN,       "\033[B",        0,   -1, -1},
+	{NH_API_KEY_KP_DOWN,       "\033OB",        0,   +1, -1},
+	{NH_API_KEY_KP_LEFT,       "\033Ot",       +1,    0, -1},
+	{NH_API_KEY_KP_LEFT,       "\033[D",        0,   -1, -1},
+	{NH_API_KEY_KP_LEFT,       "\033OD",        0,   +1, -1},
+	{NH_API_KEY_KP_RIGHT,      "\033Ov",       +1,    0, -1},
+	{NH_API_KEY_KP_RIGHT,      "\033[C",        0,   -1, -1},
+	{NH_API_KEY_KP_RIGHT,      "\033OC",        0,   +1, -1},
+	{NH_API_KEY_KP_PRIOR,      "\033[5;2~",     0,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_PRIOR,      "\033[5~",       0,    0, -1},
+	{NH_API_KEY_KP_BEGIN,      "\033[E",        0,    0, -1},
+	{NH_API_KEY_KP_END,        "\033[J",       -1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_KP_END,        "\033[1;5F",    +1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_KP_END,        "\033[K",       -1,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_END,        "\033[1;2F",    +1,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_END,        "\033[4~",       0,    0, -1},
+	{NH_API_KEY_KP_NEXT,       "\033[6;2~",     0,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_NEXT,       "\033[6~",       0,    0, -1},
+	{NH_API_KEY_KP_INSERT,     "\033[2;2~",    +1,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_INSERT,     "\033[4l",      -1,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_INSERT,     "\033[L",       -1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_KP_INSERT,     "\033[2;5~",    +1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_KP_INSERT,     "\033[4h",      -1,    0, -1},
+	{NH_API_KEY_KP_INSERT,     "\033[2~",      +1,    0, -1},
+	{NH_API_KEY_KP_DELETE,     "\033[M",       -1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_KP_DELETE,     "\033[3;5~",    +1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_KP_DELETE,     "\033[2K",      -1,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_DELETE,     "\033[3;2~",    +1,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_KP_DELETE,     "\033[P",       -1,    0, -1},
+	{NH_API_KEY_KP_DELETE,     "\033[3~",      +1,    0, -1},
+	{NH_API_KEY_KP_MULTIPLY,   "\033Oj",       +2,    0, -1},
+	{NH_API_KEY_KP_ADD,        "\033Ok",       +2,    0, -1},
+	{NH_API_KEY_KP_ENTER,      "\033OM",       +2,    0, -1},
+	{NH_API_KEY_KP_ENTER,      "\r",           -1,    0, -1},
+	{NH_API_KEY_KP_SUBTRACT,   "\033Om",       +2,    0, -1},
+	{NH_API_KEY_KP_DECIMAL,    "\033On",       +2,    0, -1},
+	{NH_API_KEY_KP_DIVIDE,     "\033Oo",       +2,    0, -1},
+	{NH_API_KEY_KP_0,          "\033Op",       +2,    0, -1},
+	{NH_API_KEY_KP_1,          "\033Oq",       +2,    0, -1},
+	{NH_API_KEY_KP_2,          "\033Or",       +2,    0, -1},
+	{NH_API_KEY_KP_3,          "\033Os",       +2,    0, -1},
+	{NH_API_KEY_KP_4,          "\033Ot",       +2,    0, -1},
+	{NH_API_KEY_KP_5,          "\033Ou",       +2,    0, -1},
+	{NH_API_KEY_KP_6,          "\033Ov",       +2,    0, -1},
+	{NH_API_KEY_KP_7,          "\033Ow",       +2,    0, -1},
+	{NH_API_KEY_KP_8,          "\033Ox",       +2,    0, -1},
+	{NH_API_KEY_KP_9,          "\033Oy",       +2,    0, -1},
+	{NH_API_KEY_UP,            "\033[1;2A",     0,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_UP,            "\033[1;3A",     0,    0, NH_API_MODIFIER_MOD1}, 
+	{NH_API_KEY_UP,            "\033[1;4A",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_UP,            "\033[1;5A",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_UP,            "\033[1;6A",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_UP,            "\033[1;7A",     0,    0, NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_UP,            "\033[1;8A",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_UP,            "\033[A",        0,   -1, -1},
+	{NH_API_KEY_UP,            "\033OA",        0,   +1, -1},
+	{NH_API_KEY_DOWN,          "\033[1;2B",     0,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_DOWN,          "\033[1;3B",     0,    0, NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_DOWN,          "\033[1;4B",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_DOWN,          "\033[1;5B",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_DOWN,          "\033[1;6B",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_DOWN,          "\033[1;7B",     0,    0, NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_DOWN,          "\033[1;8B",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_DOWN,          "\033[B",        0,   -1, -1},
+	{NH_API_KEY_DOWN,          "\033OB",        0,   +1, -1},
+	{NH_API_KEY_LEFT,          "\033[1;2D",     0,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_LEFT,          "\033[1;3D",     0,    0, NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_LEFT,          "\033[1;4D",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_LEFT,          "\033[1;5D",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_LEFT,          "\033[1;6D",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_LEFT,          "\033[1;7D",     0,    0, NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_LEFT,          "\033[1;8D",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_LEFT,          "\033[D",        0,   -1, -1},
+	{NH_API_KEY_LEFT,          "\033OD",        0,   +1, -1},
+	{NH_API_KEY_RIGHT,         "\033[1;2C",     0,    0, NH_API_MODIFIER_SHIFT},
+	{NH_API_KEY_RIGHT,         "\033[1;3C",     0,    0, NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_RIGHT,         "\033[1;4C",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_RIGHT,         "\033[1;5C",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_RIGHT,         "\033[1;6C",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_RIGHT,         "\033[1;7C",     0,    0, NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_RIGHT,         "\033[1;8C",     0,    0, NH_API_MODIFIER_SHIFT|NH_API_MODIFIER_CONTROL|NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_RIGHT,         "\033[C",        0,   -1, -1},                     
+	{NH_API_KEY_RIGHT,         "\033OC",        0,   +1, -1},                     
+//	{NH_API_KEY_ISO_LEFT_TAB,  "\033[Z",        0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_RETURN,        "\033\r",        0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_RETURN,        "\r",            0,    0, -1},                     
+	{NH_API_KEY_INSERT,        "\033[4l",      -1,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_INSERT,        "\033[2;2~",    +1,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_INSERT,        "\033[L",       -1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_INSERT,        "\033[2;5~",    +1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_INSERT,        "\033[4h",      -1,    0, -1},                     
+	{NH_API_KEY_INSERT,        "\033[2~",      +1,    0, -1},                     
+	{NH_API_KEY_DELETE,        "\033[M",       -1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_DELETE,        "\033[3;5~",    +1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_DELETE,        "\033[2K",      -1,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_DELETE,        "\033[3;2~",    +1,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_DELETE,        "\033[P",       -1,    0, -1},                     
+	{NH_API_KEY_DELETE,        "\033[3~",      +1,    0, -1},                     
+	{NH_API_KEY_BACKSPACE,     "\177",          0,    0, 0},                      
+	{NH_API_KEY_BACKSPACE,     "\033\177",      0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_HOME,          "\033[2J",       0,   -1, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_HOME,          "\033[1;2H",     0,   +1, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_HOME,          "\033[H",        0,   -1, -1},                     
+	{NH_API_KEY_HOME,          "\033[1~",       0,   +1, -1},                     
+	{NH_API_KEY_END,           "\033[J",       -1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_END,           "\033[1;5F",    +1,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_END,           "\033[K",       -1,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_END,           "\033[1;2F",    +1,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_END,           "\033[4~",       0,    0, -1},                     
+	{NH_API_KEY_PRIOR,         "\033[5;5~",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_PRIOR,         "\033[5;2~",     0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_PRIOR,         "\033[5~",       0,    0, -1},                     
+	{NH_API_KEY_NEXT,          "\033[6;5~",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_NEXT,          "\033[6;2~",     0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_NEXT,          "\033[6~",       0,    0, -1},                     
+	{NH_API_KEY_F1,            "\033OP" ,       0,    0, 0},                      
+	{NH_API_KEY_F1, /* F13 */  "\033[1;2P",     0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F1, /* F25 */  "\033[1;5P",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F1, /* F37 */  "\033[1;6P",     0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F1, /* F49 */  "\033[1;3P",     0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F1, /* F61 */  "\033[1;4P",     0,    0, NH_API_MODIFIER_MOD3},   
+	{NH_API_KEY_F2,            "\033OQ" ,       0,    0, 0},                      
+	{NH_API_KEY_F2, /* F14 */  "\033[1;2Q",     0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F2, /* F26 */  "\033[1;5Q",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F2, /* F38 */  "\033[1;6Q",     0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F2, /* F50 */  "\033[1;3Q",     0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F2, /* F62 */  "\033[1;4Q",     0,    0, NH_API_MODIFIER_MOD3},   
+	{NH_API_KEY_F3,            "\033OR" ,       0,    0, 0},                      
+	{NH_API_KEY_F3, /* F15 */  "\033[1;2R",     0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F3, /* F27 */  "\033[1;5R",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F3, /* F39 */  "\033[1;6R",     0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F3, /* F51 */  "\033[1;3R",     0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F3, /* F63 */  "\033[1;4R",     0,    0, NH_API_MODIFIER_MOD3},   
+	{NH_API_KEY_F4,            "\033OS" ,       0,    0, 0},                      
+	{NH_API_KEY_F4, /* F16 */  "\033[1;2S",     0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F4, /* F28 */  "\033[1;5S",     0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F4, /* F40 */  "\033[1;6S",     0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F4, /* F52 */  "\033[1;3S",     0,    0, NH_API_MODIFIER_MOD1},
+	{NH_API_KEY_F5,            "\033[15~",      0,    0, 0},                      
+	{NH_API_KEY_F5, /* F17 */  "\033[15;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F5, /* F29 */  "\033[15;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F5, /* F41 */  "\033[15;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F5, /* F53 */  "\033[15;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F6,            "\033[17~",      0,    0, 0},                      
+	{NH_API_KEY_F6, /* F18 */  "\033[17;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F6, /* F30 */  "\033[17;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F6, /* F42 */  "\033[17;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F6, /* F54 */  "\033[17;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F7,            "\033[18~",      0,    0, 0},                      
+	{NH_API_KEY_F7, /* F19 */  "\033[18;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F7, /* F31 */  "\033[18;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F7, /* F43 */  "\033[18;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F7, /* F55 */  "\033[18;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F8,            "\033[19~",      0,    0, 0},                      
+	{NH_API_KEY_F8, /* F20 */  "\033[19;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F8, /* F32 */  "\033[19;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F8, /* F44 */  "\033[19;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F8, /* F56 */  "\033[19;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F9,            "\033[20~",      0,    0, 0},                      
+	{NH_API_KEY_F9, /* F21 */  "\033[20;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F9, /* F33 */  "\033[20;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F9, /* F45 */  "\033[20;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F9, /* F57 */  "\033[20;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F10,           "\033[21~",      0,    0, 0},                      
+	{NH_API_KEY_F10, /* F22 */ "\033[21;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F10, /* F34 */ "\033[21;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F10, /* F46 */ "\033[21;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F10, /* F58 */ "\033[21;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F11,           "\033[23~",      0,    0, 0},                      
+	{NH_API_KEY_F11, /* F23 */ "\033[23;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F11, /* F35 */ "\033[23;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F11, /* F47 */ "\033[23;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F11, /* F59 */ "\033[23;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F12,           "\033[24~",      0,    0, 0},                      
+	{NH_API_KEY_F12, /* F24 */ "\033[24;2~",    0,    0, NH_API_MODIFIER_SHIFT},  
+	{NH_API_KEY_F12, /* F36 */ "\033[24;5~",    0,    0, NH_API_MODIFIER_CONTROL},
+	{NH_API_KEY_F12, /* F48 */ "\033[24;6~",    0,    0, NH_API_MODIFIER_MOD4},   
+	{NH_API_KEY_F12, /* F60 */ "\033[24;3~",    0,    0, NH_API_MODIFIER_MOD1},   
+	{NH_API_KEY_F13,           "\033[1;2P",     0,    0, 0},                      
+	{NH_API_KEY_F14,           "\033[1;2Q",     0,    0, 0},                      
+	{NH_API_KEY_F15,           "\033[1;2R",     0,    0, 0},                      
+	{NH_API_KEY_F16,           "\033[1;2S",     0,    0, 0},                      
+	{NH_API_KEY_F17,           "\033[15;2~",    0,    0, 0},                      
+	{NH_API_KEY_F18,           "\033[17;2~",    0,    0, 0},                      
+	{NH_API_KEY_F19,           "\033[18;2~",    0,    0, 0},                      
+	{NH_API_KEY_F20,           "\033[19;2~",    0,    0, 0},                      
+	{NH_API_KEY_F21,           "\033[20;2~",    0,    0, 0},                      
+	{NH_API_KEY_F22,           "\033[21;2~",    0,    0, 0},                      
+	{NH_API_KEY_F23,           "\033[23;2~",    0,    0, 0},                      
+	{NH_API_KEY_F24,           "\033[24;2~",    0,    0, 0},                      
+	{NH_API_KEY_F25,           "\033[1;5P",     0,    0, 0},                      
+	{NH_API_KEY_F26,           "\033[1;5Q",     0,    0, 0},                      
+	{NH_API_KEY_F27,           "\033[1;5R",     0,    0, 0},                      
+	{NH_API_KEY_F28,           "\033[1;5S",     0,    0, 0},                      
+	{NH_API_KEY_F29,           "\033[15;5~",    0,    0, 0},                      
+	{NH_API_KEY_F30,           "\033[17;5~",    0,    0, 0},                      
+	{NH_API_KEY_F31,           "\033[18;5~",    0,    0, 0},                      
+	{NH_API_KEY_F32,           "\033[19;5~",    0,    0, 0},                      
+	{NH_API_KEY_F33,           "\033[20;5~",    0,    0, 0},                      
+	{NH_API_KEY_F34,           "\033[21;5~",    0,    0, 0},                      
+	{NH_API_KEY_F35,           "\033[23;5~",    0,    0, 0},                      
 };
 
 typedef struct ttyr_tty_ShellSelection {
-    nh_PixelPosition Start;
+    nh_api_PixelPosition Start;
     int startScroll;
-    nh_PixelPosition Stop;
+    nh_api_PixelPosition Stop;
     int stopScroll;
     int lines;
-    NH_ENCODING_UTF32 **buffer_pp;
+    NH_API_UTF32 **buffer_pp;
     bool active;
     bool draw;
     bool doubleClick;
@@ -282,10 +282,10 @@ typedef struct ttyr_tty_ShellSelection {
 } ttyr_tty_ShellSelection;
 
 typedef struct ttyr_tty_ShellScroll {
-    nh_PixelPosition Position;
-    nh_PixelPosition Current;
+    nh_api_PixelPosition Position;
+    nh_api_PixelPosition Current;
     bool active;
-    nh_SystemTime LastScroll;
+    nh_core_SystemTime LastScroll;
 } ttyr_tty_ShellScroll;
 
 typedef struct ttyr_tty_Shell {
@@ -302,8 +302,8 @@ typedef struct ttyr_tty_Shell {
     int width;
     int height;
     int scroll;
-    nh_wsi_KeyboardEvent LastEvent;
-    nh_SystemTime LastClick;
+    nh_api_KeyboardEvent LastEvent;
+    nh_core_SystemTime LastClick;
 } ttyr_tty_Shell;
 
 #define SHELL_PATH "/bin/sh"
@@ -426,7 +426,7 @@ static void ttyr_tty_drawShell(
 static TTYR_TTY_RESULT ttyr_tty_handleFastScroll(
     ttyr_tty_Shell *Shell_p)
 {
-    nh_SystemTime Now = nh_core_getSystemTime();
+    nh_core_SystemTime Now = nh_core_getSystemTime();
     if (nh_core_getSystemTimeDiffInSeconds(Shell_p->Scroll.LastScroll, Now) > 0.05f) {
         return TTYR_TTY_SUCCESS;
     }
@@ -553,7 +553,7 @@ static TTYR_TTY_RESULT ttyr_tty_copyFromShell(
         // Remove trailing whitespaces.
         int empty = 0;
         for (int c = Shell_p->ST_p->col-1; c >= 0; --c, ++empty) {
-            NH_ENCODING_UTF32 codepoint = Shell_p->Selection.buffer_pp[i][c];
+            NH_API_UTF32 codepoint = Shell_p->Selection.buffer_pp[i][c];
             if (codepoint != ' ' && codepoint != 0) {break;}
         }
         if (empty != 0) {empty--;}
@@ -569,7 +569,7 @@ static TTYR_TTY_RESULT ttyr_tty_copyFromShell(
             }
     
             // Start-pointer calculation of selection depends on direction from which the selection was initiated.
-            NH_ENCODING_UTF32 *p = NULL;
+            NH_API_UTF32 *p = NULL;
             if (Shell_p->Selection.Start.x < Shell_p->Selection.Stop.x) {
                 p = Shell_p->Selection.buffer_pp[i] + Shell_p->Selection.Start.x;
             } else {
@@ -603,7 +603,7 @@ static TTYR_TTY_RESULT ttyr_tty_pasteIntoShell(
     nh_wsi_getClipboard_f getClipboard_f = nh_core_loadExistingSymbol(NH_MODULE_WSI, 0, "nh_wsi_getClipboard");
     if (!getClipboard_f) {return TTYR_TTY_SUCCESS;}
 
-    NH_BYTE *clipboard_p = getClipboard_f();
+    char *clipboard_p = getClipboard_f();
     if (!clipboard_p) {return TTYR_TTY_SUCCESS;}
 
     // In bracketed paste mode, text pasted into the terminal will be surrounded by ESC [200~ and ESC [201~; 
@@ -639,11 +639,11 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
     for (int i = start; i <= stop; ++i) {Shell_p->Selection.lines++;}
 
     if (Shell_p->Selection.doubleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
-        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
+        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
         TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
-        NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        NH_API_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         TTYR_CHECK_MEM(buffer_p)
-        memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        memset(buffer_p, 0, sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         Shell_p->Selection.buffer_pp[0] = buffer_p;
  
         if (start < 0) { 
@@ -675,11 +675,11 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
         }
 
     } else if (Shell_p->Selection.trippleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
-        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
+        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
         TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
-        NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        NH_API_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         TTYR_CHECK_MEM(buffer_p)
-        memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+        memset(buffer_p, 0, sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         Shell_p->Selection.buffer_pp[0] = buffer_p;
  
         if (start < 0) { 
@@ -711,13 +711,13 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
         }
 
     } else {
-        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_ENCODING_UTF32*)*Shell_p->Selection.lines);
+        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
         TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
     
         for (int i = 0; i < Shell_p->Selection.lines; ++i) {
-            NH_ENCODING_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+            NH_API_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
             TTYR_CHECK_MEM(buffer_p)
-            memset(buffer_p, 0, sizeof(NH_ENCODING_UTF32)*Shell_p->ST_p->col);
+            memset(buffer_p, 0, sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
             Shell_p->Selection.buffer_pp[i] = buffer_p;
         }
      
@@ -738,8 +738,8 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellSelection(
     return TTYR_TTY_SUCCESS;
 }
 
-static NH_BYTE *ttyr_tty_getShellKey(
-    ttyr_tty_Shell *Shell_p, NH_WSI_KEY_E k, uint state)
+static char *ttyr_tty_getShellKey(
+    ttyr_tty_Shell *Shell_p, NH_API_KEY_E k, uint state)
 {
     for (ttyr_tty_ShellKey *kp = KEYS_P; kp < KEYS_P + sizeof(KEYS_P)/sizeof(KEYS_P[0]); kp++) {
         if (kp->key != k)
@@ -763,23 +763,23 @@ static NH_BYTE *ttyr_tty_getShellKey(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_sendMouseEvent(
-    ttyr_tty_Shell *Shell_p, nh_wsi_MouseEvent Event)
+    ttyr_tty_Shell *Shell_p, nh_api_MouseEvent Event)
 {
     if (Shell_p->ST_p->windowMode & MODE_MOUSESGR) {
 
         unsigned int button = 0;
         switch (Event.type) {
-            case NH_WSI_MOUSE_LEFT   : button = 0; break;
-            case NH_WSI_MOUSE_MIDDLE : button = 1; break;
-            case NH_WSI_MOUSE_RIGHT  : button = 2; break;
-            case NH_WSI_MOUSE_SCROLL : 
-                button = Event.trigger == NH_WSI_TRIGGER_UP ? 64 : 65;
+            case NH_API_MOUSE_LEFT   : button = 0; break;
+            case NH_API_MOUSE_MIDDLE : button = 1; break;
+            case NH_API_MOUSE_RIGHT  : button = 2; break;
+            case NH_API_MOUSE_SCROLL : 
+                button = Event.trigger == NH_API_TRIGGER_UP ? 64 : 65;
                 break;
         }
          
-        NH_BYTE buf_p[64] = {};
+        char buf_p[64] = {};
         int len = snprintf(buf_p, sizeof(buf_p), "\033[<%d;%d;%d%c",
-            button, Event.Position.x, Event.Position.y, Event.trigger == NH_WSI_TRIGGER_RELEASE ? 'm' : 'M');
+            button, Event.Position.x, Event.Position.y, Event.trigger == NH_API_TRIGGER_RELEASE ? 'm' : 'M');
 
         ttywrite(Shell_p->ST_p, buf_p, len, 0);
 
@@ -787,15 +787,15 @@ static TTYR_TTY_RESULT ttyr_tty_sendMouseEvent(
 
         unsigned int button = 0;
         switch (Event.type) {
-            case NH_WSI_MOUSE_LEFT   : button = 0; break;
-            case NH_WSI_MOUSE_MIDDLE : button = 1; break;
-            case NH_WSI_MOUSE_RIGHT  : button = 2; break;
-            case NH_WSI_MOUSE_SCROLL : 
-                button = Event.trigger == NH_WSI_TRIGGER_UP ? 64 : 65;
+            case NH_API_MOUSE_LEFT   : button = 0; break;
+            case NH_API_MOUSE_MIDDLE : button = 1; break;
+            case NH_API_MOUSE_RIGHT  : button = 2; break;
+            case NH_API_MOUSE_SCROLL : 
+                button = Event.trigger == NH_API_TRIGGER_UP ? 64 : 65;
                 break;
         }
  
-        NH_BYTE buf_p[64] = {}; 
+        char buf_p[64] = {}; 
         int len = snprintf(buf_p, sizeof(buf_p), "\033[M%c%c%c", 
             32+button, 32+Event.Position.x, 32+Event.Position.y);
 
@@ -806,19 +806,19 @@ static TTYR_TTY_RESULT ttyr_tty_sendMouseEvent(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
-    ttyr_tty_Program *Program_p, nh_wsi_Event Event)
+    ttyr_tty_Program *Program_p, nh_api_WSIEvent Event)
 {
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
     if (!Shell_p->ST_p) {return TTYR_TTY_SUCCESS;}
 
-    if (Event.type == NH_WSI_EVENT_KEYBOARD) {
+    if (Event.type == NH_API_WSI_EVENT_KEYBOARD) {
         Shell_p->LastEvent = Event.Keyboard;
     }
 
     // Handle key-press events.
-    if (Event.type == NH_WSI_EVENT_KEYBOARD && Event.Keyboard.trigger == NH_WSI_TRIGGER_PRESS) {
+    if (Event.type == NH_API_WSI_EVENT_KEYBOARD && Event.Keyboard.trigger == NH_API_TRIGGER_PRESS) {
         // Handle special key.
-        NH_BYTE *specialkey = NULL;
+        char *specialkey = NULL;
         if ((specialkey = ttyr_tty_getShellKey(Shell_p, Event.Keyboard.special, Event.Keyboard.state)) && Event.Keyboard.codepoint == 0) {
             if (specialkey) {
                 ttywrite(Shell_p->ST_p, specialkey, strlen(specialkey), 1);
@@ -834,13 +834,13 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
             // Reset scrolling.
             Shell_p->scroll = 0;
  
-            NH_BYTE p[4] = {0};
-            NH_ENCODING_UTF32 codepoint = Event.Keyboard.codepoint;
+            char p[4] = {0};
+            NH_API_UTF32 codepoint = Event.Keyboard.codepoint;
             int length = nh_encoding_encodeUTF8Single(codepoint, p);
-            if (length == 1 && Event.Keyboard.state & NH_WSI_MODIFIER_MOD1) {
+            if (length == 1 && Event.Keyboard.state & NH_API_MODIFIER_MOD1) {
                 if (Shell_p->ST_p->windowMode & MODE_8BIT) {
                     if (*p < 0177) {
-                        NH_ENCODING_UTF32 c = *p | 0x80;
+                        NH_API_UTF32 c = *p | 0x80;
                         length = nh_encoding_encodeUTF8Single(c, p);
                     }
                 } else {
@@ -854,23 +854,23 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
     }
 
     // Handle mouse events.
-    if (Event.type == NH_WSI_EVENT_MOUSE) {
-        if (Event.Mouse.type == NH_WSI_MOUSE_MIDDLE && Event.Mouse.trigger == NH_WSI_TRIGGER_PRESS) {
+    if (Event.type == NH_API_WSI_EVENT_MOUSE) {
+        if (Event.Mouse.type == NH_API_MOUSE_MIDDLE && Event.Mouse.trigger == NH_API_TRIGGER_PRESS) {
             Shell_p->Scroll.active = true;
             Shell_p->Scroll.Position = Event.Window.Position;
             Shell_p->Scroll.Current = Event.Window.Position;
             Shell_p->Scroll.LastScroll = nh_core_getSystemTime();
         }
-        if (Event.Mouse.type == NH_WSI_MOUSE_MIDDLE && Event.Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
+        if (Event.Mouse.type == NH_API_MOUSE_MIDDLE && Event.Mouse.trigger == NH_API_TRIGGER_RELEASE) {
             Shell_p->Scroll.active = false;
         }
-        if (Event.Mouse.type == NH_WSI_MOUSE_LEFT && Event.Mouse.trigger == NH_WSI_TRIGGER_PRESS) {
+        if (Event.Mouse.type == NH_API_MOUSE_LEFT && Event.Mouse.trigger == NH_API_TRIGGER_PRESS) {
             Shell_p->Selection.Start = Event.Mouse.Position;
             Shell_p->Selection.startScroll = Shell_p->scroll;
             Shell_p->Selection.Stop = Shell_p->Selection.Start;
             Shell_p->Selection.stopScroll = Shell_p->Selection.startScroll;
             Shell_p->Selection.active = true;
-            nh_SystemTime Now = nh_core_getSystemTime();
+            nh_core_SystemTime Now = nh_core_getSystemTime();
             bool fastClick = nh_core_getSystemTimeDiffInSeconds(Shell_p->LastClick, Now) < 0.3f;
             Shell_p->Selection.trippleClick = Shell_p->Selection.doubleClick && fastClick;
             Shell_p->Selection.doubleClick = fastClick && !Shell_p->Selection.trippleClick;
@@ -881,7 +881,7 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
                 ttyr_tty_handleShellSelection(Shell_p);
             }
         }
-        if (Event.Mouse.type == NH_WSI_MOUSE_LEFT && Event.Mouse.trigger == NH_WSI_TRIGGER_RELEASE) {
+        if (Event.Mouse.type == NH_API_MOUSE_LEFT && Event.Mouse.trigger == NH_API_TRIGGER_RELEASE) {
             if (!Shell_p->Selection.doubleClick && !Shell_p->Selection.trippleClick) {
                 Shell_p->Selection.Stop = Event.Mouse.Position;
                 Shell_p->Selection.stopScroll = Shell_p->scroll;
@@ -890,7 +890,7 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
             Shell_p->Selection.draw = Shell_p->Selection.moved || Shell_p->Selection.doubleClick || Shell_p->Selection.trippleClick;
             ttyr_tty_handleShellSelection(Shell_p);
         }
-        if (Event.Mouse.type == NH_WSI_MOUSE_MOVE) {
+        if (Event.Mouse.type == NH_API_MOUSE_MOVE) {
             if (Shell_p->Selection.active) {
                 Shell_p->Selection.doubleClick = false;
                 Shell_p->Selection.trippleClick = false;
@@ -907,12 +907,12 @@ static TTYR_TTY_RESULT ttyr_tty_handleShellInput(
         if (Shell_p->ST_p->mode & TERM_MODE_ALTSCREEN) {
             ttyr_tty_sendMouseEvent(Shell_p, Event.Mouse);
         } else {
-#define CTRL_ACTIVE ((Shell_p->LastEvent.state & NH_WSI_MODIFIER_CONTROL) && (Shell_p->LastEvent.trigger != NH_WSI_TRIGGER_RELEASE && (Shell_p->LastEvent.special != NH_WSI_KEY_CONTROL_L && Shell_p->LastEvent.special != NH_WSI_KEY_CONTROL_R)))
-            if (Event.Mouse.type == NH_WSI_MOUSE_SCROLL && !CTRL_ACTIVE) {
-                if (Event.Mouse.trigger == NH_WSI_TRIGGER_DOWN) {
+#define CTRL_ACTIVE ((Shell_p->LastEvent.state & NH_API_MODIFIER_CONTROL) && (Shell_p->LastEvent.trigger != NH_API_TRIGGER_RELEASE && (Shell_p->LastEvent.special != NH_API_KEY_CONTROL_L && Shell_p->LastEvent.special != NH_API_KEY_CONTROL_R)))
+            if (Event.Mouse.type == NH_API_MOUSE_SCROLL && !CTRL_ACTIVE) {
+                if (Event.Mouse.trigger == NH_API_TRIGGER_DOWN) {
                     if (Shell_p->scroll > 0) {Shell_p->scroll--;};
                 }
-                if (Event.Mouse.trigger == NH_WSI_TRIGGER_UP) {
+                if (Event.Mouse.trigger == NH_API_TRIGGER_UP) {
                     if (Shell_p->scroll < Shell_p->ST_p->scrollup) {Shell_p->scroll++;}
                 }
                 ttyr_tty_drawShell(Shell_p);
@@ -1053,14 +1053,14 @@ static TTYR_TTY_RESULT ttyr_tty_drawShellTopbar(
 {
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
 
-    NH_BYTE topbar_p[1024];
+    char topbar_p[1024];
     memset(topbar_p, ' ', 1024);
 
     if (Shell_p->ST_p) {
-        NH_BYTE path_p[255] = {0};
+        char path_p[255] = {0};
         sprintf(path_p, "/proc/%ld/cwd", Shell_p->ST_p->pid);
 
-        NH_BYTE buf_p[1024];
+        char buf_p[1024];
         memset(buf_p, 0, 1024);
         readlink(path_p, buf_p, 1024);
 
@@ -1075,7 +1075,7 @@ static TTYR_TTY_RESULT ttyr_tty_drawShellTopbar(
     }
 
     if (Shell_p->scroll > 0) {
-        NH_BYTE scroll_p[64];
+        char scroll_p[64];
         sprintf(scroll_p, "%d/%d", Shell_p->scroll, Shell_p->ST_p->scrollup);
         for (int i = 0, j = strlen(scroll_p)-1; i < strlen(scroll_p); ++i, --j) {
             Glyphs_p[(width-4)-i].codepoint = scroll_p[j];
@@ -1094,7 +1094,7 @@ typedef enum TTYR_TTY_SHELL_COMMAND_E {
 } TTYR_TTY_SHELL_COMMAND_E;
 
 static TTYR_TTY_RESULT ttyr_tty_handleShellCommand(
-    ttyr_tty_Program *Program_p, nh_List *Arguments_p)
+    ttyr_tty_Program *Program_p)
 {
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
 
@@ -1145,13 +1145,9 @@ static void ttyr_tty_destroyShell(
 static void ttyr_tty_destroyShellPrototype(
     ttyr_tty_Interface *Prototype_p)
 {
-    nh_encoding_freeUTF32(&Prototype_p->Name);
-
-    for (int i = 0; i < TTYR_TTY_SHELL_COMMAND_E_COUNT; ++i) {
-        nh_encoding_freeUTF32(&Prototype_p->CommandNames_p[i]);
-    }
-
-    nh_core_free(Prototype_p->CommandNames_p);
+    nh_core_free(Prototype_p->commands_pp[0]);
+    nh_core_free(Prototype_p->commands_pp[1]);
+    nh_core_free(Prototype_p->commands_pp);
     nh_core_free(Prototype_p);
 }
 
@@ -1172,25 +1168,25 @@ ttyr_tty_Interface *ttyr_tty_createShellInterface()
     Prototype_p->Callbacks.destroyPrototype_f = ttyr_tty_destroyShellPrototype;
     Prototype_p->Callbacks.destroy_f = ttyr_tty_destroyShell;
 
-    NH_ENCODING_UTF32 name_p[5] = {'s', 'h', 'e', 'l', 'l'};
-    Prototype_p->Name = nh_encoding_initUTF32(5);
-    NH_ENCODING_CHECK_2(NULL, nh_encoding_appendUTF32(&Prototype_p->Name, name_p, 5))
+    NH_API_UTF32 name_p[6] = {'s', 'h', 'e', 'l', 'l', 0};
+    memcpy(Prototype_p->name_p, name_p, sizeof(name_p));
 
-    nh_encoding_UTF32String *CommandNames_p =
-        nh_core_allocate(sizeof(nh_encoding_UTF32String)*TTYR_TTY_SHELL_COMMAND_E_COUNT);
-    TTYR_CHECK_MEM_2(NULL, CommandNames_p)
+    NH_API_UTF32 command1_p[5] = {'c', 'o', 'p', 'y', 0};
+    NH_API_UTF32 command2_p[6] = {'p', 'a', 's', 't', 'e', 0};
  
-    NH_ENCODING_UTF32 command1_p[4] = {'c', 'o', 'p', 'y'};
-    NH_ENCODING_UTF32 command2_p[5] = {'p', 'a', 's', 't', 'e'};
- 
-    CommandNames_p[TTYR_TTY_SHELL_COMMAND_COPY] = nh_encoding_initUTF32(5);
-    CommandNames_p[TTYR_TTY_SHELL_COMMAND_PASTE] = nh_encoding_initUTF32(6);
- 
-    NH_ENCODING_CHECK_2(NULL, nh_encoding_appendUTF32(&CommandNames_p[TTYR_TTY_SHELL_COMMAND_COPY], command1_p, 4))
-    NH_ENCODING_CHECK_2(NULL, nh_encoding_appendUTF32(&CommandNames_p[TTYR_TTY_SHELL_COMMAND_PASTE], command2_p, 5))
+    NH_API_UTF32 **commands_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*2);
+    TTYR_CHECK_MEM_2(NULL, commands_pp)
 
-    Prototype_p->CommandNames_p = CommandNames_p;
-    Prototype_p->commands = TTYR_TTY_SHELL_COMMAND_E_COUNT;
+    commands_pp[0] = nh_core_allocate(sizeof(command1_p));
+    TTYR_CHECK_MEM_2(NULL, commands_pp[0])
+    commands_pp[1] = nh_core_allocate(sizeof(command2_p));
+    TTYR_CHECK_MEM_2(NULL, commands_pp[1])
+
+    memcpy(commands_pp[0], command1_p, sizeof(command1_p));
+    memcpy(commands_pp[1], command2_p, sizeof(command2_p));
+
+    Prototype_p->commands_pp = commands_pp;
+    Prototype_p->commands = 2;
 
     return Prototype_p;
 }

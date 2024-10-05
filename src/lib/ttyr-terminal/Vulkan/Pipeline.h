@@ -11,12 +11,12 @@
 
 #include "../Common/Includes.h"
 
-#include "nhgfx/Vulkan/Driver.h"
-#include "nhgfx/Vulkan/Helper.h"
+#include "nh-gfx/Vulkan/Driver.h"
+#include "nh-gfx/Vulkan/Helper.h"
 
 #endif
 
-/** @addtogroup lib_nhcss_enums
+/** @addtogroup lib_nh-css_enums
  *  @{
  */
 
@@ -27,7 +27,7 @@
 
 /** @} */
 
-/** @addtogroup lib_nhcss_functions
+/** @addtogroup lib_nh-css_functions
  *  @{
  */
 

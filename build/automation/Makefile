@@ -9,7 +9,7 @@ CFLAGS = -fPIC -std=gnu99 -Wl,-rpath,$(CURDIR)/lib,-rpath,$(NETZHAUT_PATH)/lib
 LD = gcc
 LDFLAGS_TTYR_TTY = -lutil -Lexternal/st-0.8.5/ -l:libst.so
 LDFLAGS_TTYR_TERMINAL =
-LDFLAGS_TTYR = -Llib -lttyr-api -L$(NETZHAUT_PATH)/lib -lnhapi
+LDFLAGS_TTYR = -Llib -lttyr-api -L$(NETZHAUT_PATH)/lib -lnh-api
 
 # Define the source file directory for each library
 SRC_DIR_TTYR_TTY = src/lib/ttyr-tty
@@ -92,7 +92,7 @@ BIN_TTYR = bin/ttyr
 
 build_netzhaut:
 ifeq ($(NETZHAUT_PATH),$(CURDIR)/external/Netzhaut)
-	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk nhapi.so nhcore.so nhencoding.so nhwsi.so nhgfx.so)
+	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk nh-api.so nh-core.so nh-encoding.so nh-wsi.so nh-gfx.so)
 endif
 
 create_lib_dir:

@@ -13,8 +13,8 @@
 #include "../Terminal/Graphics.h"
 #include "../Common/Macros.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Common/Macros.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Common/Macros.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -32,7 +32,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBackgroundProgram(
 {
 TTYR_TERMINAL_BEGIN()
 
-    static const NH_BYTE* vsSource_p =
+    static const char* vsSource_p =
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
         "uniform vec3 in_color;\n"
@@ -42,7 +42,7 @@ TTYR_TERMINAL_BEGIN()
         "    gl_Position = vec4(position, 1.0);\n"
         "}\n";
 
-    static const NH_BYTE* fsSource_p =
+    static const char* fsSource_p =
         "#version 450\n"
         "in vec3 color;\n"
         "out vec4 fragColor;\n"
@@ -114,8 +114,8 @@ TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
 // UPDATE ==========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBackgroundVertices(
-    ttyr_terminal_OpenGLBackground *Background_p, nh_opengl_CommandBuffer *CommandBuffer_p, nh_Array *Vertices_p,
-    nh_Array *Indices_p)
+    ttyr_terminal_OpenGLBackground *Background_p, nh_opengl_CommandBuffer *CommandBuffer_p, nh_core_Array *Vertices_p,
+    nh_core_Array *Indices_p)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -161,7 +161,7 @@ TTYR_TERMINAL_BEGIN()
             State_p->Viewport_p->OpenGL.CommandBuffer_p);
         ttyr_terminal_initOpenGLBackgroundVertices(&Data_p->Background.OpenGL, 
             State_p->Viewport_p->OpenGL.CommandBuffer_p);
-        Data_p->Background.Action.init = NH_FALSE;
+        Data_p->Background.Action.init = false;
     }
 
     ttyr_terminal_updateOpenGLBackgroundVertices(&Data_p->Background.OpenGL,

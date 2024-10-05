@@ -11,7 +11,7 @@
 #include "ttyr-terminal.h"
 #include "ttyr-api.h"
 
-#include "nhcore/Loader/Loader.h"
+#include "nh-core/Loader/Loader.h"
 
 // TYPEDEFS ========================================================================================
 
@@ -20,7 +20,7 @@ typedef ttyr_terminal_Terminal *(*ttyr_terminal_openTerminal_f)(
 ); 
 
 typedef TTYR_TERMINAL_RESULT (*ttyr_terminal_cmd_setViewport_f)( 
-    ttyr_terminal_Terminal *Terminal_p, nh_gfx_Viewport *Viewport_p 
+    ttyr_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p 
 ); 
 
 // FUNCTIONS =======================================================================================
@@ -28,7 +28,7 @@ typedef TTYR_TERMINAL_RESULT (*ttyr_terminal_cmd_setViewport_f)(
 static bool added = false;
 static const char name_p[] = "ttyr-terminal";
 static const char *dependencies_pp[16] = {
-    "nhgfx",
+    "nh-gfx",
     "ttyr-tty",
 };
 
@@ -44,7 +44,7 @@ static bool ttyr_api_add() {
 }
 
 ttyr_terminal_Terminal *ttyr_api_openTerminal(
-    NH_BYTE *config_p, ttyr_tty_TTY *TTY_p)
+    char *config_p, ttyr_tty_TTY *TTY_p)
 {
     if (!ttyr_api_add()) {return NULL;}
 
@@ -53,7 +53,7 @@ ttyr_terminal_Terminal *ttyr_api_openTerminal(
 }
 
 TTYR_TERMINAL_RESULT ttyr_api_setViewport(
-    ttyr_terminal_Terminal *Terminal_p, nh_gfx_Viewport *Viewport_p)
+    ttyr_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p)
 {
     if (!ttyr_api_add()) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
 

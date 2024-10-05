@@ -23,8 +23,8 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -36,7 +36,7 @@
 // CURSOR ==========================================================================================
 
 TTYR_TTY_RESULT ttyr_tty_getCursorPosition(
-    ttyr_tty_Tile *MacroTile_p, ttyr_tty_Tile *MicroTile_p, NH_BOOL standardIO, int *x_p, int *y_p)
+    ttyr_tty_Tile *MacroTile_p, ttyr_tty_Tile *MicroTile_p, bool standardIO, int *x_p, int *y_p)
 {
     *x_p = -1;
     *y_p = -1;
@@ -98,7 +98,7 @@ static void ttyr_tty_drawVerticalBorderGlyph(
 
     Glyph_p->codepoint = ' ';
     Glyph_p->mark = TTYR_TTY_MARK_LINE_VERTICAL | TTYR_TTY_MARK_ACCENT;
-    Glyph_p->Attributes.reverse = NH_TRUE;
+    Glyph_p->Attributes.reverse = true;
     return;
 }
 
@@ -114,7 +114,7 @@ static TTYR_TTY_RESULT ttyr_tty_draw(
     row = row - Tile_p->rowPosition;
 
     int cols = Tile_p->colSize;
-    NH_BOOL topbar = NH_FALSE;
+    bool topbar = false;
 
     // Check if topbar should be drawn. 
     if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) {
@@ -170,11 +170,11 @@ static TTYR_TTY_RESULT ttyr_tty_postProcessRow(
         ttyr_tty_Glyph *Glyph_p = &Row_p->Glyphs_p[i];
         if (Glyph_p->mark & TTYR_TTY_MARK_LINE_VERTICAL) {
             Glyph_p->codepoint = 'x';
-            Glyph_p->Attributes.reverse = NH_FALSE;
+            Glyph_p->Attributes.reverse = false;
             Glyph_p->mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
             if (((Glyph_p+1)->Attributes.reverse && (Glyph_p+1)->mark & TTYR_TTY_MARK_LINE_HORIZONTAL)
             &&  ((Glyph_p-1)->Attributes.reverse && (Glyph_p-1)->mark & TTYR_TTY_MARK_LINE_HORIZONTAL)) {
-                Glyph_p->Attributes.reverse = NH_TRUE;
+                Glyph_p->Attributes.reverse = true;
                 continue;
             } 
             if ((Glyph_p+1)->mark & TTYR_TTY_MARK_LINE_HORIZONTAL) {
@@ -210,7 +210,7 @@ static TTYR_TTY_RESULT ttyr_tty_postProcessRow(
 }
 
 TTYR_TTY_RESULT ttyr_tty_refreshGrid1Row(
-    nh_List *Tiles_p, ttyr_tty_View *View_p, int row)
+    nh_core_List *Tiles_p, ttyr_tty_View *View_p, int row)
 {
     memset(View_p->Row.Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
     int offset = 0;
@@ -221,7 +221,7 @@ TTYR_TTY_RESULT ttyr_tty_refreshGrid1Row(
             ttyr_tty_Tile *Tile_p = Tiles_p->pp[tile];
             if (Tile_p->Children.count > 0) {continue;}
 
-            Tile_p->refresh = NH_FALSE;
+            Tile_p->refresh = false;
 
             if (Tile_p->rowPosition <= row
             &&  Tile_p->rowPosition  + Tile_p->rowSize > row
@@ -232,7 +232,7 @@ TTYR_TTY_RESULT ttyr_tty_refreshGrid1Row(
                 for (int i = 0; i < Tile_p->colSize; ++i) {
                     ttyr_tty_Glyph *Glyph_p = View_p->Grid1_p[row].Glyphs_p+col+i;
                     if (memcmp(Glyph_p, View_p->Row.Glyphs_p+i, sizeof(ttyr_tty_Glyph))) {
-                        View_p->Grid1_p[row].update_p[col+i] = NH_TRUE;
+                        View_p->Grid1_p[row].update_p[col+i] = true;
                     }
                 }
 
@@ -258,13 +258,13 @@ TTYR_TTY_RESULT ttyr_tty_refreshGrid1(
     int offset = 0;
 
     ttyr_tty_updateTiling(TTY_p->Window_p->RootTile_p, View_p->rows, View_p->cols-offset);
-    nh_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
+    nh_core_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
 
     for (int row = 0; row < View_p->rows; ++row) {
         TTYR_CHECK(ttyr_tty_refreshGrid1Row(&Tiles, View_p, row))
     }
 
-    nh_core_freeList(&Tiles, NH_FALSE);
+    nh_core_freeList(&Tiles, false);
 
     TTYR_CHECK(ttyr_tty_forwardGrid1(View_p))
 

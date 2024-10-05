@@ -11,8 +11,8 @@
 
 #include "../Common/Includes.h"
 
-#include "nhgfx/OpenGL/CommandBuffer.h"
-#include "nhgfx/OpenGL/Commands.h"
+#include "nh-gfx/OpenGL/CommandBuffer.h"
+#include "nh-gfx/OpenGL/Commands.h"
 
 #endif
 

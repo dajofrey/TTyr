@@ -15,11 +15,11 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
 
-#include "nhencoding/Encodings/UTF32.h"
-#include "nhencoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -37,12 +37,12 @@ ttyr_tty_Tile *ttyr_tty_createTile(
     Tile_p->type = type;
     Tile_p->p = p;
     Tile_p->orientation = TTYR_TTY_TILE_ORIENTATION_VERTICAL;
-    Tile_p->rightSeparator = NH_FALSE;
-    Tile_p->refresh  = NH_FALSE;
+    Tile_p->rightSeparator = false;
+    Tile_p->refresh  = false;
     Tile_p->Children = nh_core_initLinkedList();
     Tile_p->Parent_p = Parent_p;
     Tile_p->Prev_p   = NULL;
-    Tile_p->close    = NH_FALSE;
+    Tile_p->close    = false;
 
     if (Parent_p != NULL) {
         nh_core_insertIntoLinkedList(&Parent_p->Children, Tile_p, index);
@@ -62,7 +62,7 @@ static void ttyr_tty_destroyTile(
         }
     }
 
-    nh_core_destroyLinkedList(&Tile_p->Children, NH_FALSE); 
+    nh_core_destroyLinkedList(&Tile_p->Children, false); 
     nh_core_free(Tile_p);
 }
 
@@ -162,7 +162,7 @@ TTYR_TTY_RESULT ttyr_tty_closeTile(
         }
 
         // Remove and destroy Tile_p. 
-        nh_core_removeFromLinkedList2(&Tile_p->Parent_p->Children, Tile_p, NH_FALSE);
+        nh_core_removeFromLinkedList2(&Tile_p->Parent_p->Children, Tile_p, false);
         ttyr_tty_destroyTile(Tile_p);
     }
 
@@ -204,10 +204,10 @@ static ttyr_tty_Tile *ttyr_tty_getTileFromNumber(
     return NULL;
 }
 
-nh_List ttyr_tty_getTiles(
+nh_core_List ttyr_tty_getTiles(
     ttyr_tty_Tile *Root_p)
 {
-    nh_List List = nh_core_initList(4);
+    nh_core_List List = nh_core_initList(4);
 
     for (int i = 0; Root_p != NULL;++i) {
         int start = 0;
@@ -325,7 +325,7 @@ ttyr_tty_Tile *ttyr_tty_switchTile(
 static TTYR_TTY_RESULT ttyr_tty_computeTileSizeRecursively(
     ttyr_tty_Tile *Tile_p, int viewRows, int viewCols)
 {
-    Tile_p->rightSeparator = NH_FALSE;
+    Tile_p->rightSeparator = false;
 
     if (Tile_p->Parent_p == NULL) {
         Tile_p->rowPosition = 0;
@@ -384,7 +384,7 @@ TTYR_TTY_RESULT ttyr_tty_updateTiling(
 // INSERT ==========================================================================================
 
 static void ttyr_tty_moveInsertTile(
-    ttyr_tty_Tile *Tile_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Tile *Tile_p, NH_API_UTF32 c)
 {
     int index = ttyr_tty_getTileIndex(Tile_p);
     if (index == -1) {return;}
@@ -426,7 +426,7 @@ static void ttyr_tty_moveInsertTile(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
-    ttyr_tty_Tile *Parent_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Tile *Parent_p, NH_API_UTF32 c)
 {
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
@@ -459,14 +459,14 @@ static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
         case TTYR_TTY_INSERT_TILE_LEFT_KEY :
             if (Parent_p->type == TTYR_TTY_TILE_TYPE_MACRO) {
                 if (Parent_p->Children.count == 0) {
-                    nh_List *List_pp[9] = {};
+                    nh_core_List *List_pp[9] = {};
                     for (int i = 0; i < 9; ++i) {
                         List_pp[i] = TTYR_TTY_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
                     }
                     TTY_p->InsertTile_p     = ttyr_tty_createMacroTile(Parent_p, NULL, 0);
                     TTY_p->Window_p->Tile_p = ttyr_tty_createMacroTile(Parent_p, List_pp, 1);
                     // Remove data references from parent tile.
-                    nh_core_freeList(&TTYR_TTY_MACRO_TILE(Parent_p)->MacroTabs, NH_TRUE);
+                    nh_core_freeList(&TTYR_TTY_MACRO_TILE(Parent_p)->MacroTabs, true);
                     TTYR_TTY_MACRO_TILE(Parent_p)->current = -1;
                 } else {
                     TTY_p->InsertTile_p = ttyr_tty_createMacroTile(Parent_p, NULL, 0);
@@ -486,14 +486,14 @@ static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
         case TTYR_TTY_INSERT_TILE_RIGHT_KEY  :
             if (Parent_p->type == TTYR_TTY_TILE_TYPE_MACRO) {
                 if (Parent_p->Children.count == 0) {
-                    nh_List *List_pp[9] = {};
+                    nh_core_List *List_pp[9] = {};
                     for (int i = 0; i < 9; ++i) {
                         List_pp[i] = TTYR_TTY_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
                     }
                     TTY_p->Window_p->Tile_p = ttyr_tty_createMacroTile(Parent_p, List_pp, 0);
                     TTY_p->InsertTile_p     = ttyr_tty_createMacroTile(Parent_p, NULL, 1);
                     // Remove data references from parent tile.
-                    nh_core_freeList(&TTYR_TTY_MACRO_TILE(Parent_p)->MacroTabs, NH_TRUE);
+                    nh_core_freeList(&TTYR_TTY_MACRO_TILE(Parent_p)->MacroTabs, true);
                     TTYR_TTY_MACRO_TILE(Parent_p)->current = -1;
                 } else {
                     TTY_p->InsertTile_p = ttyr_tty_createMacroTile(Parent_p, NULL, Parent_p->Children.count);
@@ -515,14 +515,14 @@ static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_addTile(
-    ttyr_tty_Tile *Tile_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Tile *Tile_p, NH_API_UTF32 c)
 {
     if (Tile_p->Parent_p == NULL || Tile_p->Parent_p->Children.count == 0) {return TTYR_TTY_ERROR_BAD_STATE;}
     return ttyr_tty_insertEmptyTile(Tile_p->Parent_p, c);
 }
 
 static TTYR_TTY_RESULT ttyr_tty_splitTile(
-    ttyr_tty_Tile *Tile_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Tile *Tile_p, NH_API_UTF32 c)
 {
     if (Tile_p->Children.count != 0) {return TTYR_TTY_ERROR_BAD_STATE;}
     return ttyr_tty_insertEmptyTile(Tile_p, c);
@@ -589,7 +589,7 @@ static TTYR_TTY_RESULT ttyr_tty_updateTilingMessages(
 // INPUT ===========================================================================================
 
 static TTYR_TTY_RESULT ttyr_tty_handlePotentialMacroTileInsertion(
-    ttyr_tty_MacroWindow *Window_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_MacroWindow *Window_p, NH_API_UTF32 c)
 {
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
@@ -625,7 +625,7 @@ static TTYR_TTY_RESULT ttyr_tty_handlePotentialMacroTileInsertion(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handlePotentialMicroTileInsertion(
-    ttyr_tty_MacroWindow *Window_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_MacroWindow *Window_p, NH_API_UTF32 c)
 {
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
 
@@ -633,7 +633,7 @@ static TTYR_TTY_RESULT ttyr_tty_handlePotentialMicroTileInsertion(
     {
         // Insert data into new micro tile.
         TTYR_TTY_MICRO_TILE(TTY_p->InsertTile_p)->Program_p = ttyr_tty_createProgramInstance(
-            TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Prototype_p, NH_FALSE);
+            TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Prototype_p, false);
 
         return ttyr_tty_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p);
     }
@@ -656,9 +656,9 @@ static TTYR_TTY_RESULT ttyr_tty_handlePotentialMicroTileInsertion(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleMacroTilingInput(
-    ttyr_tty_MacroWindow *Window_p, nh_wsi_KeyboardEvent Event)
+    ttyr_tty_MacroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
-    NH_ENCODING_UTF32 c = Event.codepoint;
+    NH_API_UTF32 c = Event.codepoint;
 
     switch (Window_p->Tiling.stage)
     {
@@ -696,9 +696,9 @@ static TTYR_TTY_RESULT ttyr_tty_handleMacroTilingInput(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_handleMicroTilingInput(
-    ttyr_tty_MacroWindow *Window_p, nh_wsi_KeyboardEvent Event)
+    ttyr_tty_MacroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
-    NH_ENCODING_UTF32 c = Event.codepoint;
+    NH_API_UTF32 c = Event.codepoint;
 
     switch (Window_p->Tiling.stage)
     {
@@ -752,9 +752,9 @@ static TTYR_TTY_RESULT ttyr_tty_handleMicroTilingInput(
 }
 
 TTYR_TTY_RESULT ttyr_tty_handleTilingInput(
-    ttyr_tty_MacroWindow *Window_p, nh_wsi_KeyboardEvent Event)
+    ttyr_tty_MacroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
-    if (Event.trigger != NH_WSI_TRIGGER_PRESS) {return TTYR_TTY_SUCCESS;}
+    if (Event.trigger != NH_API_TRIGGER_PRESS) {return TTYR_TTY_SUCCESS;}
 
     if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
         TTYR_CHECK(ttyr_tty_handleMicroTilingInput(Window_p, Event))

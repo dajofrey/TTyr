@@ -21,8 +21,8 @@
  */
 
     TTYR_TTY_RESULT ttyr_tty_handleTextFileInput(
-        nh_List *Views_p, ttyr_tty_File *File_p, NH_ENCODING_UTF32 c, NH_BOOL insertMode,  
-        NH_BOOL *refresh_p
+        nh_core_List *Views_p, ttyr_tty_File *File_p, NH_API_UTF32 c, bool insertMode,  
+        bool *refresh_p
     );
 
 /** @} */

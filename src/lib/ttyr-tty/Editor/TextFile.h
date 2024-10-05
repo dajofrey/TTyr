@@ -21,10 +21,10 @@
  */
 
     typedef struct ttyr_tty_TextFileLine {
-	NH_BOOL copy;
-        nh_Array Copy;
-        nh_Array Unsaved;
-        nh_Array Search;
+	bool copy;
+        nh_core_Array Copy;
+        nh_core_Array Unsaved;
+        nh_core_Array Search;
         nh_encoding_UTF32String Codepoints;
         nh_encoding_UTF32String RenderCodepoints;
     } ttyr_tty_TextFileLine;
@@ -36,7 +36,7 @@
         int fileCursorX;
         int fileCursorY;
         int select;
-        nh_List Lines;
+        nh_core_List Lines;
     } ttyr_tty_TextFile;
 
 /** @} */
@@ -50,7 +50,7 @@
     );
     
     TTYR_TTY_RESULT ttyr_tty_insertIntoTextFileLine(
-        ttyr_tty_TextFileLine *Line_p, int index, NH_ENCODING_UTF32 c
+        ttyr_tty_TextFileLine *Line_p, int index, NH_API_UTF32 c
     );
     
     TTYR_TTY_RESULT ttyr_tty_removeFromTextFileLine(
@@ -70,7 +70,7 @@
     );
 
     TTYR_TTY_RESULT ttyr_tty_searchTextFile(
-        ttyr_tty_TextFile *TextFile_p, NH_ENCODING_UTF32 *str_p, int length
+        ttyr_tty_TextFile *TextFile_p, NH_API_UTF32 *str_p, int length
     );
 
     TTYR_TTY_RESULT ttyr_tty_writeTextFile(

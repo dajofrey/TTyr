@@ -16,8 +16,8 @@
 
 #include "../Common/Includes.h"
 
-#include "nhcore/Util/String.h"
-#include "nhcore/Util/List.h"
+#include "nh-core/Util/String.h"
+#include "nh-core/Util/List.h"
 
 #endif
 
@@ -32,17 +32,17 @@
 
     typedef struct ttyr_tty_MacroTile {
         int current;       /**<Current focused macro tab.*/
-        nh_List MacroTabs; /**<List of macro tabs.*/
+        nh_core_List MacroTabs; /**<List of macro tabs.*/
     } ttyr_tty_MacroTile;
 
     typedef struct ttyr_tty_MacroWindow {
         ttyr_tty_Tiling Tiling;
         ttyr_tty_ContextMenu *MouseMenu_p;
-        NH_BOOL refreshGrid1;
-        NH_BOOL refreshGrid2;
-        NH_BOOL refreshCursor;
-        NH_BOOL refreshTitlebar;
-        NH_BOOL close;
+        bool refreshGrid1;
+        bool refreshGrid2;
+        bool refreshCursor;
+        bool refreshTitlebar;
+        bool close;
         ttyr_tty_Tile *RootTile_p;
         ttyr_tty_Tile *LastFocus_p;
         ttyr_tty_Tile *Tile_p;
@@ -67,11 +67,11 @@
     );
 
     TTYR_TTY_RESULT ttyr_tty_handleMacroWindowInput(
-        ttyr_tty_MacroWindow *Tab_p, nh_wsi_Event Event 
+        ttyr_tty_MacroWindow *Tab_p, nh_api_WSIEvent Event 
     );
 
     ttyr_tty_Tile *ttyr_tty_createMacroTile(
-        ttyr_tty_Tile *Parent_p, nh_List **MicroTabs_pp, int index
+        ttyr_tty_Tile *Parent_p, nh_core_List **MicroTabs_pp, int index
     );
 
     void ttyr_tty_destroyMacroTile(
@@ -83,7 +83,7 @@
     );
 
     void ttyr_tty_drawEmptyGlyph(
-        ttyr_tty_Glyph *Glyph_p, NH_BOOL reverse
+        ttyr_tty_Glyph *Glyph_p, bool reverse
     );
 
 /** @} */

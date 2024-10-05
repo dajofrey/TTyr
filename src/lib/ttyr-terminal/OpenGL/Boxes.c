@@ -13,8 +13,8 @@
 #include "../Terminal/Graphics.h"
 #include "../Common/Macros.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Common/Macros.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Common/Macros.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -82,7 +82,7 @@ TTYR_TERMINAL_BEGIN()
     if (Data_p->Boxes.Action.init) {
         ttyr_terminal_initOpenGLBoxesVertices(
             &Data_p->Boxes.OpenGL, State_p->Viewport_p->OpenGL.CommandBuffer_p);
-        Data_p->Boxes.Action.init = NH_FALSE;
+        Data_p->Boxes.Action.init = false;
     }
 
     ttyr_terminal_updateOpenGLBoxesVertices(

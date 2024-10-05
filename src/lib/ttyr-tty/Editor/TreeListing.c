@@ -14,12 +14,12 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/Common/Macros.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/Common/Macros.h"
 
-#include "nhencoding/Encodings/UTF32.h"
-#include "nhencoding/Encodings/UTF8.h"
-#include "nhencoding/Common/Macros.h"
+#include "nh-encoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF8.h"
+#include "nh-encoding/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -36,7 +36,7 @@
 static int ttyr_tty_isRegularFile(
     ttyr_tty_TreeListingNode *Node_p)
 {
-    if (Node_p->unsaved) {return NH_TRUE;}
+    if (Node_p->unsaved) {return true;}
 
     nh_encoding_UTF8String Path = nh_encoding_encodeUTF8(Node_p->Path.p, Node_p->Path.length);
     struct stat path_stat;
@@ -47,7 +47,7 @@ static int ttyr_tty_isRegularFile(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_getNodeList(
-    nh_List *List_p, ttyr_tty_TreeListingNode *Node_p)
+    nh_core_List *List_p, ttyr_tty_TreeListingNode *Node_p)
 {
     nh_core_appendToList(List_p, Node_p);
 
@@ -64,12 +64,12 @@ static ttyr_tty_TreeListingNode *ttyr_tty_getCurrentNode(
     ttyr_tty_TreeListing *Listing_p)
 {
     int current = 0; 
-    nh_List Nodes = nh_core_initList(128);
+    nh_core_List Nodes = nh_core_initList(128);
     ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p);
 
     ttyr_tty_TreeListingNode *Current_p = Nodes.pp[Listing_p->current];
 
-    nh_core_freeList(&Nodes, NH_FALSE);
+    nh_core_freeList(&Nodes, false);
 
     return Current_p;
 }
@@ -78,7 +78,7 @@ static ttyr_tty_TreeListingNode *ttyr_tty_getTreeListingNode(
     ttyr_tty_TreeListing *Listing_p, nh_encoding_UTF32String *Path_p)
 {
     int current = 0; 
-    nh_List Nodes = nh_core_initList(128);
+    nh_core_List Nodes = nh_core_initList(128);
     ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p);
 
     ttyr_tty_TreeListingNode *Result_p = NULL;
@@ -89,7 +89,7 @@ static ttyr_tty_TreeListingNode *ttyr_tty_getTreeListingNode(
         }
     }
 
-    nh_core_freeList(&Nodes, NH_FALSE);
+    nh_core_freeList(&Nodes, false);
 
     return Result_p;
 }
@@ -102,8 +102,8 @@ static ttyr_tty_TreeListingNode *ttyr_tty_createTreeListingNode(
     ttyr_tty_TreeListingNode *Node_p = nh_core_allocate(sizeof(ttyr_tty_TreeListingNode));
     TTYR_CHECK_MEM_2(NULL, Node_p)
 
-    Node_p->open      = NH_FALSE;
-    Node_p->unsaved   = NH_FALSE;
+    Node_p->open      = false;
+    Node_p->unsaved   = false;
     Node_p->Path      = Path;
     Node_p->Children  = nh_core_initList(16);
     Node_p->Parent_p  = Parent_p;
@@ -123,7 +123,7 @@ static TTYR_TTY_RESULT ttyr_tty_freeTreeListingNode(
     for (int i = 0; i < Node_p->Children.size; ++i) {
         ttyr_tty_freeTreeListingNode(Node_p->Children.pp[i]);
     }
-    nh_core_freeList(&Node_p->Children, NH_TRUE);
+    nh_core_freeList(&Node_p->Children, true);
 
     return TTYR_TTY_SUCCESS;
 }
@@ -189,13 +189,13 @@ static TTYR_TTY_RESULT ttyr_tty_openNode(
 
 #endif
 
-    Node_p->open = NH_TRUE;
+    Node_p->open = true;
 
     return TTYR_TTY_SUCCESS;
 }
 
 ttyr_tty_TreeListingNode *ttyr_tty_insertTreeListingNode(
-    ttyr_tty_TreeListing *Listing_p, NH_ENCODING_UTF32 *name_p, int length)
+    ttyr_tty_TreeListing *Listing_p, NH_API_UTF32 *name_p, int length)
 {
     TTYR_CHECK_NULL_2(NULL, name_p)
     if (length <= 0) {return NULL;}
@@ -227,8 +227,8 @@ ttyr_tty_TreeListingNode *ttyr_tty_insertTreeListingNode(
         }
         else {return NULL;}
         TTYR_CHECK_MEM_2(NULL, New_p)
-        New_p->unsaved = NH_TRUE;
-        Listing_p->dirty = NH_TRUE;
+        New_p->unsaved = true;
+        Listing_p->dirty = true;
     }
     else {
         TTYR_CHECK_2(NULL, ttyr_tty_setDefaultMessage(NULL, TTYR_TTY_MESSAGE_EDITOR_FILE_ALREADY_EXISTS))
@@ -257,11 +257,11 @@ static TTYR_TTY_RESULT ttyr_tty_removeFile(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_delete(
-    nh_wsi_KeyboardEvent Event, NH_BOOL *continue_p)
+    nh_api_KeyboardEvent Event, bool *continue_p)
 {
-    if (Event.trigger != NH_WSI_TRIGGER_PRESS) {return TTYR_TTY_SUCCESS;}
+    if (Event.trigger != NH_API_TRIGGER_PRESS) {return TTYR_TTY_SUCCESS;}
 
-    NH_ENCODING_UTF32 c = Event.codepoint;
+    NH_API_UTF32 c = Event.codepoint;
 
     if (c == 'y' || c == 'n') 
     {
@@ -287,7 +287,7 @@ static TTYR_TTY_RESULT ttyr_tty_setCurrentToRoot(
 
     if (Current_p->Children.size > 0) {
         for (ttyr_tty_TreeListingNode *Parent_p = Current_p; Parent_p = Parent_p->Parent_p;) {
-            Parent_p->open = NH_FALSE;
+            Parent_p->open = false;
         }
         Listing_p->Root_p = Current_p;
     }
@@ -304,7 +304,7 @@ static TTYR_TTY_RESULT ttyr_tty_setParentToRoot(
 {
     if (Listing_p->Root_p->Parent_p != NULL) {
         Listing_p->Root_p = Listing_p->Root_p->Parent_p;
-        Listing_p->Root_p->open = NH_TRUE;
+        Listing_p->Root_p->open = true;
     }
     else {
         nh_encoding_UTF32String Path = nh_encoding_initUTF32(128);
@@ -321,14 +321,14 @@ static TTYR_TTY_RESULT ttyr_tty_setParentToRoot(
         OldRoot_p->Parent_p = Listing_p->Root_p;
         TTYR_CHECK(ttyr_tty_openNode(Listing_p->Root_p))
 
-        NH_BOOL isChild = NH_FALSE;
+        bool isChild = false;
         for (int i = 0; i < Listing_p->Root_p->Children.size; ++i) {
             ttyr_tty_TreeListingNode *Child_p = Listing_p->Root_p->Children.pp[i];
             if (nh_encoding_compareUTF32(Child_p->Path.p, OldRoot_p->Path.p)) {
                 nh_encoding_freeUTF32(&Child_p->Path);
                 nh_core_free(Listing_p->Root_p->Children.pp[i]);
                 Listing_p->Root_p->Children.pp[i] = OldRoot_p;
-                isChild = NH_TRUE;
+                isChild = true;
                 break;
             }
         }
@@ -386,7 +386,7 @@ static void ttyr_tty_moveCursorVertically(
     ttyr_tty_FileEditor *FileEditor_p = &((ttyr_tty_Editor*)Program_p->handle_p)->FileEditor;
     ttyr_tty_TreeListing *Listing_p = &((ttyr_tty_Editor*)Program_p->handle_p)->TreeListing;
 
-    nh_List Nodes = nh_core_initList(32);
+    nh_core_List Nodes = nh_core_initList(32);
     ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p);
 
     switch (key) 
@@ -410,7 +410,7 @@ static void ttyr_tty_moveCursorVertically(
             break;
     }
 
-    nh_core_freeList(&Nodes, NH_FALSE);
+    nh_core_freeList(&Nodes, false);
 
     if (Listing_p->preview && FileEditor_p != NULL)
     {
@@ -423,14 +423,14 @@ static void ttyr_tty_moveCursorVertically(
         ttyr_tty_TreeListingNode *Current_p = ttyr_tty_getCurrentNode(Listing_p);
 
         if (Current_p->File_p == NULL && Current_p->Path.length > 0 && ttyr_tty_isRegularFile(Current_p)) {
-            Current_p->File_p = ttyr_tty_openFile(Program_p, Current_p, NH_TRUE);
+            Current_p->File_p = ttyr_tty_openFile(Program_p, Current_p, true);
             Listing_p->Preview_p = Current_p; 
         }
     }
 }
 
 TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
-    ttyr_tty_Program *Program_p, NH_ENCODING_UTF32 c)
+    ttyr_tty_Program *Program_p, NH_API_UTF32 c)
 {
     ttyr_tty_Editor *Editor_p = Program_p->handle_p;
     ttyr_tty_EditorView *View_p = &Editor_p->View;
@@ -465,7 +465,7 @@ TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
                 ttyr_tty_setParentToRoot(Listing_p);
             } 
             else if (Current_p->Children.size > 0 && Current_p->open) {
-                Current_p->open = NH_FALSE;
+                Current_p->open = false;
             }
             else if (Current_p->Children.size == 0 && Current_p->File_p != NULL && Current_p->Path.length > 0) {
                 TTYR_CHECK(ttyr_tty_closeFileFromTreeListing(Program_p, Current_p->File_p))   
@@ -474,13 +474,13 @@ TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
             }
             else if (Current_p->Children.size == 0 && Current_p->File_p != NULL) {
                 TTYR_CHECK(ttyr_tty_closeFileFromTreeListing(Program_p, Current_p->File_p))
-                nh_core_removeFromList2(&Current_p->Parent_p->Children, NH_TRUE, Current_p);
+                nh_core_removeFromList2(&Current_p->Parent_p->Children, true, Current_p);
                 TTYR_CHECK(ttyr_tty_handleTreeListingInput(Program_p, 'w'))
             }
             else { // delete ?
                 nh_encoding_UTF32String Question = nh_encoding_initUTF32(128);
                 int deleteLength;
-                NH_ENCODING_UTF32 *delete_p = ttyr_tty_getMessage(TTYR_TTY_MESSAGE_BINARY_QUERY_DELETE, &deleteLength);
+                NH_API_UTF32 *delete_p = ttyr_tty_getMessage(TTYR_TTY_MESSAGE_BINARY_QUERY_DELETE, &deleteLength);
                 NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Question, delete_p, deleteLength))
                 NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Question, Current_p->Path.p, Current_p->Path.length))
                 TTYR_CHECK(ttyr_tty_setBinaryQueryMessage(NULL, Question.p, Question.length, NULL, ttyr_tty_delete))
@@ -492,22 +492,22 @@ TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
         case CTRL_KEY('d') :
 
             if (Listing_p->Preview_p != NULL) {
-                Listing_p->Preview_p->File_p->readOnly = NH_FALSE;
+                Listing_p->Preview_p->File_p->readOnly = false;
                 Listing_p->Preview_p = NULL;
             }
             else if (Current_p->Children.size > 0 && !Current_p->open) {
-                Current_p->open = NH_TRUE;
+                Current_p->open = true;
             }
             else if (Current_p->Children.size == 0 && !ttyr_tty_isRegularFile(Current_p)) {
                 TTYR_CHECK(ttyr_tty_openNode(Current_p))
             }
             else if (Current_p->Children.size == 0 && ttyr_tty_isRegularFile(Current_p)) {
                 if (Current_p->File_p == NULL) {
-                    Current_p->File_p = ttyr_tty_openFile(Program_p, Current_p, NH_FALSE);
+                    Current_p->File_p = ttyr_tty_openFile(Program_p, Current_p, false);
                 }
                 else {
                     TTYR_CHECK(ttyr_tty_writeFile(Current_p->File_p))
-                    Current_p->unsaved = NH_FALSE;
+                    Current_p->unsaved = false;
                 }
             } else {
                 ttyr_tty_setCurrentToRoot(Listing_p);
@@ -518,7 +518,7 @@ TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
             break;
     }
  
-    Listing_p->dirty = NH_TRUE;
+    Listing_p->dirty = true;
 
     return TTYR_TTY_SUCCESS;
 }
@@ -526,7 +526,7 @@ TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
 // RENDER ==========================================================================================
 
 static ttyr_tty_Glyph ttyr_tty_glyph(
-    NH_ENCODING_UTF32 codepoint, NH_BOOL reverse)
+    NH_API_UTF32 codepoint, bool reverse)
 {
     ttyr_tty_Glyph Glyph;
     memset(&Glyph, 0, sizeof(ttyr_tty_Glyph));
@@ -536,8 +536,8 @@ static ttyr_tty_Glyph ttyr_tty_glyph(
 }
 
 static TTYR_TTY_RESULT ttyr_tty_renderTreeListingNode(
-    ttyr_tty_TreeListingNode *Node_p, NH_BOOL isCurrent, ttyr_tty_Glyph *Row_p, int *length_p,
-    NH_BOOL first, ttyr_tty_TreeListingView *View_p)
+    ttyr_tty_TreeListingNode *Node_p, bool isCurrent, ttyr_tty_Glyph *Row_p, int *length_p,
+    bool first, ttyr_tty_TreeListingView *View_p)
 {
     ttyr_tty_TreeListingNode *Parent_p = Node_p->Parent_p;
 
@@ -553,13 +553,13 @@ static TTYR_TTY_RESULT ttyr_tty_renderTreeListingNode(
     }
 
     for (int i = 0; i < prefixLength; i++) {
-        Prefix_p[i] = ttyr_tty_glyph(' ', NH_FALSE);
-        if (i == prefixLength - 2) {Prefix_p[i] = ttyr_tty_glyph('-', NH_FALSE);}
-        if (i == prefixLength - 1 && isCurrent) {Prefix_p[i] = ttyr_tty_glyph('>', NH_FALSE);}
+        Prefix_p[i] = ttyr_tty_glyph(' ', false);
+        if (i == prefixLength - 2) {Prefix_p[i] = ttyr_tty_glyph('-', false);}
+        if (i == prefixLength - 1 && isCurrent) {Prefix_p[i] = ttyr_tty_glyph('>', false);}
     }
 
     if (isCurrent && !first) {
-        Prefix_p[prefixLength++] = ttyr_tty_glyph(' ', NH_FALSE);
+        Prefix_p[prefixLength++] = ttyr_tty_glyph(' ', false);
     }
 
     // Render suffix.
@@ -580,7 +580,7 @@ static TTYR_TTY_RESULT ttyr_tty_renderTreeListingNode(
         suffixLength += Node_p->Path.length - pathOffset;
 
         if (!ttyr_tty_isRegularFile(Node_p)) {
-            Suffix_p[suffixLength++] = ttyr_tty_glyph('/', NH_FALSE); 
+            Suffix_p[suffixLength++] = ttyr_tty_glyph('/', false); 
         }
     }
 
@@ -590,7 +590,7 @@ static TTYR_TTY_RESULT ttyr_tty_renderTreeListingNode(
             Row_p[i] = Prefix_p[i];
         }
         if (prefixLength + suffixLength > View_p->width) {
-            nh_SystemTime Now = nh_core_getSystemTime();
+            nh_core_SystemTime Now = nh_core_getSystemTime();
             if (nh_core_getSystemTimeDiffInSeconds(Node_p->Overflow.LastShift, Now) >= 0.2f) {
                 Node_p->Overflow.LastShift = Now;
                 Node_p->Overflow.offset++;
@@ -632,7 +632,7 @@ static TTYR_TTY_RESULT ttyr_tty_renderTreeListingNode(
 static TTYR_TTY_RESULT ttyr_tty_calculateTreeListingWidth(
     ttyr_tty_TreeListing *Listing_p, ttyr_tty_TreeListingView *View_p, int editorWidth)
 {
-    nh_List Nodes = nh_core_initList(64);
+    nh_core_List Nodes = nh_core_initList(64);
     TTYR_CHECK(ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p))
     ttyr_tty_TreeListingNode *Current_p = ttyr_tty_getCurrentNode(Listing_p);
 
@@ -653,7 +653,7 @@ static TTYR_TTY_RESULT ttyr_tty_calculateTreeListingWidth(
         View_p->maxOffset = 0;
     }
 
-    nh_core_freeList(&Nodes, NH_FALSE);
+    nh_core_freeList(&Nodes, false);
 
     return TTYR_TTY_SUCCESS;
 }
@@ -661,21 +661,21 @@ static TTYR_TTY_RESULT ttyr_tty_calculateTreeListingWidth(
 static TTYR_TTY_RESULT ttyr_tty_renderTreeListing(
     ttyr_tty_TreeListing *Listing_p, ttyr_tty_TreeListingView *View_p, int editorWidth)
 {
-    nh_List Nodes = nh_core_initList(32);
+    nh_core_List Nodes = nh_core_initList(32);
     TTYR_CHECK(ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p))
     ttyr_tty_TreeListingNode *Current_p = ttyr_tty_getCurrentNode(Listing_p);
 
     for (int i = 0; i < Listing_p->RenderLines.length; ++i) {
-        nh_core_freeArray(&((nh_Array*)Listing_p->RenderLines.p)[i]);
+        nh_core_freeArray(&((nh_core_Array*)Listing_p->RenderLines.p)[i]);
     }
     nh_core_freeArray(&Listing_p->RenderLines);
-    Listing_p->RenderLines = nh_core_initArray(sizeof(nh_Array), Nodes.size);
+    Listing_p->RenderLines = nh_core_initArray(sizeof(nh_core_Array), Nodes.size);
 
     TTYR_CHECK(ttyr_tty_calculateTreeListingWidth(Listing_p, View_p, editorWidth))
 
     for (int row = 0; row < Nodes.size; ++row) 
     {
-        nh_Array *Line_p = nh_core_incrementArray(&Listing_p->RenderLines);
+        nh_core_Array *Line_p = nh_core_incrementArray(&Listing_p->RenderLines);
         *Line_p = nh_core_initArray(sizeof(ttyr_tty_Glyph), 32);
         ttyr_tty_TreeListingNode *Node_p = nh_core_getFromList(&Nodes, row);
         TTYR_CHECK_NULL(Node_p)
@@ -692,7 +692,7 @@ static TTYR_TTY_RESULT ttyr_tty_renderTreeListing(
         }
     }  
 
-    nh_core_freeList(&Nodes, NH_FALSE);
+    nh_core_freeList(&Nodes, false);
 
     return TTYR_TTY_SUCCESS;
 }
@@ -700,9 +700,9 @@ static TTYR_TTY_RESULT ttyr_tty_renderTreeListing(
 TTYR_TTY_RESULT ttyr_tty_treeListingNeedsRefresh(
     ttyr_tty_TreeListing *Listing_p)
 {
-    nh_List Nodes = nh_core_initList(32);
+    nh_core_List Nodes = nh_core_initList(32);
     TTYR_CHECK(ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p))
-    nh_core_freeList(&Nodes, NH_FALSE);
+    nh_core_freeList(&Nodes, false);
     return TTYR_TTY_SUCCESS;
 }
 
@@ -721,13 +721,13 @@ TTYR_TTY_RESULT ttyr_tty_drawTreeListingRow(
             ttyr_tty_openNode(Listing_p->Root_p);
         }
         TTYR_CHECK(ttyr_tty_renderTreeListing(Listing_p, View_p, width))
-        Listing_p->dirty = NH_FALSE;
+        Listing_p->dirty = false;
     }
 
     row += View_p->offset; 
 
     if (row < Listing_p->RenderLines.length) {
-        nh_Array *RenderLine_p = &((nh_Array*)Listing_p->RenderLines.p)[row];
+        nh_core_Array *RenderLine_p = &((nh_core_Array*)Listing_p->RenderLines.p)[row];
         for (int i = 0; i < RenderLine_p->length; ++i) {
             Glyphs_p[i] = ((ttyr_tty_Glyph*)RenderLine_p->p)[i];
         }
@@ -741,7 +741,7 @@ TTYR_TTY_RESULT ttyr_tty_drawTreeListingRow(
 TTYR_TTY_RESULT ttyr_tty_setTreeListingCursor(
     ttyr_tty_Program *Program_p, ttyr_tty_File *File_p)
 {
-    nh_List Nodes = nh_core_initList(16);
+    nh_core_List Nodes = nh_core_initList(16);
     ttyr_tty_TreeListing *Listing_p = &((ttyr_tty_Editor*)Program_p->handle_p)->TreeListing;
 
     ttyr_tty_getNodeList(&Nodes, Listing_p->Root_p);
@@ -764,8 +764,8 @@ TTYR_TTY_RESULT ttyr_tty_setTreeListingCursor(
         }
     }
 
-    nh_core_freeList(&Nodes, NH_FALSE);
-    Listing_p->dirty = NH_TRUE;
+    nh_core_freeList(&Nodes, false);
+    Listing_p->dirty = true;
 
     return TTYR_TTY_SUCCESS;
 }
@@ -778,9 +778,9 @@ ttyr_tty_TreeListing ttyr_tty_initTreeListing()
 
     Listing.Root_p      = ttyr_tty_createTreeListingNode(NULL, nh_encoding_initUTF32(0), NULL);
     Listing.current     = 0;
-    Listing.RenderLines = nh_core_initArray(sizeof(nh_String), 255);
-    Listing.dirty       = NH_TRUE;
-    Listing.preview     = NH_FALSE;
+    Listing.RenderLines = nh_core_initArray(sizeof(nh_core_String), 255);
+    Listing.dirty       = true;
+    Listing.preview     = false;
     Listing.Preview_p   = NULL;
 
     memset(Listing.wrkDir_p, 0, 2048);
@@ -794,7 +794,7 @@ TTYR_TTY_RESULT ttyr_tty_freeTreeListing(
     ttyr_tty_freeTreeListingNode(TreeListing_p->Root_p);
     nh_core_free(TreeListing_p->Root_p);
     for (int i = 0; i < TreeListing_p->RenderLines.length; ++i) {
-        nh_core_freeString(((nh_String*)TreeListing_p->RenderLines.p)+i);
+        nh_core_freeString(((nh_core_String*)TreeListing_p->RenderLines.p)+i);
     }
     nh_core_freeArray(&TreeListing_p->RenderLines);
  

@@ -9,7 +9,7 @@
 // INCLUDES ========================================================================================
 
 #include "ttyr-api/ttyr-api.h"
-#include "nhapi/nhapi.h"
+#include "nh-api/nh-api.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,13 +19,13 @@
 // TYPES ===========================================================================================
 
 typedef struct Arguments {
-    NH_GFX_API_E renderer;
+    NH_API_GRAPHICS_BACKEND_E renderer;
     bool no_unload;
 } Arguments;
 
 static Arguments Args;
-static nh_PixelPosition Position = {0};
-static nh_gfx_Viewport *Viewport_p = NULL;
+static nh_api_PixelPosition Position = {0};
+static nh_api_Viewport *Viewport_p = NULL;
 static ttyr_tty_TTY *TTY_p = NULL;
 
 // HELPER ==========================================================================================
@@ -33,12 +33,12 @@ static ttyr_tty_TTY *TTY_p = NULL;
 static int handleArgs(
     int argc, char **argv_pp)
 {
-    Args.renderer = NH_GFX_API_OPENGL;
+    Args.renderer = NH_API_GRAPHICS_BACKEND_OPENGL;
     Args.no_unload = false;
 
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv_pp[i], "--vulkan")) {
-            Args.renderer = NH_GFX_API_VULKAN;
+            Args.renderer = NH_API_GRAPHICS_BACKEND_VULKAN;
         }
         if (!strcmp(argv_pp[i], "--no-unload")) {
             Args.no_unload = true;
@@ -55,24 +55,24 @@ static int handleArgs(
 }
 
 static void handleInput(
-    nh_wsi_Window *Window_p, nh_wsi_Event Event)
+    nh_api_Window *Window_p, nh_api_WSIEvent Event)
 {
     switch (Event.type)
     {
-        case NH_WSI_EVENT_MOUSE :
-        case NH_WSI_EVENT_KEYBOARD :
+        case NH_API_WSI_EVENT_MOUSE :
+        case NH_API_WSI_EVENT_KEYBOARD :
             ttyr_api_sendEvent(TTY_p, Event);
             break;
-        case NH_WSI_EVENT_WINDOW :
+        case NH_API_WSI_EVENT_WINDOW :
             switch (Event.Window.type) 
             {
-                case NH_WSI_WINDOW_CONFIGURE :
+                case NH_API_WINDOW_CONFIGURE :
                     if (Viewport_p) {
                         nh_api_configureViewport(Viewport_p, Position, Event.Window.Size); 
                     }
                     break;
-                case NH_WSI_WINDOW_FOCUS_OUT :
-                case NH_WSI_WINDOW_FOCUS_IN :
+                case NH_API_WINDOW_FOCUS_OUT :
+                case NH_API_WINDOW_FOCUS_IN :
                     ttyr_api_sendEvent(TTY_p, Event);
                     break;
             }
@@ -85,7 +85,7 @@ static void handleInput(
 int main(int argc, char **argv_pp) 
 {
     if (handleArgs(argc, argv_pp)) {return 1;}
-    if (nh_api_initialize(NULL, NULL, 0) != NH_CORE_SUCCESS) {return 1;}
+    if (nh_api_initialize(NULL, NULL, 0) != NH_API_SUCCESS) {return 1;}
 
     nh_api_registerConfig("/etc/ttyr.conf", 14);
 
@@ -97,14 +97,14 @@ int main(int argc, char **argv_pp)
     ttyr_terminal_Terminal *Terminal_p = ttyr_api_openTerminal(NULL, TTY_p);
     if (!Terminal_p) {return 1;}
 
-    nh_wsi_Window *Window_p = 
+    nh_api_Window *Window_p = 
         nh_api_createWindow(NULL, nh_api_getSurfaceRequirements());
     if (!Window_p) {return 1;}
 
-    nh_gfx_Surface *Surface_p = nh_api_createSurface(Window_p, Args.renderer);
+    nh_api_Surface *Surface_p = nh_api_createSurface(Window_p, Args.renderer);
     if (!Surface_p) {return 1;}
 
-    nh_PixelSize Size;
+    nh_api_PixelSize Size;
     Size.width  = 3000;
     Size.height = 2000;
 

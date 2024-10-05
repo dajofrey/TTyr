@@ -12,9 +12,9 @@
 
 #include "../Common/Macros.h"
 
-#include "nhcore/Util/Array.h"
-#include "nhgfx/Vulkan/Texture.h"
-#include "nhgfx/Common/Macros.h"
+#include "nh-core/Util/Array.h"
+#include "nh-gfx/Vulkan/Texture.h"
+#include "nh-gfx/Common/Macros.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -28,7 +28,7 @@
 // HELPER ==========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_createTextVertices(
-    nh_vk_Driver *Driver_p, ttyr_terminal_VulkanText *Text_p, nh_Array *Vertices_p, nh_Array *Indices_p)
+    nh_vk_Driver *Driver_p, ttyr_terminal_VulkanText *Text_p, nh_core_Array *Vertices_p, nh_core_Array *Indices_p)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -42,9 +42,9 @@ TTYR_TERMINAL_BEGIN()
     nh_vk_BufferInfo BufferInfo = {
         .Info_p           = &BufferCreateInfo,
         .data_p           = Vertices_p->p,
-        .mapMemory        = NH_TRUE,
+        .mapMemory        = true,
         .memoryProperties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        .createInfo       = NH_FALSE,
+        .createInfo       = false,
     };
 
     NH_GFX_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_vk_createBuffer(
@@ -85,9 +85,9 @@ TTYR_TERMINAL_BEGIN()
     {
         .Info_p           = &VSInfo,
         .data_p           = vsData_p,
-        .mapMemory        = NH_TRUE,
+        .mapMemory        = true,
         .memoryProperties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        .createInfo       = NH_FALSE,
+        .createInfo       = false,
     };
 
     NH_GFX_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_vk_createBuffer(
@@ -242,15 +242,15 @@ TTYR_TERMINAL_RESULT ttyr_terminal_initVulkanText(
 {
 TTYR_TERMINAL_BEGIN()
 
-    Text_p->destroy = NH_FALSE;
+    Text_p->destroy = false;
     TTYR_TERMINAL_CHECK(ttyr_terminal_createTextDescriptor(GPU_p, Text_p))
 
 TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateVulkanText(
-    nh_vk_GPU *GPU_p, nh_gfx_FontInstance *FontInstance_p, ttyr_terminal_VulkanText *Text_p, nh_Array *Vertices_p, 
-    nh_Array *Indices_p)
+    nh_vk_GPU *GPU_p, nh_gfx_FontInstance *FontInstance_p, ttyr_terminal_VulkanText *Text_p, nh_core_Array *Vertices_p, 
+    nh_core_Array *Indices_p)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -267,7 +267,7 @@ TTYR_TERMINAL_BEGIN()
     TTYR_TERMINAL_CHECK(ttyr_terminal_createTextUniform(&GPU_p->Driver, Text_p))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateTextDescriptor(GPU_p, Text_p, Texture_p))
 
-    Text_p->destroy = NH_TRUE;
+    Text_p->destroy = true;
 
 TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
 }

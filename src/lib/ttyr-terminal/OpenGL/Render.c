@@ -13,7 +13,7 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "nhgfx/Base/Viewport.h"
+#include "nh-gfx/Base/Viewport.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -31,7 +31,7 @@ TTYR_TERMINAL_BEGIN()
     int offset = 0;
     for (int i = 0; i < Data_p->Background.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Background.Ranges.p)+i;
-        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, NH_FALSE);
+        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, false);
         nh_opengl_addCommand(CommandBuffer_p, "glUniform3f", &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
             nh_opengl_glfloat(NULL, Color.r), nh_opengl_glfloat(NULL, Color.g), nh_opengl_glfloat(NULL, Color.b));
         nh_opengl_addCommand(CommandBuffer_p, "glDrawElements", 
@@ -70,7 +70,7 @@ TTYR_TERMINAL_BEGIN()
     int offset = 0;
     for (int i = 0; i < Data_p->Foreground.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges.p)+i;
-        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, NH_TRUE);
+        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
         nh_opengl_addCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
             nh_opengl_glfloat(NULL, Color.r), nh_opengl_glfloat(NULL, Color.g), nh_opengl_glfloat(NULL, Color.b));
         nh_opengl_addCommand(CommandBuffer_p, "glDrawElements", 
@@ -86,7 +86,7 @@ TTYR_TERMINAL_BEGIN()
     offset = 0;
     for (int i = 0; i < Data_p->Foreground.Ranges2.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges2.p)+i;
-        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, NH_TRUE);
+        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
         nh_opengl_addCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor2_p->Result, 
             nh_opengl_glfloat(NULL, Color.r), nh_opengl_glfloat(NULL, Color.g), nh_opengl_glfloat(NULL, Color.b));
         nh_opengl_addCommand(CommandBuffer_p, "glDrawElements", 
@@ -167,7 +167,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
 {
 TTYR_TERMINAL_BEGIN()
 
-    NH_BOOL blockUntilRender = Graphics_p->Data1.Background.Action.init || Graphics_p->Data1.Foreground.Action.init;
+    bool blockUntilRender = Graphics_p->Data1.Background.Action.init || Graphics_p->Data1.Foreground.Action.init;
 
     nh_gfx_beginRecording(Graphics_p->State.Viewport_p);
 

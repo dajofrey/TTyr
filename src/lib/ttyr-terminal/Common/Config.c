@@ -13,16 +13,16 @@
 
 #include "../Terminal/Terminal.h"
 
-#include "nhcore/Config/Config.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
+#include "nh-core/Config/Config.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
 
 #include <string.h>
 #include <stdlib.h>
 
 // NAMES ===========================================================================================
 
-const NH_BYTE *TTYR_TERMINAL_SETTING_NAMES_PP[] = {
+const char *TTYR_TERMINAL_SETTING_NAMES_PP[] = {
     "ttyr.terminal.font.size",
     "ttyr.terminal.blink.frequency",
     "ttyr.terminal.color.foreground",
@@ -34,7 +34,7 @@ const NH_BYTE *TTYR_TERMINAL_SETTING_NAMES_PP[] = {
 size_t TTYR_TERMINAL_SETTING_NAMES_PP_COUNT = 
     sizeof(TTYR_TERMINAL_SETTING_NAMES_PP) / sizeof(TTYR_TERMINAL_SETTING_NAMES_PP[0]);
 
-const NH_BYTE *ttyr_terminal_getSettingName(
+const char *ttyr_terminal_getSettingName(
     TTYR_TERMINAL_SETTING_E setting)
 {
 TTYR_TERMINAL_BEGIN()
@@ -44,11 +44,11 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SETTING_NAMES_PP[setting])
 // FUNCTIONS =======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getSetting(
-    ttyr_terminal_Config *Config_p, NH_BYTE namespace_p[255], int setting)
+    ttyr_terminal_Config *Config_p, char namespace_p[255], int setting)
 {
 TTYR_TERMINAL_BEGIN()
 
-    nh_List *Setting_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TERMINAL_SETTING_NAMES_PP[setting]);
+    nh_core_List *Setting_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TERMINAL_SETTING_NAMES_PP[setting]);
     TTYR_TERMINAL_CHECK_NULL(Setting_p)
 
     switch (setting) {

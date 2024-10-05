@@ -11,7 +11,7 @@
 #include "ttyr-tty.h"
 #include "ttyr-api.h"
 
-#include "nhcore/Loader/Loader.h"
+#include "nh-core/Loader/Loader.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,7 +35,7 @@ typedef TTYR_TTY_RESULT (*ttyr_tty_cmd_unclaimStandardIO_f)(
 ); 
 
 typedef TTYR_TTY_RESULT (*ttyr_tty_cmd_sendEvent_f)( 
-    ttyr_tty_TTY *TTY_p, nh_wsi_Event Event 
+    ttyr_tty_TTY *TTY_p, nh_api_WSIEvent Event 
 ); 
  
 // ADD =============================================================================================
@@ -43,7 +43,7 @@ typedef TTYR_TTY_RESULT (*ttyr_tty_cmd_sendEvent_f)(
 static bool added = false;
 static const char name_p[] = "ttyr-tty";
 static const char *dependencies_pp[16] = {
-    "nhencoding",
+    "nh-encoding",
 };
 
 static bool ttyr_api_add() {
@@ -58,7 +58,7 @@ static bool ttyr_api_add() {
 }
 
 ttyr_tty_TTY *ttyr_api_openTTY(
-    NH_BYTE *config_p, ttyr_tty_Interface *Interface_p)
+    char *config_p, ttyr_tty_Interface *Interface_p)
 {
     if (!ttyr_api_add()) {return NULL;}
 
@@ -94,7 +94,7 @@ TTYR_TTY_RESULT ttyr_api_unclaimStandardIO(
 }
 
 TTYR_TTY_RESULT ttyr_api_sendEvent(
-    ttyr_tty_TTY *TTY_p, nh_wsi_Event Event)
+    ttyr_tty_TTY *TTY_p, nh_api_WSIEvent Event)
 {
     if (!ttyr_api_add()) {return TTYR_TTY_ERROR_BAD_STATE;}
 

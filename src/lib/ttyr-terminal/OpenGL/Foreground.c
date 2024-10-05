@@ -15,8 +15,8 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Common/Macros.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Common/Macros.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,7 +34,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundPrograms(
 {
 TTYR_TERMINAL_BEGIN()
 
-    static const NH_BYTE* vsSource_p =
+    static const char* vsSource_p =
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
         "layout(location=1) in vec2 uv;\n"
@@ -47,7 +47,7 @@ TTYR_TERMINAL_BEGIN()
         "    gl_Position = vec4(position, 1.0);\n"
         "}\n";
 
-    static const NH_BYTE* fsSource_p =
+    static const char* fsSource_p =
         "#version 450\n"
         "#if __VERSION__ < 130\n"
         "#define TEXTURE2D texture2D\n"
@@ -103,7 +103,7 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_disableCommandAutoFree(nh_opengl_addCommand(CommandBuffer_p, "glGetUniformLocation", 
             &Foreground_p->Program_p->Result, nh_opengl_glchar(NULL, NULL, 0, &colorName_p)));
 
-    static const NH_BYTE* vsSource2_p =
+    static const char* vsSource2_p =
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
         "uniform vec3 in_color;\n"
@@ -113,7 +113,7 @@ TTYR_TERMINAL_BEGIN()
         "    gl_Position = vec4(position, 1.0);\n"
         "}\n";
 
-    static const NH_BYTE* fsSource2_p =
+    static const char* fsSource2_p =
         "#version 450\n"
         "in vec3 color;\n"
         "out vec4 fragColor;\n"
@@ -334,7 +334,7 @@ TTYR_TERMINAL_BEGIN()
             State_p->Viewport_p->OpenGL.CommandBuffer_p);
         ttyr_terminal_initOpenGLForegroundVertices(&Data_p->Foreground.OpenGL, 
             State_p->Viewport_p->OpenGL.CommandBuffer_p);
-        Data_p->Foreground.Action.init = NH_FALSE;
+        Data_p->Foreground.Action.init = false;
     }
 
     ttyr_terminal_updateOpenGLForegroundFont(

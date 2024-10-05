@@ -19,10 +19,10 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Process.h"
-#include "nhcore/System/Memory.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/System/Memory.h"
 
-#include "nhencoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF8.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -73,7 +73,7 @@ TTYR_TTY_RESULT ttyr_tty_destroyFileViews(
         if (FileView_p->File_p == File_p) {break;}
         FileView_p = NULL;
     }
-    if (FileView_p) {nh_core_removeFromList2(&View_p->FileViews, NH_TRUE, FileView_p);}
+    if (FileView_p) {nh_core_removeFromList2(&View_p->FileViews, true, FileView_p);}
 
     return TTYR_TTY_SUCCESS;
 }
@@ -185,7 +185,7 @@ TTYR_TTY_RESULT ttyr_tty_clearFileSearch(
 }
 
 TTYR_TTY_RESULT ttyr_tty_searchFile(
-    ttyr_tty_File *File_p, NH_ENCODING_UTF32 *str_p, int length)
+    ttyr_tty_File *File_p, NH_API_UTF32 *str_p, int length)
 {
     switch (File_p->type)
     {
@@ -200,15 +200,15 @@ TTYR_TTY_RESULT ttyr_tty_searchFile(
 // INPUT ===========================================================================================
 
 TTYR_TTY_RESULT ttyr_tty_handleFileInput(
-    ttyr_tty_Program *Program_p, ttyr_tty_File *File_p, NH_ENCODING_UTF32 c, NH_BOOL insertMode, 
-    NH_BOOL *refresh_p)
+    ttyr_tty_Program *Program_p, ttyr_tty_File *File_p, NH_API_UTF32 c, bool insertMode, 
+    bool *refresh_p)
 {
     if (File_p->readOnly) {
-        *refresh_p = NH_TRUE;
+        *refresh_p = true;
         TTYR_CHECK(ttyr_tty_setDefaultMessage(NULL, TTYR_TTY_MESSAGE_EDITOR_READ_ONLY))
     }
 
-    nh_List FileViews = ((ttyr_tty_Editor*)Program_p->handle_p)->View.FileEditor.FileViews;
+    nh_core_List FileViews = ((ttyr_tty_Editor*)Program_p->handle_p)->View.FileEditor.FileViews;
 
     switch (File_p->type)
     {

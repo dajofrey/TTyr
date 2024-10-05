@@ -31,11 +31,11 @@
     ); 
 
     TTYR_TTY_RESULT ttyr_tty_refreshGrid1Row(
-        nh_List *Tiles_p, ttyr_tty_View *View_p, int row
+        nh_core_List *Tiles_p, ttyr_tty_View *View_p, int row
     );
 
     TTYR_TTY_RESULT ttyr_tty_getCursorPosition(
-        ttyr_tty_Tile *MacroTile_p, ttyr_tty_Tile *MicroTile_p, NH_BOOL standardIO, int *x_p, int *y_p
+        ttyr_tty_Tile *MacroTile_p, ttyr_tty_Tile *MicroTile_p, bool standardIO, int *x_p, int *y_p
     );
     
 /** @} */

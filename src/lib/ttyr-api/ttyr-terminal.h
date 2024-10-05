@@ -9,8 +9,8 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
-#include <stdbool.h>
 #include "ttyr-tty.h"
+#include <stdbool.h>
 
 #endif
 
@@ -79,7 +79,7 @@
      * @return @ref TTYR_TERMINAL_SUCCESS on success.
      */
     TTYR_TERMINAL_RESULT ttyr_api_setViewport(
-        ttyr_terminal_Terminal *Terminal_p, nh_gfx_Viewport *Viewport_p
+        ttyr_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p
     );
 
 /** @} */

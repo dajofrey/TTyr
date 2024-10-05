@@ -11,8 +11,8 @@
 
 #include "../Common/Includes.h"
 
-#include "nhcore/Util/Time.h"
-#include "nhgfx/Fonts/Text.h"
+#include "nh-core/Util/Time.h"
+#include "nh-gfx/Fonts/Text.h"
 
 #endif
 
@@ -21,9 +21,9 @@
  */
 
     typedef struct ttyr_terminal_Box {
-        NH_BOOL accent;
-        nh_PixelPosition UpperLeft;
-        nh_PixelPosition LowerRight;
+        bool accent;
+        nh_api_PixelPosition UpperLeft;
+        nh_api_PixelPosition LowerRight;
         float innerVertices_p[18];
         float outerVertices_p[18];
     } ttyr_terminal_Box;
@@ -32,7 +32,7 @@
         ttyr_tty_Glyph Glyph;
         int row;
         int col;
-        NH_BOOL cursor;
+        bool cursor;
     } ttyr_terminal_TileUpdate;
 
     typedef struct ttyr_terminal_TileForeground {
@@ -47,19 +47,19 @@
         ttyr_terminal_TileForeground Foreground;
         ttyr_terminal_TileBackground Background;
         ttyr_tty_Glyph Glyph;
-        NH_BOOL dirty;
+        bool dirty;
     } ttyr_terminal_Tile;
 
     typedef struct ttyr_terminal_Grid {
-        nh_List Rows;
-        nh_Array Boxes;
-        nh_PixelSize TileSize;
-        nh_PixelSize Size;
+        nh_core_List Rows;
+        nh_core_Array Boxes;
+        nh_api_PixelSize TileSize;
+        nh_api_PixelSize Size;
         int cols;
         int rows;
         ttyr_terminal_Tile *Cursor_p;
         ttyr_terminal_TileUpdate **Updates_pp;
-        NH_BOOL **updates_pp;
+        bool **updates_pp;
     } ttyr_terminal_Grid;
 
 /** @} */
@@ -84,20 +84,20 @@
         ttyr_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p
     );
 
-    NH_BOOL ttyr_terminal_compareBackgroundAttributes(
+    bool ttyr_terminal_compareBackgroundAttributes(
         ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p
     );
     
-    NH_BOOL ttyr_terminal_compareForegroundAttributes(
+    bool ttyr_terminal_compareForegroundAttributes(
         ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(
-        ttyr_terminal_Grid *Grid_p, void *state_p, ttyr_terminal_TileUpdate *Update_p, NH_BOOL *update_p
+        ttyr_terminal_Grid *Grid_p, void *state_p, ttyr_terminal_TileUpdate *Update_p, bool *update_p
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateBoxes(
-        ttyr_terminal_Grid *Grid_p, void *state_p, nh_Array *Boxes_p
+        ttyr_terminal_Grid *Grid_p, void *state_p, nh_core_Array *Boxes_p
     );
 
 /** @} */

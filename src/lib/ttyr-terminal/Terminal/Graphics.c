@@ -17,13 +17,13 @@
 #include "../Common/Macros.h"
 #include "../Common/Config.h"
 
-#include "nhgfx/Base/Viewport.h"
-#include "nhgfx/Fonts/HarfBuzz.h"
+#include "nh-gfx/Base/Viewport.h"
+#include "nh-gfx/Fonts/HarfBuzz.h"
 
-#include "nhcore/System/Memory.h"
-#include "nhcore/Util/Math.h"
-#include "nhcore/Util/Array.h"
-#include "nhcore/Util/List.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/Util/Math.h"
+#include "nh-core/Util/Array.h"
+#include "nh-core/Util/List.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -32,7 +32,7 @@
 // HELPER ==========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getInternalMonospaceFonts(
-    nh_List *Fonts_p)
+    nh_core_List *Fonts_p)
 {
 TTYR_TERMINAL_BEGIN()
  
@@ -40,9 +40,9 @@ TTYR_TERMINAL_BEGIN()
     nh_gfx_parseFontStyle(&Style, "normal");
 
     nh_gfx_FontFamily Family = nh_gfx_initFontFamily(NULL);
-    Family.generic_p[NH_GFX_GENERIC_FONT_FAMILY_MONOSPACE] = NH_TRUE;
+    Family.generic_p[NH_GFX_GENERIC_FONT_FAMILY_MONOSPACE] = true;
 
-    *Fonts_p = nh_gfx_getFonts(Family, Style, NH_TRUE);
+    *Fonts_p = nh_gfx_getFonts(Family, Style, true);
     if (Fonts_p->size <= 0) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
 
     nh_gfx_freeFontStyle(&Style);
@@ -55,7 +55,7 @@ static ttyr_terminal_GraphicsAction ttyr_terminal_initGraphicsAction()
 TTYR_TERMINAL_BEGIN()
 
     ttyr_terminal_GraphicsAction Action;
-    Action.init = NH_TRUE;
+    Action.init = true;
 
 TTYR_TERMINAL_END(Action)
 }
@@ -133,7 +133,7 @@ TTYR_TERMINAL_BEGIN()
     State_p->Gradient.LastChange = nh_core_getSystemTime();
 
     State_p->Blink.LastBlink = nh_core_getSystemTime();
-    State_p->Blink.on = NH_FALSE;
+    State_p->Blink.on = false;
  
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
@@ -184,9 +184,9 @@ TTYR_TERMINAL_BEGIN()
     TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->Data1))
     TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->Data2))
 
-    nh_core_freeList(&Graphics_p->State.Fonts, NH_FALSE);
-    nh_core_freeList(&Graphics_p->State.Glyphs, NH_TRUE);
-    nh_core_freeList(&Graphics_p->State.Codepoints, NH_TRUE);
+    nh_core_freeList(&Graphics_p->State.Fonts, false);
+    nh_core_freeList(&Graphics_p->State.Glyphs, true);
+    nh_core_freeList(&Graphics_p->State.Codepoints, true);
 
     nh_core_freeHashMap(Graphics_p->State.Map);
 
@@ -204,7 +204,7 @@ TTYR_TERMINAL_BEGIN()
 
     for (int row = *row_p; row < Grid_p->rows; ++row) {
         for (int col = *col_p; col < Grid_p->cols; ++col) {
-            ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
+            ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
             if (!(Glyph.mark & TTYR_TTY_MARK_LINE_GRAPHICS)) {
                 continue;
             }
@@ -226,7 +226,7 @@ TTYR_TERMINAL_END(total)
 }
 
 static int ttyr_terminal_getCurrentAttributeRange(
-    ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Current_p, int *col_p, int *row_p, NH_BOOL foreground)
+    ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Current_p, int *col_p, int *row_p, bool foreground)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -234,7 +234,7 @@ TTYR_TERMINAL_BEGIN()
 
     for (int row = *row_p; row < Grid_p->rows; ++row) {
         for (int col = *col_p; col < Grid_p->cols; ++col) {
-            ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
+            ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
             if (foreground && (!Glyph.codepoint || Glyph.codepoint == ' ' || Glyph.mark & TTYR_TTY_MARK_LINE_GRAPHICS)) {
                 continue;
             }
@@ -275,15 +275,15 @@ TTYR_TERMINAL_BEGIN()
     int row = 0;
     int col = 0;
 
-    ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
-    NH_BOOL begin = NH_TRUE;
+    ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
+    bool begin = true;
 
-    while (NH_TRUE)
+    while (true)
     {
         ttyr_tty_Glyph NextGlyph = Glyph;
         total = ttyr_terminal_getCurrentAttributeRangeForLineGraphics(Grid_p, &NextGlyph, &col, &row) * 12;
         if (!total && !begin) {break;}
-        begin = NH_FALSE;
+        begin = false;
 
         ttyr_terminal_AttributeRange *Range_p = nh_core_incrementArray(&Data_p->Foreground.Ranges2);
 
@@ -297,7 +297,7 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
-    ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, NH_BOOL foreground)
+    ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, bool foreground)
 {
 TTYR_TERMINAL_BEGIN()
 
@@ -317,16 +317,16 @@ TTYR_TERMINAL_BEGIN()
     int row = 0;
     int col = 0;
 
-    ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
-    NH_BOOL begin = NH_TRUE;
+    ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
+    bool begin = true;
 
     // Default Foreground/Background.
-    while (NH_TRUE)
+    while (true)
     {
         ttyr_tty_Glyph NextGlyph = Glyph;
         total = ttyr_terminal_getCurrentAttributeRange(Grid_p, &NextGlyph, &col, &row, foreground) * 6;
         if (!total && !begin) {break;}
-        begin = NH_FALSE;
+        begin = false;
 
         ttyr_terminal_AttributeRange *Range_p = nh_core_incrementArray(
             foreground ? &Data_p->Foreground.Ranges : &Data_p->Background.Ranges);
@@ -352,16 +352,16 @@ TTYR_TERMINAL_BEGIN()
     nh_core_freeArray(&Foreground_p->Vertices2);
     nh_core_freeArray(&Foreground_p->Indices2);
 
-    nh_Array Vertices = nh_core_initArray(sizeof(float), 2000);
-    nh_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
-    nh_Array Vertices2 = nh_core_initArray(sizeof(float), 2000);
-    nh_Array Indices2 = nh_core_initArray(sizeof(uint32_t), 1024);
+    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2000);
+    nh_core_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
+    nh_core_Array Vertices2 = nh_core_initArray(sizeof(float), 2000);
+    nh_core_Array Indices2 = nh_core_initArray(sizeof(uint32_t), 1024);
 
     int offset1 = 0;
     int offset2 = 0;
 
     for (int i = 0; i < Grid_p->Rows.size; ++i) {
-        nh_List *Row_p = Grid_p->Rows.pp[i];
+        nh_core_List *Row_p = Grid_p->Rows.pp[i];
 
         for (int j = 0; j < Row_p->size; ++j) {
             ttyr_terminal_Tile *Tile_p = Row_p->pp[j];
@@ -400,13 +400,13 @@ TTYR_TERMINAL_BEGIN()
     nh_core_freeArray(&Background_p->Vertices);
     nh_core_freeArray(&Background_p->Indices);
 
-    nh_Array Vertices = nh_core_initArray(sizeof(float), 2000);
-    nh_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
+    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2000);
+    nh_core_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
 
     int offset = 0;
 
     for (int i = 0; i < Grid_p->Rows.size; ++i) {
-        nh_List *Row_p = Grid_p->Rows.pp[i];
+        nh_core_List *Row_p = Grid_p->Rows.pp[i];
         for (int j = 0; j < Row_p->size; ++j) {
             ttyr_terminal_Tile *Tile_p = Row_p->pp[j];
             if (!Tile_p->Glyph.Background.custom && !Tile_p->Glyph.Attributes.reverse && !Tile_p->Glyph.Attributes.blink) {continue;}
@@ -450,30 +450,30 @@ TTYR_TERMINAL_BEGIN()
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBackgroundData(Grid_p, &Data_p->Background))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBoxesData(Grid_p, &Data_p->Boxes))
 
-    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, NH_TRUE))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, NH_FALSE))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, true))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, false))
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRangeForLineGraphics(Data_p, Grid_p))
 
 TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 }
 
-NH_BOOL ttyr_terminal_updateBlinkOrGradient(
+bool ttyr_terminal_updateBlinkOrGradient(
     ttyr_terminal_GraphicsState *State_p)
 {
 TTYR_TERMINAL_BEGIN()
 
-    NH_BOOL update = NH_FALSE;
-    nh_SystemTime Time = nh_core_getSystemTime();
+    bool update = false;
+    nh_core_SystemTime Time = nh_core_getSystemTime();
 
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
     if (nh_core_getSystemTimeDiffInSeconds(State_p->Blink.LastBlink, Time) >= Config.blinkFrequency) {
-        update = NH_TRUE;
+        update = true;
         State_p->Blink.LastBlink = Time;
         State_p->Blink.on = !State_p->Blink.on;
     }
 
     if (Config.accents > 1 && nh_core_getSystemTimeDiffInSeconds(State_p->Gradient.LastChange, Time) >= State_p->Gradient.interval) { 
-        update = NH_TRUE; 
+        update = true; 
         State_p->Gradient.LastChange = Time; 
         if (State_p->Gradient.ratio >= 1.0f) {
             State_p->Gradient.index = State_p->Gradient.index == Config.accents-1 ? 0 : State_p->Gradient.index+1; 
@@ -497,11 +497,11 @@ TTYR_TERMINAL_BEGIN()
     {
         switch (Viewport_p->Surface_p->api)
         {
-            case NH_GFX_API_VULKAN :
+            case NH_API_GRAPHICS_BACKEND_VULKAN :
 //                ttyr_terminal_initVulkanText(Viewport_p->Surface_p->Vulkan.GPU_p, 
 //                    &Graphics_p->Foreground.Vulkan);
                 break;
-            case NH_GFX_API_OPENGL :
+            case NH_API_GRAPHICS_BACKEND_OPENGL :
                 break;
             default :
                 TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)
@@ -525,10 +525,10 @@ TTYR_TERMINAL_BEGIN()
 
     switch (Graphics_p->State.Viewport_p->Surface_p->api)
     {
-        case NH_GFX_API_VULKAN :
+        case NH_API_GRAPHICS_BACKEND_VULKAN :
 //            TTYR_TERMINAL_CHECK(ttyr_terminal_renderUsingVulkan(Graphics_p))
             break;
-       case NH_GFX_API_OPENGL :
+       case NH_API_GRAPHICS_BACKEND_OPENGL :
             TTYR_TERMINAL_CHECK(ttyr_terminal_renderUsingOpenGL(Graphics_p, Grid_p, Grid2_p))
             break;
         default :
@@ -541,7 +541,7 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 // COLOR ===========================================================================================
 
 nh_Color ttyr_terminal_getGlyphColor(
-    ttyr_terminal_GraphicsState *State_p, ttyr_tty_Glyph *Glyph_p, NH_BOOL foreground)
+    ttyr_terminal_GraphicsState *State_p, ttyr_tty_Glyph *Glyph_p, bool foreground)
 {
 TTYR_TERMINAL_BEGIN()
 

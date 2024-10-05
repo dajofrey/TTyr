@@ -15,11 +15,11 @@
 #include "../Shell/Shell.h"
 #include "../Common/Macros.h"
 
-#include "nhcore/Loader/Loader.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Thread.h"
+#include "nh-core/Loader/Loader.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Thread.h"
 
-#include "nhencoding/Encodings/UTF32.h"
+#include "nh-encoding/Encodings/UTF32.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -93,7 +93,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
 
     // Check if there already exists a program with this name.
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
-        if (nh_encoding_compareUTF32(((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Name.p, Prototype_p->Name.p)) {
+        if (nh_encoding_compareUTF32(((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->name_p, Prototype_p->name_p)) {
             return TTYR_TTY_ERROR_BAD_STATE;
         }
     }
@@ -102,7 +102,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
     nh_core_appendToList(&TTY_p->Prototypes, Prototype_p);
 
     // If necessary, Add program prototype instance to all current tiles.
-    nh_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
+    nh_core_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
     for (int i = 0; i < Tiles.size; ++i) {
         ttyr_tty_Tile *Tile_p = Tiles.pp[i];
         bool add = true;
@@ -110,7 +110,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
             ttyr_tty_Interface *MicroTileProgramPrototype_p = 
                 ((ttyr_tty_MicroTab*)TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p->pp[j])->Prototype_p;
             if (!MicroTileProgramPrototype_p) {continue;}
-            if (nh_encoding_compareUTF32(MicroTileProgramPrototype_p->Name.p, Prototype_p->Name.p)) {
+            if (nh_encoding_compareUTF32(MicroTileProgramPrototype_p->name_p, Prototype_p->name_p)) {
                 add = false;
             }
         }

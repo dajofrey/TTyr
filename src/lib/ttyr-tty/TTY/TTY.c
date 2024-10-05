@@ -25,15 +25,15 @@
 #include "../Shell/Shell.h"
 #include "../Common/Macros.h"
 
-#include "nhcore/System/Thread.h"
-#include "nhcore/System/Memory.h"
-#include "nhcore/System/Process.h"
-#include "nhcore/System/Logger.h"
-#include "nhcore/Util/RingBuffer.h"
+#include "nh-core/System/Thread.h"
+#include "nh-core/System/Memory.h"
+#include "nh-core/System/Process.h"
+#include "nh-core/System/Logger.h"
+#include "nh-core/Util/RingBuffer.h"
 
-#include "nhencoding/Base/UnicodeDataHelper.h"
-#include "nhencoding/Encodings/UTF8.h"
-#include "nhencoding/Encodings/UTF32.h"
+#include "nh-encoding/Base/UnicodeDataHelper.h"
+#include "nh-encoding/Encodings/UTF8.h"
+#include "nh-encoding/Encodings/UTF32.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -86,8 +86,8 @@ static void *ttyr_tty_initTTY(
 {
     ttyr_tty_OpenTTY *Args_p = Workload_p->args_p;
 
-    static NH_BYTE *path_p = "nhtty/TTY/TTY.c";
-    static NH_BYTE *name_p = "TTY Workload";
+    static char *path_p = "nhtty/TTY/TTY.c";
+    static char *name_p = "TTY Workload";
     Workload_p->path_p = path_p;
     Workload_p->name_p = name_p;
     Workload_p->module = -1;
@@ -108,15 +108,15 @@ static void *ttyr_tty_initTTY(
     TTY_p->Prototypes = nh_core_initList(8);
     TTY_p->Clipboard.Lines = nh_core_initArray(sizeof(nh_encoding_UTF32String), 32);
 
-    TTY_p->hasFocus = NH_TRUE;
-    TTY_p->Borders.on = NH_TRUE;
-    TTY_p->Topbars.on = NH_TRUE;
+    TTY_p->hasFocus = true;
+    TTY_p->Borders.on = true;
+    TTY_p->Topbars.on = true;
 
-    TTY_p->Preview.blink = NH_TRUE;
+    TTY_p->Preview.blink = true;
     TTY_p->Preview.LastBlink = nh_core_getSystemTime();
 
     TTYR_CHECK_2(NULL, nh_core_initRingBuffer(
-        &TTY_p->Events, 128, sizeof(nh_wsi_Event), NULL 
+        &TTY_p->Events, 128, sizeof(nh_api_WSIEvent), NULL 
     ))
 
     TTYR_CHECK_NULL_2(NULL, ttyr_tty_insertAndFocusWindow(TTY_p, 0))
@@ -124,7 +124,7 @@ static void *ttyr_tty_initTTY(
     if (Args_p->Interface_p == NULL) {
         Args_p->Interface_p = ttyr_tty_createShellInterface();
     }
-    ttyr_tty_addProgram(TTY_p, Args_p->Interface_p, NH_FALSE);
+    ttyr_tty_addProgram(TTY_p, Args_p->Interface_p, false);
  
     return TTY_p;
 }
@@ -148,12 +148,12 @@ static void ttyr_tty_freeTTY(
             ((ttyr_tty_Interface*)TTY_p->Prototypes.pp[i])->Callbacks.destroyPrototype_f(TTY_p->Prototypes.pp[i]);
         }
     }
-    nh_core_freeList(&TTY_p->Prototypes, NH_FALSE);
+    nh_core_freeList(&TTY_p->Prototypes, false);
 
     for (int i = 0; i < TTY_p->Views.size; ++i) {
         ttyr_tty_destroyView(TTY_p, TTY_p->Views.pp[i]);
     }
-    nh_core_freeList(&TTY_p->Views, NH_FALSE);
+    nh_core_freeList(&TTY_p->Views, false);
 
     nh_core_free(TTY_p);
 }
@@ -170,7 +170,7 @@ static TTYR_TTY_RESULT ttyr_tty_handleInput(
 
     while (1)
     {
-        nh_wsi_Event *Event_p =
+        nh_api_WSIEvent *Event_p =
             nh_core_incrementRingBufferMarker(&TTY_p->Events, &TTY_p->Events.Marker);
 
         if (Event_p == NULL) {break;}
@@ -210,7 +210,7 @@ static NH_SIGNAL ttyr_tty_runTTY(
     void *tty_p)
 {
     ttyr_tty_TTY *TTY_p = tty_p;
-    NH_BOOL idle = NH_TRUE;
+    bool idle = true;
 
     for (int i = 0; i < TTY_p->Views.size; ++i) {
         TTYR_CHECK_2(NH_SIGNAL_ERROR, ttyr_tty_handleWindowResize(TTY_p, TTY_p->Views.pp[i]))
@@ -231,12 +231,12 @@ static NH_SIGNAL ttyr_tty_runTTY(
 
     if (TTY_p->Window_p->refreshCursor || TTY_p->Window_p->refreshGrid1) {
         TTYR_CHECK_2(NH_SIGNAL_ERROR, ttyr_tty_refreshCursor(TTY_p))
-        idle = NH_FALSE;
+        idle = false;
     }
 
-    TTY_p->Window_p->refreshGrid1 = NH_FALSE;
-    TTY_p->Window_p->refreshGrid2 = NH_FALSE;
-    TTY_p->Window_p->refreshCursor = NH_FALSE;
+    TTY_p->Window_p->refreshGrid1 = false;
+    TTY_p->Window_p->refreshGrid2 = false;
+    TTY_p->Window_p->refreshCursor = false;
  
     if (TTY_p->Window_p->close) {
         // First, close all dependent workloads.
@@ -283,9 +283,9 @@ static NH_SIGNAL ttyr_tty_runTTYCommand(
             TTYR_CHECK(ttyr_tty_unclaimStandardIO(TTY_p))
             break;
         case TTYR_TTY_COMMAND_SEND_EVENT :
-            nh_wsi_Event *Event2_p = nh_core_advanceRingBuffer(&TTY_p->Events);
+            nh_api_WSIEvent *Event2_p = nh_core_advanceRingBuffer(&TTY_p->Events);
             TTYR_CHECK_NULL(Event2_p)
-            *Event2_p = *((nh_wsi_Event*)Command_p->p);
+            *Event2_p = *((nh_api_WSIEvent*)Command_p->p);
             break;
     }
 
@@ -296,14 +296,14 @@ static NH_SIGNAL ttyr_tty_runTTYCommand(
 // The next functions are called by lib/netzhaut/nhtty.h functions.
 
 ttyr_tty_TTY *ttyr_tty_openTTY(
-    NH_BYTE *config_p, ttyr_tty_Interface *Interface_p)
+    char *config_p, ttyr_tty_Interface *Interface_p)
 {
     ttyr_tty_OpenTTY OpenTTY;
     OpenTTY.config_p = config_p;
     OpenTTY.Interface_p = Interface_p;
 
     ttyr_tty_TTY *TTY_p = nh_core_activateWorkload(
-        ttyr_tty_initTTY, ttyr_tty_runTTY, ttyr_tty_freeTTY, ttyr_tty_runTTYCommand, &OpenTTY, NH_TRUE
+        ttyr_tty_initTTY, ttyr_tty_runTTY, ttyr_tty_freeTTY, ttyr_tty_runTTYCommand, &OpenTTY, true
     );
 
     return TTY_p;
@@ -331,13 +331,13 @@ TTYR_TTY_RESULT ttyr_tty_cmd_unclaimStandardIO(
 }
 
 TTYR_TTY_RESULT ttyr_tty_cmd_sendEvent(
-    ttyr_tty_TTY *TTY_p, nh_wsi_Event Event)
+    ttyr_tty_TTY *TTY_p, nh_api_WSIEvent Event)
 {
     switch (Event.type) {
-        case NH_WSI_EVENT_KEYBOARD :
-        case NH_WSI_EVENT_MOUSE :
-        case NH_WSI_EVENT_WINDOW :
-            nh_core_executeWorkloadCommand(TTY_p, TTYR_TTY_COMMAND_SEND_EVENT, &Event, sizeof(nh_wsi_Event));
+        case NH_API_WSI_EVENT_KEYBOARD :
+        case NH_API_WSI_EVENT_MOUSE :
+        case NH_API_WSI_EVENT_WINDOW :
+            nh_core_executeWorkloadCommand(TTY_p, TTYR_TTY_COMMAND_SEND_EVENT, &Event, sizeof(nh_api_WSIEvent));
         default :
             // Ignore other events.
     }

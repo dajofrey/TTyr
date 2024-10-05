@@ -9,7 +9,7 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
-#include "nhapi/nhapi.h"
+#include "nh-api/nh-api.h"
 #include <stdbool.h>
 
 #endif
@@ -71,9 +71,9 @@
     typedef TTYR_TTY_RESULT (*ttyr_tty_draw_f)(ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width, int height, int row);
     typedef TTYR_TTY_RESULT (*ttyr_tty_drawTopbar_f)(ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width);
     typedef TTYR_TTY_RESULT (*ttyr_tty_getCursorPosition_f)(ttyr_tty_Program *Program_p, int *x_p, int *y_p);
-    typedef TTYR_TTY_RESULT (*ttyr_tty_handleInput_f)(ttyr_tty_Program *Program_p, nh_wsi_Event Event);
+    typedef TTYR_TTY_RESULT (*ttyr_tty_handleInput_f)(ttyr_tty_Program *Program_p, nh_api_WSIEvent Event);
     typedef TTYR_TTY_RESULT (*ttyr_tty_update_f)(ttyr_tty_Program *Program_p);
-    typedef TTYR_TTY_RESULT (*ttyr_tty_handleCommand_f)(ttyr_tty_Program *Program_p, nh_List *Arguments_p);
+    typedef TTYR_TTY_RESULT (*ttyr_tty_handleCommand_f)(ttyr_tty_Program *Program_p);
     typedef void (*ttyr_tty_destroy_f)(void *p);
     typedef void (*ttyr_tty_destroyPrototype_f)(ttyr_tty_Interface *Prototype_p);
 
@@ -101,7 +101,7 @@
         ttyr_tty_GlyphAttributes Attributes;
         ttyr_tty_GlyphColor Foreground;
         ttyr_tty_GlyphColor Background;
-        NH_ENCODING_UTF32 codepoint;       /* character code */
+        NH_API_UTF32 codepoint;       /* character code */
         TTYR_TTY_MARK_E mark;
     } ttyr_tty_Glyph;
     
@@ -123,9 +123,9 @@
     } ttyr_tty_InterfaceCallbacks;
     
     typedef struct ttyr_tty_Interface {
-        nh_encoding_UTF32String Name;
-        nh_encoding_UTF32String *CommandNames_p;
-        int commands;
+        NH_API_UTF32 name_p[64];
+        NH_API_UTF32 **commands_pp;
+        unsigned int commands;
         ttyr_tty_InterfaceCallbacks Callbacks;
         void *initArg_p;
     } ttyr_tty_Interface;
@@ -188,7 +188,7 @@
      * Todo.
      */
     TTYR_TTY_RESULT ttyr_api_sendEvent(
-        ttyr_tty_TTY *TTY_p, nh_wsi_Event Event
+        ttyr_tty_TTY *TTY_p, nh_api_WSIEvent Event
     );
 
 /** @} */
