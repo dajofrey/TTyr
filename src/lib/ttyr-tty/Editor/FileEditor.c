@@ -21,7 +21,6 @@
 #include "nh-core/System/Process.h"
 #include "nh-core/System/Memory.h"
 #include "nh-core/Util/LinkedList.h"
-#include "nh-core/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>

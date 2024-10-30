@@ -25,13 +25,11 @@
 #include <limits.h>
 #include <float.h>
 
-// INIT HELPER =====================================================================================
+// FUNCTIONS =======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBackgroundProgram(
     ttyr_terminal_OpenGLBackground *Background_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     static const char* vsSource_p =
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
@@ -83,14 +81,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_disableCommandAutoFree(nh_opengl_addCommand(CommandBuffer_p, "glGetUniformLocation", 
             &Background_p->Program_p->Result, nh_opengl_glchar(NULL, NULL, 0, &colorName_p)));
   
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBackgroundVertices(
     ttyr_terminal_OpenGLBackground *Background_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     Background_p->VertexArray_p = nh_opengl_disableDataAutoFree(nh_opengl_gluint(NULL, 0));
     nh_opengl_addCommand(CommandBuffer_p, "glGenVertexArrays", nh_opengl_gluint(NULL, 1),
         Background_p->VertexArray_p);
@@ -108,17 +104,13 @@ TTYR_TERMINAL_BEGIN()
     nh_opengl_addCommand(CommandBuffer_p, "glBindBuffer",
         nh_opengl_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Background_p->VerticesBuffer_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-
-// UPDATE ==========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBackgroundVertices(
     ttyr_terminal_OpenGLBackground *Background_p, nh_opengl_CommandBuffer *CommandBuffer_p, nh_core_Array *Vertices_p,
     nh_core_Array *Indices_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_addCommand(CommandBuffer_p, "glBindVertexArray", Background_p->VertexArray_p);
 
     // Indices.
@@ -145,14 +137,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_glboolean(NULL, GL_FALSE), nh_opengl_glsizei(NULL, sizeof(float)*3), 
         nh_opengl_pointer(NULL, NULL));
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBackground(
     void *state_p, void *data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_GraphicsState *State_p = state_p;
     ttyr_terminal_GraphicsData *Data_p = data_p;
 
@@ -168,24 +158,20 @@ TTYR_TERMINAL_BEGIN()
         State_p->Viewport_p->OpenGL.CommandBuffer_p, &Data_p->Background.Vertices,
         &Data_p->Background.Indices);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBackground(
     ttyr_terminal_OpenGLBackground *Background_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     memset(Background_p, 0, sizeof(ttyr_terminal_OpenGLBackground));
  
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLBackground(
     ttyr_terminal_OpenGLBackground *Background_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_freeCommand(Background_p->VertexShader_p);
     nh_opengl_freeCommand(Background_p->FragmentShader_p);
     nh_opengl_freeCommand(Background_p->Program_p);
@@ -195,6 +181,5 @@ TTYR_TERMINAL_BEGIN()
     nh_opengl_freeData(Background_p->IndicesBuffer_p);
     nh_opengl_freeData(Background_p->VerticesBuffer_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

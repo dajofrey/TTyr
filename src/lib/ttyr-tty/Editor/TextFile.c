@@ -21,15 +21,11 @@
 #include "nh-core/System/Process.h"
 #include "nh-core/System/Memory.h"
 #include "nh-core/Util/File.h"
-#include "nh-core/Common/Macros.h"
-
 #include "nh-css/Parser/Parser.h"
 #include "nh-html/Parser/Parser.h"
 #include "nh-webidl/Runtime/Parser.h"
-
 #include "nh-encoding/Encodings/UTF32.h"
 #include "nh-encoding/Encodings/UTF8.h"
-#include "nh-encoding/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -62,7 +58,7 @@ ttyr_tty_TextFileLine *ttyr_tty_newTextFileLine(
 static TTYR_TTY_RESULT ttyr_tty_appendToTextFileLine(
     ttyr_tty_TextFileLine *Line_p, NH_API_UTF32 *codepoints_p, int length)
 {
-    NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Line_p->Codepoints, codepoints_p, length))
+    NH_CORE_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Line_p->Codepoints, codepoints_p, length))
     bool b = false;
     for (int i = 0; i < length; ++i) {
         nh_core_appendToArray(&Line_p->Copy, &b, 1);
@@ -76,7 +72,7 @@ static TTYR_TTY_RESULT ttyr_tty_appendToTextFileLine(
 TTYR_TTY_RESULT ttyr_tty_insertIntoTextFileLine(
     ttyr_tty_TextFileLine *Line_p, int index, NH_API_UTF32 c)
 {
-    NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_insertUTF32(&Line_p->Codepoints, index, &c, 1))
+    NH_CORE_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_insertUTF32(&Line_p->Codepoints, index, &c, 1))
     bool b = false;
     nh_core_insertIntoArray(&Line_p->Copy, index, &b, 1);
     nh_core_insertIntoArray(&Line_p->Search, index, &b, 1);
@@ -89,7 +85,7 @@ TTYR_TTY_RESULT ttyr_tty_insertIntoTextFileLine(
 TTYR_TTY_RESULT ttyr_tty_removeFromTextFileLine(
     ttyr_tty_TextFileLine *Line_p, int index, int length)
 {
-    NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_removeUTF32(&Line_p->Codepoints, index, length))
+    NH_CORE_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_removeUTF32(&Line_p->Codepoints, index, length))
     nh_core_removeFromArray(&Line_p->Copy, index, length);
 
     return TTYR_TTY_SUCCESS;

@@ -27,13 +27,11 @@
 #include <limits.h>
 #include <float.h>
 
-// INIT HELPER =====================================================================================
+// FUNCTIONS =======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundPrograms(
     ttyr_terminal_OpenGLForeground *Foreground_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     static const char* vsSource_p =
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
@@ -153,14 +151,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_disableCommandAutoFree(nh_opengl_addCommand(CommandBuffer_p, "glGetUniformLocation",
             &Foreground_p->Program2_p->Result, nh_opengl_glchar(NULL, NULL, 0, &colorName_p)));
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLFontTexture(
     ttyr_terminal_OpenGLForeground *Foreground_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     Foreground_p->Texture_p = nh_opengl_disableDataAutoFree(nh_opengl_gluint(NULL, 0));
 
     nh_opengl_addCommand(CommandBuffer_p, "glGenTextures", nh_opengl_glsizei(NULL, 1), Foreground_p->Texture_p);
@@ -181,14 +177,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_glenum(NULL, GL_TEXTURE_2D), nh_opengl_glenum(NULL, GL_TEXTURE_MIN_FILTER),
         nh_opengl_glenum(NULL, GL_LINEAR));
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundVertices(
     ttyr_terminal_OpenGLForeground *Foreground_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     Foreground_p->VertexArray_p = nh_opengl_disableDataAutoFree(nh_opengl_gluint(NULL, 0));
     nh_opengl_addCommand(CommandBuffer_p, "glGenVertexArrays", nh_opengl_gluint(NULL, 1),
         Foreground_p->VertexArray_p);
@@ -224,17 +218,13 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Foreground_p->VerticesBuffer2_p);
 
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-
-// UPDATE ==========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForegroundFont(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsForeground *Foreground_p, 
     nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
     nh_gfx_FontInstance *FontInstance_p = 
@@ -250,14 +240,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_glint(NULL, 0), nh_opengl_glenum(NULL, GL_RED), nh_opengl_glenum(NULL, GL_UNSIGNED_BYTE),
         nh_opengl_glchar(NULL, NULL, 0, (GLchar**)&FontInstance_p->Font_p->Atlas.data_p));
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForegroundVertices(
     ttyr_terminal_GraphicsForeground *Foreground_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_addCommand(CommandBuffer_p, "glBindVertexArray", Foreground_p->OpenGL.VertexArray_p);
 
     // Indices.
@@ -316,14 +304,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_glboolean(NULL, GL_FALSE), nh_opengl_glsizei(NULL, sizeof(float)*3), 
         nh_opengl_pointer(NULL, NULL));
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForeground(
     void *state_p, void *data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_GraphicsState *State_p = state_p;
     ttyr_terminal_GraphicsData *Data_p = data_p;
 
@@ -343,24 +329,20 @@ TTYR_TERMINAL_BEGIN()
     ttyr_terminal_updateOpenGLForegroundVertices(
         &Data_p->Foreground, State_p->Viewport_p->OpenGL.CommandBuffer_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForeground(
     ttyr_terminal_OpenGLForeground *Foreground_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     memset(Foreground_p, 0, sizeof(ttyr_terminal_OpenGLForeground));
  
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLForeground(
     ttyr_terminal_OpenGLForeground *Foreground_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_freeCommand(Foreground_p->VertexShader_p);
     nh_opengl_freeCommand(Foreground_p->VertexShader2_p);
     nh_opengl_freeCommand(Foreground_p->FragmentShader_p);
@@ -379,6 +361,5 @@ TTYR_TERMINAL_BEGIN()
     nh_opengl_freeData(Foreground_p->VerticesBuffer_p);
     nh_opengl_freeData(Foreground_p->VerticesBuffer2_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

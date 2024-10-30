@@ -19,19 +19,17 @@
 #include <string.h>
 #include <stdio.h>
 
-// BACKGROUND ======================================================================================
+// FUNCTIONS =======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBackground(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_CommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
 
     int offset = 0;
     for (int i = 0; i < Data_p->Background.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Background.Ranges.p)+i;
-        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, false);
+        ttyr_tty_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, false);
         nh_opengl_addCommand(CommandBuffer_p, "glUniform3f", &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
             nh_opengl_glfloat(NULL, Color.r), nh_opengl_glfloat(NULL, Color.g), nh_opengl_glfloat(NULL, Color.b));
         nh_opengl_addCommand(CommandBuffer_p, "glDrawElements", 
@@ -41,27 +39,21 @@ TTYR_TERMINAL_BEGIN()
         offset += Range_p->indices;
     }
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_prepareOpenGLBackgroundDraw(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_CommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
     nh_opengl_addCommand(CommandBuffer_p, "glUseProgram", &Data_p->Background.OpenGL.Program_p->Result);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-
-// FOREGROUND ======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_CommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
 
     nh_opengl_addCommand(CommandBuffer_p, "glBindVertexArray", Data_p->Foreground.OpenGL.VertexArray_p);
@@ -70,7 +62,7 @@ TTYR_TERMINAL_BEGIN()
     int offset = 0;
     for (int i = 0; i < Data_p->Foreground.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges.p)+i;
-        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
+        ttyr_tty_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
         nh_opengl_addCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
             nh_opengl_glfloat(NULL, Color.r), nh_opengl_glfloat(NULL, Color.g), nh_opengl_glfloat(NULL, Color.b));
         nh_opengl_addCommand(CommandBuffer_p, "glDrawElements", 
@@ -86,7 +78,7 @@ TTYR_TERMINAL_BEGIN()
     offset = 0;
     for (int i = 0; i < Data_p->Foreground.Ranges2.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges2.p)+i;
-        nh_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
+        ttyr_tty_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
         nh_opengl_addCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor2_p->Result, 
             nh_opengl_glfloat(NULL, Color.r), nh_opengl_glfloat(NULL, Color.g), nh_opengl_glfloat(NULL, Color.b));
         nh_opengl_addCommand(CommandBuffer_p, "glDrawElements", 
@@ -96,29 +88,23 @@ TTYR_TERMINAL_BEGIN()
         offset += Range_p->indices;
     }
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_prepareOpenGLForegroundDraw(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_CommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
 
     nh_opengl_addCommand(CommandBuffer_p, "glUseProgram", &Data_p->Foreground.OpenGL.Program_p->Result);
     nh_opengl_addCommand(CommandBuffer_p, "glUniform1i", &Data_p->Foreground.OpenGL.GetUniformLocationTexture_p->Result, nh_opengl_glint(NULL, 0));
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-
-// BOXES ===========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBoxes(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
 
     nh_opengl_CommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
@@ -146,27 +132,21 @@ TTYR_TERMINAL_BEGIN()
         offset += 6;
     }
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_prepareOpenGLBoxesDraw(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_CommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
     nh_opengl_addCommand(CommandBuffer_p, "glUseProgram", &Data_p->Background.OpenGL.Program_p->Result);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-
-// RENDER ==========================================================================================
 
 TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
     ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     bool blockUntilRender = Graphics_p->Data1.Background.Action.init || Graphics_p->Data1.Foreground.Action.init;
 
     nh_gfx_beginRecording(Graphics_p->State.Viewport_p);
@@ -201,6 +181,5 @@ TTYR_TERMINAL_BEGIN()
  
     nh_gfx_endRecording(Graphics_p->State.Viewport_p, blockUntilRender);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

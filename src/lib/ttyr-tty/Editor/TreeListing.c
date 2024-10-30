@@ -15,11 +15,9 @@
 #include "../Common/Macros.h"
 
 #include "nh-core/System/Memory.h"
-#include "nh-core/Common/Macros.h"
 
 #include "nh-encoding/Encodings/UTF32.h"
 #include "nh-encoding/Encodings/UTF8.h"
-#include "nh-encoding/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>
@@ -481,8 +479,8 @@ TTYR_TTY_RESULT ttyr_tty_handleTreeListingInput(
                 nh_encoding_UTF32String Question = nh_encoding_initUTF32(128);
                 int deleteLength;
                 NH_API_UTF32 *delete_p = ttyr_tty_getMessage(TTYR_TTY_MESSAGE_BINARY_QUERY_DELETE, &deleteLength);
-                NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Question, delete_p, deleteLength))
-                NH_ENCODING_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Question, Current_p->Path.p, Current_p->Path.length))
+                NH_CORE_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Question, delete_p, deleteLength))
+                NH_CORE_CHECK_2(TTYR_TTY_ERROR_BAD_STATE, nh_encoding_appendUTF32(&Question, Current_p->Path.p, Current_p->Path.length))
                 TTYR_CHECK(ttyr_tty_setBinaryQueryMessage(NULL, Question.p, Question.length, NULL, ttyr_tty_delete))
                 nh_encoding_freeUTF32(&Question);
             }

@@ -30,8 +30,6 @@
 static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBoxesVertices(
     ttyr_terminal_OpenGLBoxes *Boxes_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     Boxes_p->VertexArray_p = nh_opengl_disableDataAutoFree(nh_opengl_gluint(NULL, 0));
     nh_opengl_addCommand(CommandBuffer_p, "glGenVertexArrays", nh_opengl_gluint(NULL, 1),
         Boxes_p->VertexArray_p);
@@ -43,14 +41,12 @@ TTYR_TERMINAL_BEGIN()
     nh_opengl_addCommand(CommandBuffer_p, "glBindBuffer",
         nh_opengl_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Boxes_p->VerticesBuffer_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBoxesVertices(
     ttyr_terminal_GraphicsBoxes *Boxes_p, nh_opengl_CommandBuffer *CommandBuffer_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_addCommand(CommandBuffer_p, "glBindVertexArray", Boxes_p->OpenGL.VertexArray_p);
 
     // Vertices.
@@ -68,14 +64,12 @@ TTYR_TERMINAL_BEGIN()
         nh_opengl_glboolean(NULL, GL_FALSE), nh_opengl_glsizei(NULL, sizeof(float)*3), 
         nh_opengl_pointer(NULL, NULL));
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBoxes(
     void *state_p, void *data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_GraphicsData *Data_p = data_p;
     ttyr_terminal_GraphicsState *State_p = state_p;
 
@@ -88,28 +82,23 @@ TTYR_TERMINAL_BEGIN()
     ttyr_terminal_updateOpenGLBoxesVertices(
         &Data_p->Boxes, State_p->Viewport_p->OpenGL.CommandBuffer_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBoxes(
     ttyr_terminal_OpenGLBoxes *Boxes_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     memset(Boxes_p, 0, sizeof(ttyr_terminal_OpenGLBoxes));
  
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLBoxes(
     ttyr_terminal_OpenGLBoxes *Boxes_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_opengl_freeData(Boxes_p->VertexArray_p);
     nh_opengl_freeData(Boxes_p->VerticesBuffer_p);
     nh_opengl_freeCommand(Boxes_p->BufferData_p);
  
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

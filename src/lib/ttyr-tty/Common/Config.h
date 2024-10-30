@@ -31,8 +31,8 @@
 
     typedef struct ttyr_tty_TitlebarConfig {
         bool on;
-        nh_Color Foreground;
-        nh_Color Background;
+        ttyr_tty_Color Foreground;
+        ttyr_tty_Color Background;
     } ttyr_tty_TitlebarConfig;
 
     typedef struct ttyr_tty_ShellConfig {

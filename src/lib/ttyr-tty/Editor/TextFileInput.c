@@ -19,15 +19,11 @@
 #include "nh-core/System/Process.h"
 #include "nh-core/System/Memory.h"
 #include "nh-core/Util/File.h"
-#include "nh-core/Common/Macros.h"
-
 #include "nh-css/Parser/Parser.h"
 #include "nh-html/Parser/Parser.h"
 #include "nh-webidl/Runtime/Parser.h"
-
 #include "nh-encoding/Encodings/UTF32.h"
 #include "nh-encoding/Encodings/UTF8.h"
-#include "nh-encoding/Common/Macros.h"
 
 #include <stddef.h>
 #include <unistd.h>

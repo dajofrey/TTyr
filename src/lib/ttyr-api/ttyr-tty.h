@@ -92,8 +92,12 @@
         bool wide;
     } ttyr_tty_GlyphAttributes;
     
+    typedef struct ttyr_tty_Color { 
+        float r, g, b, a; 
+    } ttyr_tty_Color; 
+
     typedef struct ttyr_tty_GlyphColor {
-        nh_Color Color;
+        ttyr_tty_Color Color;
         bool custom;
     } ttyr_tty_GlyphColor;
 

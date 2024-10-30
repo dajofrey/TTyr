@@ -27,7 +27,6 @@
 #include "nh-core/System/Memory.h"
 #include "nh-core/System/Thread.h"
 #include "nh-core/Util/RingBuffer.h"
-#include "nh-core/Common/Macros.h"
 
 #include <string.h>
 #include <stdio.h>

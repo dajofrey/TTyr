@@ -37,8 +37,6 @@ TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Glyph_p, int col, 
     int row, float vertices_p[12])
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
       
     nh_Vertex Vertices_p[4];
@@ -80,14 +78,12 @@ TTYR_TERMINAL_BEGIN()
 
     nh_verticesToArray(Vertices_p, vertices_p, 4, false, 0);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
     nh_core_Array Vertices = nh_core_initArray(sizeof(nh_Vertex), 8);
@@ -148,14 +144,12 @@ TTYR_TERMINAL_BEGIN()
     nh_verticesToArray(Vertices.p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, Vertices.length, false, 0);
     nh_core_freeArray(&Vertices);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getOutlineVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
     nh_Vertex Vertices_p[6];
@@ -213,29 +207,27 @@ TTYR_TERMINAL_BEGIN()
 
     nh_verticesToArray(Vertices_p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, 6, false, 0);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesDefault(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col, 
     int row, float depth, float vertices_p[20])
 {
-TTYR_TERMINAL_BEGIN()
-
     char p[4] = {0};
     nh_encoding_encodeUTF8Single(codepoint, p);
     nh_gfx_Glyph *Glyph_p = nh_core_getFromHashMap(&State_p->Map, p);
 
     if (!Glyph_p) {
         if (nh_gfx_loadGlyphs(State_p->FontInstance_p, &codepoint, 1)) {
-            TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)
+            return TTYR_TERMINAL_ERROR_BAD_STATE;
         }
     
         unsigned int glyphs = 0;
         nh_gfx_HarfBuzzBuffer Buffer = nh_gfx_createHarfBuzzBuffer(State_p->FontInstance_p, &codepoint, 1);
         nh_gfx_HarfBuzzGlyphInfo *Infos_p = nh_gfx_getHarfBuzzGlyphInfos(Buffer, &glyphs);
     
-        if (glyphs != 1) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+        if (glyphs != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
 
         nh_gfx_Glyph Glyph = nh_gfx_getGlyph(State_p->FontInstance_p, Infos_p[0].id);
 
@@ -299,15 +291,13 @@ TTYR_TERMINAL_BEGIN()
 
     nh_verticesToArray(Vertices_p, vertices_p, 4, true, 0);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col,
     int row, float depth, float vertices_p[24])
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
 
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
@@ -569,15 +559,13 @@ TTYR_TERMINAL_BEGIN()
 
     nh_verticesToArray(Vertices_p, vertices_p, 8, false, 0);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Glyph_p, int col,
     int row, float *vertices_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     float depth = Glyph_p->mark & TTYR_TTY_MARK_ELEVATED ? 0.1f : 0.2f;
 
     if (Glyph_p->mark & TTYR_TTY_MARK_LINE_GRAPHICS) {
@@ -590,6 +578,5 @@ TTYR_TERMINAL_BEGIN()
         ))
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

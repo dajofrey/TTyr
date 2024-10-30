@@ -34,8 +34,6 @@
 static TTYR_TERMINAL_RESULT ttyr_terminal_getInternalMonospaceFonts(
     nh_core_List *Fonts_p)
 {
-TTYR_TERMINAL_BEGIN()
- 
     nh_gfx_FontStyle Style;
     nh_gfx_parseFontStyle(&Style, "normal");
 
@@ -43,36 +41,32 @@ TTYR_TERMINAL_BEGIN()
     Family.generic_p[NH_GFX_GENERIC_FONT_FAMILY_MONOSPACE] = true;
 
     *Fonts_p = nh_gfx_getFonts(Family, Style, true);
-    if (Fonts_p->size <= 0) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+    if (Fonts_p->size <= 0) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
 
     nh_gfx_freeFontStyle(&Style);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static ttyr_terminal_GraphicsAction ttyr_terminal_initGraphicsAction()
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_GraphicsAction Action;
     Action.init = true;
 
-TTYR_TERMINAL_END(Action)
+    return Action;
 }
 
-static nh_Color ttyr_terminal_getGradientColor(
+static ttyr_tty_Color ttyr_terminal_getGradientColor(
     ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsGradient *Gradient_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     if (Config_p->accents == 1) {
-        TTYR_TERMINAL_END(Config_p->Accents_p[0])
+        return Config_p->Accents_p[0];
     }
 
-    nh_Color Color1 = Config_p->Accents_p[Gradient_p->index];
-    nh_Color Color2 = Gradient_p->index == Config_p->accents-1 ? Config_p->Accents_p[0] : Config_p->Accents_p[Gradient_p->index+1];
+    ttyr_tty_Color Color1 = Config_p->Accents_p[Gradient_p->index];
+    ttyr_tty_Color Color2 = Gradient_p->index == Config_p->accents-1 ? Config_p->Accents_p[0] : Config_p->Accents_p[Gradient_p->index+1];
 
-    nh_Color Result;
+    ttyr_tty_Color Result;
     Result.r = Color1.r + Gradient_p->ratio * (Color2.r - Color1.r);
     Result.g = Color1.g + Gradient_p->ratio * (Color2.g - Color1.g);
     Result.b = Color1.b + Gradient_p->ratio * (Color2.b - Color1.b);
@@ -80,7 +74,7 @@ TTYR_TERMINAL_BEGIN()
 
     Gradient_p->ratio += 0.01f;
 
-TTYR_TERMINAL_END(Result)
+    return Result;
 }
 
 // INIT/FREE =======================================================================================
@@ -88,8 +82,6 @@ TTYR_TERMINAL_END(Result)
 static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsData(
     ttyr_terminal_GraphicsData *Data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     Data_p->Foreground.Action = ttyr_terminal_initGraphicsAction();
     Data_p->Foreground.Vertices = nh_core_initArray(sizeof(float), 1024);
     Data_p->Foreground.Indices  = nh_core_initArray(sizeof(uint32_t), 1024);
@@ -110,14 +102,12 @@ TTYR_TERMINAL_BEGIN()
     Data_p->Boxes.Action = ttyr_terminal_initGraphicsAction();
     ttyr_terminal_initOpenGLBoxes(&Data_p->Boxes.OpenGL);
  
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsState(
     ttyr_terminal_GraphicsState *State_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_getInternalMonospaceFonts(&State_p->Fonts))
@@ -135,28 +125,24 @@ TTYR_TERMINAL_BEGIN()
     State_p->Blink.LastBlink = nh_core_getSystemTime();
     State_p->Blink.on = false;
  
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_initGraphics(
     ttyr_terminal_Graphics *Graphics_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     memset(Graphics_p, 0, sizeof(ttyr_terminal_Graphics));
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsState(&Graphics_p->State))
     TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsData(&Graphics_p->Data1))
     TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsData(&Graphics_p->Data2))
  
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphicsData(
     ttyr_terminal_GraphicsData *Data_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_freeArray(&Data_p->Foreground.Vertices);
     nh_core_freeArray(&Data_p->Foreground.Indices);
     nh_core_freeArray(&Data_p->Foreground.Ranges);
@@ -173,14 +159,12 @@ TTYR_TERMINAL_BEGIN()
     ttyr_terminal_freeOpenGLBackground(&Data_p->Background.OpenGL);
     ttyr_terminal_freeOpenGLBoxes(&Data_p->Boxes.OpenGL);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphics(
     ttyr_terminal_Graphics *Graphics_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->Data1))
     TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->Data2))
 
@@ -190,7 +174,7 @@ TTYR_TERMINAL_BEGIN()
 
     nh_core_freeHashMap(Graphics_p->State.Map);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 // RANGES ==========================================================================================
@@ -198,8 +182,6 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
     ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Current_p, int *col_p, int *row_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     int total = 0;
 
     for (int row = *row_p; row < Grid_p->rows; ++row) {
@@ -212,7 +194,7 @@ TTYR_TERMINAL_BEGIN()
                 *col_p = col;
                 *row_p = row;
                 *Current_p = Glyph;
-                TTYR_TERMINAL_END(total)
+                return total;
             }
             ++total;
         }
@@ -222,14 +204,12 @@ TTYR_TERMINAL_BEGIN()
     *col_p = Grid_p->cols;
     *row_p = Grid_p->rows;
 
-TTYR_TERMINAL_END(total)
+    return total;
 }
 
 static int ttyr_terminal_getCurrentAttributeRange(
     ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Current_p, int *col_p, int *row_p, bool foreground)
 {
-TTYR_TERMINAL_BEGIN()
-
     int total = 0;
 
     for (int row = *row_p; row < Grid_p->rows; ++row) {
@@ -246,7 +226,7 @@ TTYR_TERMINAL_BEGIN()
                 *col_p = col;
                 *row_p = row;
                 *Current_p = Glyph;
-                TTYR_TERMINAL_END(total)
+                return total;
             }
             ++total;
         }
@@ -256,19 +236,17 @@ TTYR_TERMINAL_BEGIN()
     *col_p = Grid_p->cols;
     *row_p = Grid_p->rows;
 
-TTYR_TERMINAL_END(total)
+    return total;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_computeRangeForLineGraphics(
     ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_freeArray(&Data_p->Foreground.Ranges2);
     Data_p->Foreground.Ranges2 = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 32);
 
     if (Grid_p->rows <= 0 || Grid_p->Rows.size == 0) {
-        TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+        return TTYR_TERMINAL_SUCCESS;
     }
 
     int total = 0;
@@ -293,14 +271,12 @@ TTYR_TERMINAL_BEGIN()
         Glyph = NextGlyph;
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
     ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, bool foreground)
 {
-TTYR_TERMINAL_BEGIN()
-
     if (foreground) {
         nh_core_freeArray(&Data_p->Foreground.Ranges);
         Data_p->Foreground.Ranges = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 32);
@@ -310,7 +286,7 @@ TTYR_TERMINAL_BEGIN()
     }
 
     if (Grid_p->rows <= 0 || Grid_p->Rows.size == 0) {
-        TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+        return TTYR_TERMINAL_SUCCESS;
     }
 
     int total = 0;
@@ -337,7 +313,7 @@ TTYR_TERMINAL_BEGIN()
         Glyph = NextGlyph;
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 // UPDATE ==========================================================================================
@@ -345,8 +321,6 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateForegroundData(
     ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsForeground *Foreground_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_freeArray(&Foreground_p->Vertices);
     nh_core_freeArray(&Foreground_p->Indices);
     nh_core_freeArray(&Foreground_p->Vertices2);
@@ -389,14 +363,12 @@ TTYR_TERMINAL_BEGIN()
     Foreground_p->Vertices2 = Vertices2;
     Foreground_p->Indices2 = Indices2;
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateBackgroundData(
     ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsBackground *Background_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_freeArray(&Background_p->Vertices);
     nh_core_freeArray(&Background_p->Indices);
 
@@ -420,14 +392,12 @@ TTYR_TERMINAL_BEGIN()
     Background_p->Vertices = Vertices;
     Background_p->Indices = Indices;
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateBoxesData(
     ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsBoxes *Boxes_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_freeArray(&Boxes_p->Vertices);
     Boxes_p->Vertices = nh_core_initArray(sizeof(float), 64);
  
@@ -438,14 +408,12 @@ TTYR_TERMINAL_BEGIN()
             &Boxes_p->Vertices, ((ttyr_terminal_Box*)Grid_p->Boxes.p)[i].outerVertices_p, 18);
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
     ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateForegroundData(Grid_p, &Data_p->Foreground))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBackgroundData(Grid_p, &Data_p->Background))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBoxesData(Grid_p, &Data_p->Boxes))
@@ -454,14 +422,12 @@ TTYR_TERMINAL_BEGIN()
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, false))
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRangeForLineGraphics(Data_p, Grid_p))
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 bool ttyr_terminal_updateBlinkOrGradient(
     ttyr_terminal_GraphicsState *State_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     bool update = false;
     nh_core_SystemTime Time = nh_core_getSystemTime();
 
@@ -482,7 +448,7 @@ TTYR_TERMINAL_BEGIN()
         State_p->Gradient.Color = ttyr_terminal_getGradientColor(&Config, &State_p->Gradient); 
     } 
 
-TTYR_TERMINAL_END(update)
+    return update;
 }
 
 // VIEWPORT ========================================================================================
@@ -490,8 +456,6 @@ TTYR_TERMINAL_END(update)
 TTYR_TERMINAL_RESULT ttyr_terminal_handleViewportChange(
     ttyr_terminal_Graphics *Graphics_p, nh_gfx_Viewport *Viewport_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     // Check if it's the initial call.
     if (!Graphics_p->State.Viewport_p) 
     {
@@ -504,16 +468,19 @@ TTYR_TERMINAL_BEGIN()
             case NH_API_GRAPHICS_BACKEND_OPENGL :
                 break;
             default :
-                TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)
+                return TTYR_TERMINAL_ERROR_BAD_STATE;
         }
     }
 
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
-    Viewport_p->Settings.ClearColor = Config.Background;
+    Viewport_p->Settings.ClearColor.r = Config.Background.r;
+    Viewport_p->Settings.ClearColor.g = Config.Background.g;
+    Viewport_p->Settings.ClearColor.b = Config.Background.b;
+
     Graphics_p->State.Viewport_p = Viewport_p;
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 // RENDER ==========================================================================================
@@ -521,8 +488,6 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
     ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     switch (Graphics_p->State.Viewport_p->Surface_p->api)
     {
         case NH_API_GRAPHICS_BACKEND_VULKAN :
@@ -532,52 +497,49 @@ TTYR_TERMINAL_BEGIN()
             TTYR_TERMINAL_CHECK(ttyr_terminal_renderUsingOpenGL(Graphics_p, Grid_p, Grid2_p))
             break;
         default :
-            TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)
+            return TTYR_TERMINAL_ERROR_BAD_STATE;
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 // COLOR ===========================================================================================
 
-nh_Color ttyr_terminal_getGlyphColor(
+ttyr_tty_Color ttyr_terminal_getGlyphColor(
     ttyr_terminal_GraphicsState *State_p, ttyr_tty_Glyph *Glyph_p, bool foreground)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
     if (foreground) {
         if (Glyph_p->Attributes.reverse || (Glyph_p->Attributes.blink && State_p->Blink.on)) {
             if (Glyph_p->Background.custom) {
-                TTYR_TERMINAL_END(Glyph_p->Background.Color)
+                return Glyph_p->Background.Color;
             }
-            TTYR_TERMINAL_END(Config.Background)
+            return Config.Background;
         }
         if (Glyph_p->mark & TTYR_TTY_MARK_ACCENT) {
-            TTYR_TERMINAL_END(State_p->Gradient.Color)
+            return State_p->Gradient.Color;
         }
         if (Glyph_p->Foreground.custom) {
-            TTYR_TERMINAL_END(Glyph_p->Foreground.Color)
+            return Glyph_p->Foreground.Color;
         }
-        TTYR_TERMINAL_END(Config.Foreground)
+        return Config.Foreground;
     }
 
     // Background.
     if ((Glyph_p->Attributes.reverse && !(Glyph_p->Attributes.blink && State_p->Blink.on)) 
     || (!Glyph_p->Attributes.reverse &&   Glyph_p->Attributes.blink && State_p->Blink.on)) {
         if (Glyph_p->mark & TTYR_TTY_MARK_ACCENT) {
-            TTYR_TERMINAL_END(State_p->Gradient.Color)
+            return State_p->Gradient.Color;
         }
         if (Glyph_p->Foreground.custom) {
-            TTYR_TERMINAL_END(Glyph_p->Foreground.Color)
+            return Glyph_p->Foreground.Color;
         }
-        TTYR_TERMINAL_END(Config.Foreground)
+        return Config.Foreground;
     }
     if (Glyph_p->Background.custom) {
-        TTYR_TERMINAL_END(Glyph_p->Background.Color)
+        return Glyph_p->Background.Color;
     }
 
-TTYR_TERMINAL_END(Config.Background)
+    return Config.Background;
 }
-

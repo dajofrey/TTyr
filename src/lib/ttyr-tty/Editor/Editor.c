@@ -17,7 +17,6 @@
 #include "nh-core/System/Logger.h"
 #include "nh-core/System/Memory.h"
 
-#include "nh-encoding/Common/Macros.h"
 #include "nh-encoding/Encodings/UTF32.h"
 #include "nh-encoding/Encodings/UTF8.h"
 

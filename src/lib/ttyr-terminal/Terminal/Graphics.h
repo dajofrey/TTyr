@@ -68,7 +68,7 @@
     } ttyr_terminal_GraphicsBoxes;
  
     typedef struct ttyr_terminal_GraphicsGradient {
-        nh_Color Color;
+        ttyr_tty_Color Color;
         float ratio;
         int index;
         double interval;
@@ -93,7 +93,7 @@
         nh_gfx_Viewport *Viewport_p;
         ttyr_terminal_GraphicsBlink Blink;
         ttyr_terminal_GraphicsGradient Gradient;
-        nh_HashMap Map;
+        nh_core_HashMap Map;
         nh_gfx_FontInstance *FontInstance_p;
         nh_core_List Fonts;
         int font;
@@ -133,7 +133,7 @@
         ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p
     );
 
-    nh_Color ttyr_terminal_getGlyphColor(
+    ttyr_tty_Color ttyr_terminal_getGlyphColor(
         ttyr_terminal_GraphicsState *State_p, ttyr_tty_Glyph *Glyph_p, bool foreground
     );
 

@@ -18,10 +18,8 @@
 #include "nh-core/Util/RingBuffer.h"
 #include "nh-core/Util/List.h"
 #include "nh-core/Config/Config.h"
-
 #include "nh-encoding/Encodings/UTF8.h"
 #include "nh-encoding/Encodings/UTF32.h"
-
 #include "nh-gfx/Base/Viewport.h"
 #include "nh-gfx/Fonts/FontManager.h"
 #include "nh-gfx/Fonts/Text.h"
@@ -43,8 +41,6 @@ typedef struct ttyr_terminal_Args {
 static void *ttyr_terminal_initTerminal(
     nh_core_Workload *Workload_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     static char *name_p = "Terminal Emulator";
     static char *path_p = "nhterminal/Terminal/Terminal.c";
 
@@ -74,14 +70,12 @@ TTYR_TERMINAL_BEGIN()
     TTYR_TERMINAL_CHECK_2(NULL, ttyr_terminal_initGrid(&Terminal_p->Grid))
     TTYR_TERMINAL_CHECK_2(NULL, ttyr_terminal_initGrid(&Terminal_p->Grid2))
 
-TTYR_TERMINAL_END(Terminal_p)
+    return Terminal_p;
 }
 
 static void ttyr_terminal_freeTerminal(
     void *terminal_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Terminal *Terminal_p = terminal_p;
 
     ttyr_terminal_freeGraphics(&Terminal_p->Graphics);
@@ -89,8 +83,6 @@ TTYR_TERMINAL_BEGIN()
     ttyr_terminal_freeGrid(&Terminal_p->Grid2);
 
     nh_core_free(Terminal_p);
-
-TTYR_TERMINAL_SILENT_END()
 }
 
 // RUN LOOP ========================================================================================
@@ -99,8 +91,6 @@ TTYR_TERMINAL_SILENT_END()
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateSize(
     ttyr_terminal_Terminal *Terminal_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
@@ -121,7 +111,7 @@ TTYR_TERMINAL_BEGIN()
         }
     }
 
-    if (failure) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+    if (failure) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
     
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGrid(&Terminal_p->Grid, &Terminal_p->Graphics.State, &Text))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGrid(&Terminal_p->Grid2, &Terminal_p->Graphics.State, &Text))
@@ -140,31 +130,27 @@ TTYR_TERMINAL_BEGIN()
 
     nh_gfx_freeText(&Text);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateSizeIfRequired(
     ttyr_terminal_Terminal *Terminal_p, bool *update_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     if (Terminal_p->Graphics.State.Viewport_p->Settings.Size.width - (Terminal_p->Graphics.State.Viewport_p->Settings.borderWidth*2) == Terminal_p->Grid.Size.width
     &&  Terminal_p->Graphics.State.Viewport_p->Settings.Size.height - (Terminal_p->Graphics.State.Viewport_p->Settings.borderWidth*2) == Terminal_p->Grid.Size.height) {
-        TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+        return TTYR_TERMINAL_SUCCESS;
     }
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateSize(Terminal_p))
 
     *update_p = true;
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_handleEvent(
     ttyr_terminal_Terminal *Terminal_p, nh_api_WSIEvent *Event_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
     if (Event_p->type == NH_API_WSI_EVENT_MOUSE) {
@@ -173,7 +159,7 @@ TTYR_TERMINAL_BEGIN()
 
             if (newFontSize < 10 || newFontSize > 60) {
                 // Out of bounds.
-                TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+                return TTYR_TERMINAL_SUCCESS;
             }
 
             nh_core_overwriteGlobalConfigSettingInt(
@@ -225,14 +211,12 @@ TTYR_TERMINAL_BEGIN()
         Terminal_p->leftMouse = false;
     }
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_handleInputIfRequired(
     ttyr_terminal_Terminal *Terminal_p, bool *update_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_Array *Array_p = NULL;
     nh_api_WSIEvent *Event_p = NULL;
 
@@ -305,18 +289,16 @@ TTYR_TERMINAL_BEGIN()
 
     } while (Event_p);
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static NH_SIGNAL ttyr_terminal_runTerminal(
     void *args_p) 
 {
-TTYR_TERMINAL_BEGIN()
-
     TTYR_TERMINAL_CHECK_NULL_2(NH_SIGNAL_ERROR, args_p)
     ttyr_terminal_Terminal *Terminal_p = args_p;
 
-    if (!Terminal_p->Graphics.State.Viewport_p) {TTYR_TERMINAL_END(NH_SIGNAL_IDLE)}
+    if (!Terminal_p->Graphics.State.Viewport_p) {return NH_SIGNAL_IDLE;}
 
     bool update = false;
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
@@ -328,8 +310,10 @@ TTYR_TERMINAL_BEGIN()
         update = true;
     }
 
-    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor = Terminal_p->Graphics.State.Gradient.Color;
-
+    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.r = Terminal_p->Graphics.State.Gradient.Color.r;
+    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.g = Terminal_p->Graphics.State.Gradient.Color.g;
+    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.b = Terminal_p->Graphics.State.Gradient.Color.b;
+ 
     if (update) {
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data1,
             &Terminal_p->Grid))
@@ -337,10 +321,10 @@ TTYR_TERMINAL_BEGIN()
             &Terminal_p->Grid2))
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_renderGraphics(&Terminal_p->Graphics, 
             &Terminal_p->Grid, &Terminal_p->Grid2))
-        TTYR_TERMINAL_END(NH_SIGNAL_OK)
+        return NH_SIGNAL_OK;
     }
 
-TTYR_TERMINAL_END(update == true ? NH_SIGNAL_OK : NH_SIGNAL_IDLE)
+    return update == true ? NH_SIGNAL_OK : NH_SIGNAL_IDLE;
 }
 
 // COMMANDS ========================================================================================
@@ -356,22 +340,20 @@ typedef enum TTYR_TERMINAL_COMMAND_E {
 static NH_SIGNAL ttyr_terminal_runTerminalCommand(
     void *terminal_p, nh_core_WorkloadCommand *Command_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Terminal *Terminal_p = terminal_p;
 
     switch (Command_p->type)
     {
         case TTYR_TERMINAL_COMMAND_SET_VIEWPORT :
             if (nh_gfx_claimViewport(Command_p->p, NH_GFX_VIEWPORT_OWNER_TERMINAL, Terminal_p) != NH_API_SUCCESS) {
-                TTYR_TERMINAL_END(NH_SIGNAL_ERROR)
+                return NH_SIGNAL_ERROR;
             }
             ttyr_terminal_handleViewportChange(&Terminal_p->Graphics, Command_p->p);
             ttyr_terminal_handleViewportChange(&Terminal_p->Graphics2, Command_p->p);
             break;
     }
 
-TTYR_TERMINAL_END(NH_SIGNAL_OK)
+    return NH_SIGNAL_OK;
 }
 
 // API =============================================================================================
@@ -380,8 +362,6 @@ TTYR_TERMINAL_END(NH_SIGNAL_OK)
 ttyr_terminal_Terminal *ttyr_terminal_openTerminal(
     char *namespace_p, ttyr_tty_TTY *TTY_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Args Args;
     Args.TTY_p = TTY_p;
     Args.namespace_p = namespace_p;
@@ -390,16 +370,13 @@ TTYR_TERMINAL_BEGIN()
         ttyr_terminal_initTerminal, ttyr_terminal_runTerminal, ttyr_terminal_freeTerminal,
         ttyr_terminal_runTerminalCommand, &Args, true);
 
-TTYR_TERMINAL_END(Terminal_p)
+    return Terminal_p;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_cmd_setViewport(
     ttyr_terminal_Terminal *Terminal_p, nh_gfx_Viewport *Viewport_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_executeWorkloadCommand(Terminal_p, TTYR_TERMINAL_COMMAND_SET_VIEWPORT, Viewport_p, 0);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

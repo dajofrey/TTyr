@@ -19,11 +19,8 @@
 #include "nh-core/Util/String.h"
 #include "nh-core/System/Memory.h"
 #include "nh-core/Loader/Loader.h"
-
-#include "nh-encoding/Common/Macros.h"
 #include "nh-encoding/Encodings/UTF8.h"
 #include "nh-encoding/Encodings/UTF32.h"
-
 #include "nh-wsi/Window/Listener.h"
 
 #include "../../../../external/st-0.8.5/st.h"
@@ -338,7 +335,7 @@ static const unsigned int FOURBIT_COLORS_PP[16][3] = {
 
 // https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
 static void ttyr_tty_getShellColor(
-    uint32_t color, nh_Color *Color_p)
+    uint32_t color, ttyr_tty_Color *Color_p)
 {
     if (IS_TRUECOL(color)) {
         Color_p->r = (float)TRUERED(color)/255;

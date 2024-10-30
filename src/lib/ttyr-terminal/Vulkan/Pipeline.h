@@ -32,11 +32,11 @@
  */
 
     TTYR_TERMINAL_RESULT ttyr_terminal_createVulkanPipelines(
-        nh_vk_Driver *Driver_p, nh_vk_Pipeline *Pipelines_p
+        nh_gfx_VulkanDriver *Driver_p, nh_gfx_VulkanPipeline *Pipelines_p
     );
     
     void ttyr_terminal_destroyVulkanPipelines(
-        nh_vk_Driver *Driver_p, nh_vk_Pipeline *Pipelines_p
+        nh_gfx_VulkanDriver *Driver_p, nh_gfx_VulkanPipeline *Pipelines_p
     );
 
 /** @} */

@@ -34,21 +34,17 @@
 TTYR_TERMINAL_RESULT ttyr_terminal_initGrid(
     ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     memset(Grid_p, 0, sizeof(ttyr_terminal_Grid));
 
     Grid_p->Rows = nh_core_initList(128);
     Grid_p->Boxes = nh_core_initArray(sizeof(ttyr_terminal_Box), 16);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_freeGrid(
     ttyr_terminal_Grid *Grid_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     for (int row = 0; row < Grid_p->Rows.size; ++row) {
         nh_core_List *Cols_p = Grid_p->Rows.pp[row];
         for (int col = 0; col < Cols_p->size; ++col) {
@@ -69,20 +65,18 @@ TTYR_TERMINAL_BEGIN()
 
     ttyr_terminal_initGrid(Grid_p);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initTile(
     ttyr_terminal_Grid *Grid_p, ttyr_terminal_Tile *Tile_p, int row, int col)
 {
-TTYR_TERMINAL_BEGIN()
-
     memset(Tile_p, 0, sizeof(ttyr_terminal_Tile));
 
     memset(Tile_p->Foreground.vertices_p, 0, sizeof(float) * 20);
     memset(Tile_p->Background.vertices_p, 0, sizeof(float) * 12);
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 // UPDATE ==========================================================================================
@@ -90,8 +84,6 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
 static void ttyr_terminal_getTileRowAndColumn(
     ttyr_terminal_Grid *Grid_p, ttyr_terminal_Tile *Tile_p, int *row_p, int *col_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     bool done = false;
 
     for (int row = 0; !done && row < Grid_p->Rows.size; ++row) {
@@ -104,18 +96,14 @@ TTYR_TERMINAL_BEGIN()
             }
         }
     }
-
-TTYR_TERMINAL_SILENT_END()
 }
 
 ttyr_terminal_Tile *ttyr_terminal_getTile(
     ttyr_terminal_Grid *Grid_p, int row, int col)
 {
-TTYR_TERMINAL_BEGIN()
-
     if (Grid_p->cols <= col || Grid_p->rows <= row) {
         // If for some reason a tile is requested that is out of bounds, there is something wrong.
-        TTYR_TERMINAL_END(NULL)
+        return NULL;
     }
 
     while (Grid_p->Rows.size <= row) {
@@ -140,22 +128,20 @@ TTYR_TERMINAL_BEGIN()
         TTYR_TERMINAL_CHECK_2(NULL, ttyr_terminal_initTile(Grid_p, Cols_p->pp[col], row, col))
     }
 
-TTYR_TERMINAL_END(Cols_p->pp[col])
+    return Cols_p->pp[col];
 }
 
 bool ttyr_terminal_compareBackgroundAttributes(
     ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     // Compare attributes.
     if ((Glyph1_p->mark & TTYR_TTY_MARK_ACCENT) != (Glyph2_p->mark & TTYR_TTY_MARK_ACCENT)) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
 
     if (Glyph1_p->Attributes.blink != Glyph2_p->Attributes.blink
     ||  Glyph1_p->Attributes.reverse != Glyph2_p->Attributes.reverse) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
 
     // Compare Color.
@@ -164,26 +150,24 @@ TTYR_TERMINAL_BEGIN()
     ||  Glyph1_p->Background.Color.g != Glyph2_p->Background.Color.g
     ||  Glyph1_p->Background.Color.b != Glyph2_p->Background.Color.b
     ||  Glyph1_p->Background.Color.a != Glyph2_p->Background.Color.a) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
     if (Glyph1_p->Foreground.custom != Glyph2_p->Foreground.custom
     ||  Glyph1_p->Foreground.Color.r != Glyph2_p->Foreground.Color.r
     ||  Glyph1_p->Foreground.Color.g != Glyph2_p->Foreground.Color.g
     ||  Glyph1_p->Foreground.Color.b != Glyph2_p->Foreground.Color.b
     ||  Glyph1_p->Foreground.Color.a != Glyph2_p->Foreground.Color.a) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
 
-TTYR_TERMINAL_END(false)
+    return false;
 }
 
 bool ttyr_terminal_compareForegroundAttributes(
     ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     if ((Glyph1_p->mark & TTYR_TTY_MARK_ACCENT) != (Glyph2_p->mark & TTYR_TTY_MARK_ACCENT)) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
 
     // Compare attributes.
@@ -197,7 +181,7 @@ TTYR_TERMINAL_BEGIN()
     ||  Glyph1_p->Attributes.struck != Glyph2_p->Attributes.struck
     ||  Glyph1_p->Attributes.wrap != Glyph2_p->Attributes.wrap
     ||  Glyph1_p->Attributes.wide != Glyph2_p->Attributes.wide) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
 
     // Compare background.
@@ -206,17 +190,15 @@ TTYR_TERMINAL_BEGIN()
     ||  Glyph1_p->Foreground.Color.g != Glyph2_p->Foreground.Color.g
     ||  Glyph1_p->Foreground.Color.b != Glyph2_p->Foreground.Color.b
     ||  Glyph1_p->Foreground.Color.a != Glyph2_p->Foreground.Color.a) {
-        TTYR_TERMINAL_END(true)
+        return true;
     }
 
-TTYR_TERMINAL_END(false)
+    return false;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateCursorTile(
     ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsState *State_p, ttyr_terminal_TileUpdate *Update_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     // Check if inside draw area, if not don't show cursor.
     if (Update_p->row >= Grid_p->rows || Update_p->col >= Grid_p->cols || Update_p->row < 0 || Update_p->col < 0) {
         if (Grid_p->Cursor_p) {
@@ -224,7 +206,7 @@ TTYR_TERMINAL_BEGIN()
             Grid_p->Cursor_p->dirty = true;
             Grid_p->Cursor_p = NULL;
         }
-        TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+        return TTYR_TERMINAL_SUCCESS;
     }
 
     ttyr_terminal_Tile *Tile_p = ((nh_core_List*)Grid_p->Rows.pp[Update_p->row])->pp[Update_p->col];
@@ -250,15 +232,13 @@ TTYR_TERMINAL_BEGIN()
         State_p->Blink.LastBlink = nh_core_getSystemTime();
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateTileVertices(
     ttyr_tty_Glyph *Glyph_p, ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, int col,
     int row, ttyr_terminal_Tile *Tile_p, bool foreground)
 {
-TTYR_TERMINAL_BEGIN()
-
     if (foreground) {
         TTYR_TERMINAL_CHECK(ttyr_terminal_getForegroundVertices(
             State_p, Grid_p, Glyph_p, col, row, Tile_p->Foreground.vertices_p
@@ -269,18 +249,16 @@ TTYR_TERMINAL_BEGIN()
         ))
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(
     ttyr_terminal_Grid *Grid_p, void *state_p, ttyr_terminal_TileUpdate *Update_p, bool *update_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     // Only update cursor tile in case of cursor flag.
     if (Update_p->cursor) {
         if (update_p) {*update_p = true;}
-        TTYR_TERMINAL_END(ttyr_terminal_updateCursorTile(Grid_p, state_p, Update_p))
+        return ttyr_terminal_updateCursorTile(Grid_p, state_p, Update_p);
     }
 
     ttyr_terminal_Tile *Tile_p = ((nh_core_List*)Grid_p->Rows.pp[Update_p->row])->pp[Update_p->col];
@@ -348,14 +326,12 @@ TTYR_TERMINAL_BEGIN()
         }
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateGrid(
     ttyr_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p)
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_GraphicsState *State_p = state_p;
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
 
@@ -412,14 +388,12 @@ TTYR_TERMINAL_BEGIN()
         }
     }
 
-TTYR_TERMINAL_DIAGNOSTIC_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateBoxes(
     ttyr_terminal_Grid *Grid_p, void *state_p, nh_core_Array *Boxes_p)
 {   
-TTYR_TERMINAL_BEGIN()
-
     if (Grid_p->Boxes.length > 0) {
         nh_core_freeArray(&Grid_p->Boxes);
     }
@@ -439,6 +413,5 @@ TTYR_TERMINAL_BEGIN()
         }
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
-

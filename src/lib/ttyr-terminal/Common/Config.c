@@ -37,8 +37,7 @@ size_t TTYR_TERMINAL_SETTING_NAMES_PP_COUNT =
 const char *ttyr_terminal_getSettingName(
     TTYR_TERMINAL_SETTING_E setting)
 {
-TTYR_TERMINAL_BEGIN()
-TTYR_TERMINAL_END(TTYR_TERMINAL_SETTING_NAMES_PP[setting])
+    return TTYR_TERMINAL_SETTING_NAMES_PP[setting];
 }
 
 // FUNCTIONS =======================================================================================
@@ -46,29 +45,27 @@ TTYR_TERMINAL_END(TTYR_TERMINAL_SETTING_NAMES_PP[setting])
 static TTYR_TERMINAL_RESULT ttyr_terminal_getSetting(
     ttyr_terminal_Config *Config_p, char namespace_p[255], int setting)
 {
-TTYR_TERMINAL_BEGIN()
-
     nh_core_List *Setting_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TERMINAL_SETTING_NAMES_PP[setting]);
     TTYR_TERMINAL_CHECK_NULL(Setting_p)
 
     switch (setting) {
         case 0 :
-            if (Setting_p->size != 1) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             Config_p->fontSize = atoi(Setting_p->pp[0]);
             break;
         case 1 :
-            if (Setting_p->size != 1) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             Config_p->blinkFrequency = atof(Setting_p->pp[0]);
             break;
         case 2 :
-            if (Setting_p->size != 4) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+            if (Setting_p->size != 4) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             Config_p->Foreground.r = ((float)atoi(Setting_p->pp[0]))/255.0f;
             Config_p->Foreground.g = ((float)atoi(Setting_p->pp[1]))/255.0f;
             Config_p->Foreground.b = ((float)atoi(Setting_p->pp[2]))/255.0f;
             Config_p->Foreground.a = ((float)atoi(Setting_p->pp[3]))/255.0f;
             break;
         case 3 :
-            if (Setting_p->size != 4) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+            if (Setting_p->size != 4) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             Config_p->Background.r = ((float)atoi(Setting_p->pp[0]))/255.0f;
             Config_p->Background.g = ((float)atoi(Setting_p->pp[1]))/255.0f;
             Config_p->Background.b = ((float)atoi(Setting_p->pp[2]))/255.0f;
@@ -76,7 +73,7 @@ TTYR_TERMINAL_BEGIN()
             break;
         case 4 :
             Config_p->accents = 0;
-            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             for (int i = 0, j = 0; j < Setting_p->size; i++, j += 4) {
                 Config_p->Accents_p[i].r = ((float)atof(Setting_p->pp[j+0]))/255.0f;
                 Config_p->Accents_p[i].g = ((float)atof(Setting_p->pp[j+1]))/255.0f;
@@ -86,18 +83,16 @@ TTYR_TERMINAL_BEGIN()
             }
             break;
         case 5 :
-            if (Setting_p->size != 1) {TTYR_TERMINAL_END(TTYR_TERMINAL_ERROR_BAD_STATE)}
+            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             Config_p->border = atoi(Setting_p->pp[0]);
             break;
     }
 
-TTYR_TERMINAL_END(TTYR_TERMINAL_SUCCESS)
+    return TTYR_TERMINAL_SUCCESS;
 }
 
 static ttyr_terminal_Config ttyr_terminal_getStaticConfig()
 {
-TTYR_TERMINAL_BEGIN()
-
     ttyr_terminal_Config Config;
     memset(&Config, 0, sizeof(ttyr_terminal_Config));
 
@@ -108,7 +103,7 @@ TTYR_TERMINAL_BEGIN()
         TTYR_TERMINAL_CHECK_2(Config, ttyr_terminal_getSetting(&Config, Terminal_p->namespace_p, i))
     }
 
-TTYR_TERMINAL_END(Config)
+    return Config;
 }
 
 ttyr_terminal_Config ttyr_terminal_getConfig() 
@@ -116,4 +111,3 @@ ttyr_terminal_Config ttyr_terminal_getConfig()
     ttyr_terminal_Config Config = ttyr_terminal_getStaticConfig(); 
     return Config; 
 }
-
