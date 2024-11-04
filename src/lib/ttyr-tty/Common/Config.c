@@ -143,4 +143,3 @@ ttyr_tty_Config ttyr_tty_getConfig()
     }
     return Config;
 }
-

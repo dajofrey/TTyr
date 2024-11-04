@@ -11,7 +11,7 @@
 #include "Log.h"
 #include "Macros.h"
 
-#include "nh-core/System/Logger.h"
+#include "nh-core/Logger/Logger.h"
 
 #include <stdio.h>
 #include <stdlib.h>

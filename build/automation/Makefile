@@ -90,20 +90,19 @@ LIB_TTYR_API = lib/libttyr-api.so
 LIB_ST = external/st-0.8.5/libst.so
 BIN_TTYR = bin/ttyr
 
-build_netzhaut:
-ifeq ($(NETZHAUT_PATH),$(CURDIR)/external/Netzhaut)
-	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk nh-api.so nh-core.so nh-encoding.so nh-wsi.so nh-gfx.so)
-endif
-
-create_lib_dir:
-	mkdir -p lib
-create_bin_dir:
-	mkdir -p bin
-
 # Build targets for each library
 all: build_netzhaut $(LIB_ST) $(LIB_TTYR_TTY) $(LIB_TTYR_TERMINAL) $(LIB_TTYR_API) $(BIN_TTYR)
 lib: build_netzhaut $(LIB_ST) $(LIB_TTYR_TTY) $(LIB_TTYR_TERMINAL) $(LIB_TTYR_API)
 bin: build_netzhaut $(BIN_TTYR)
+
+build_netzhaut:
+ifeq ($(NETZHAUT_PATH),$(CURDIR)/external/Netzhaut)
+	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk nh-api.so nh-core.so nh-encoding.so nh-wsi.so nh-gfx.so)
+endif
+create_lib_dir:
+	mkdir -p lib
+create_bin_dir:
+	mkdir -p bin
 
 # Custom compiler flags
 $(OBJ_FILES_TTYR_TERMINAL): CFLAGS += -I$(NETZHAUT_PATH)/external -I$(NETZHAUT_PATH)/src/lib -I$(NETZHAUT_PATH)/external/Vulkan-Headers/include -DINCLUDE_VOLK -DVK_VERSION_1_2 -DVK_USE_PLATFORM_XLIB_KHR -DVK_KHR_xlib_surface

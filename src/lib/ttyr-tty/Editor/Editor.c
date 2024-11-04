@@ -14,7 +14,7 @@
 #include "../TTY/TTY.h"
 #include "../Common/Macros.h"
 
-#include "nh-core/System/Logger.h"
+#include "nh-core/Logger/Logger.h"
 #include "nh-core/System/Memory.h"
 
 #include "nh-encoding/Encodings/UTF32.h"
