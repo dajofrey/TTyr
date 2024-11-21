@@ -27,24 +27,24 @@ typedef struct ttyr_terminal_Graphics ttyr_terminal_Graphics;
  */
 
     typedef struct ttyr_terminal_OpenGLForeground {
-        nh_opengl_Command *VertexShader_p;
-        nh_opengl_Command *FragmentShader_p;
-        nh_opengl_Command *Program_p;
-        nh_opengl_Command *VertexShader2_p;
-        nh_opengl_Command *FragmentShader2_p;
-        nh_opengl_Command *Program2_p;
-        nh_opengl_Data *Texture_p;
-        nh_opengl_Data *VertexArray_p;
-        nh_opengl_Data *VertexArray2_p;
-        nh_opengl_Data *IndicesBuffer_p;
-        nh_opengl_Data *IndicesBuffer2_p;
-        nh_opengl_Data *VerticesBuffer_p;
-        nh_opengl_Data *VerticesBuffer2_p;
-        nh_opengl_Command *BufferData_p;
-        nh_opengl_Command *BufferData2_p;
-        nh_opengl_Command *GetUniformLocationTexture_p;
-        nh_opengl_Command *GetUniformLocationColor_p;
-        nh_opengl_Command *GetUniformLocationColor2_p;
+        nh_gfx_OpenGLCommand *VertexShader_p;
+        nh_gfx_OpenGLCommand *FragmentShader_p;
+        nh_gfx_OpenGLCommand *Program_p;
+        nh_gfx_OpenGLCommand *VertexShader2_p;
+        nh_gfx_OpenGLCommand *FragmentShader2_p;
+        nh_gfx_OpenGLCommand *Program2_p;
+        nh_gfx_OpenGLData *Texture_p;
+        nh_gfx_OpenGLData *VertexArray_p;
+        nh_gfx_OpenGLData *VertexArray2_p;
+        nh_gfx_OpenGLData *IndicesBuffer_p;
+        nh_gfx_OpenGLData *IndicesBuffer2_p;
+        nh_gfx_OpenGLData *VerticesBuffer_p;
+        nh_gfx_OpenGLData *VerticesBuffer2_p;
+        nh_gfx_OpenGLCommand *BufferData_p;
+        nh_gfx_OpenGLCommand *BufferData2_p;
+        nh_gfx_OpenGLCommand *GetUniformLocationTexture_p;
+        nh_gfx_OpenGLCommand *GetUniformLocationColor_p;
+        nh_gfx_OpenGLCommand *GetUniformLocationColor2_p;
     } ttyr_terminal_OpenGLForeground;
 
 /** @} */

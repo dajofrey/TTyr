@@ -27,14 +27,14 @@ typedef struct ttyr_terminal_Graphics ttyr_terminal_Graphics;
  */
 
     typedef struct ttyr_terminal_OpenGLBackground {
-        nh_opengl_Command *VertexShader_p;
-        nh_opengl_Command *FragmentShader_p;
-        nh_opengl_Command *Program_p;
-        nh_opengl_Data *VertexArray_p;
-        nh_opengl_Data *IndicesBuffer_p;
-        nh_opengl_Data *VerticesBuffer_p;
-        nh_opengl_Command *BufferData_p;
-        nh_opengl_Command *GetUniformLocation_p;
+        nh_gfx_OpenGLCommand *VertexShader_p;
+        nh_gfx_OpenGLCommand *FragmentShader_p;
+        nh_gfx_OpenGLCommand *Program_p;
+        nh_gfx_OpenGLData *VertexArray_p;
+        nh_gfx_OpenGLData *IndicesBuffer_p;
+        nh_gfx_OpenGLData *VerticesBuffer_p;
+        nh_gfx_OpenGLCommand *BufferData_p;
+        nh_gfx_OpenGLCommand *GetUniformLocation_p;
     } ttyr_terminal_OpenGLBackground;
 
 /** @} */
