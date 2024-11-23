@@ -35,4 +35,3 @@ typedef struct ttyr_tty_TTY ttyr_tty_TTY;
 /** @} */
 
 #endif 
-

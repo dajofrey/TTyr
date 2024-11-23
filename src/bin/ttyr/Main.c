@@ -104,11 +104,7 @@ int main(int argc, char **argv_pp)
     nh_api_Surface *Surface_p = nh_api_createSurface(Window_p, Args.renderer);
     if (!Surface_p) {return 1;}
 
-    nh_api_PixelSize Size;
-    Size.width  = 3000;
-    Size.height = 2000;
-
-    Viewport_p = nh_api_createViewport(Surface_p, Position, Size);
+    Viewport_p = nh_api_createViewport(Surface_p, NULL, NULL);
     if (!Viewport_p) {return 1;}
 
     if (ttyr_api_setViewport(Terminal_p, Viewport_p) != TTYR_TERMINAL_SUCCESS) {

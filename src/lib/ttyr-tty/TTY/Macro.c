@@ -166,11 +166,9 @@ TTYR_TTY_RESULT ttyr_tty_destroyWindows(
 
 // UPDATE ==========================================================================================
 
-static TTYR_TTY_RESULT ttyr_tty_updateMacroTile(
-    ttyr_tty_MacroTile *Tile_p, bool *refresh_p)
+static TTYR_TTY_RESULT ttyr_tty_updateMacroTab(
+    ttyr_tty_MacroTab *Tab_p, bool *refresh_p)
 {
-    ttyr_tty_MacroTab *Tab_p = Tile_p->MacroTabs.pp[Tile_p->current];
-
     if (Tab_p->Topbar.hasFocus) {
         TTYR_CHECK(ttyr_tty_updateTopbar(&Tab_p->Topbar))
     }
@@ -203,6 +201,19 @@ static TTYR_TTY_RESULT ttyr_tty_updateMacroTile(
     }
     nh_core_freeList(&Tiles, false);
 
+    return TTYR_TTY_SUCCESS;
+}
+
+static TTYR_TTY_RESULT ttyr_tty_updateMacroTile(
+    ttyr_tty_MacroTile *Tile_p, bool *refresh_p)
+{
+    for (int i = 0; i < Tile_p->MacroTabs.size; ++i) {
+        bool refresh = false;
+        ttyr_tty_updateMacroTab(Tile_p->MacroTabs.pp[i], &refresh);
+        if (refresh && i == Tile_p->current) {
+            *refresh_p = true;
+        }
+    }
     return TTYR_TTY_SUCCESS;
 }
 
