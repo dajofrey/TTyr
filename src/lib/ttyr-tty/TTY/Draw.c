@@ -204,6 +204,26 @@ static TTYR_TTY_RESULT ttyr_tty_postProcessRow(
                 Glyph_p->codepoint = 'v';
             }
         }
+        if (Glyph_p->mark & TTYR_TTY_MARK_LINE_VERTICAL) {
+            if (i < View_p->cols-1 && (Glyph_p+1)->Attributes.reverse) {
+                Glyph_p->mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
+                Glyph_p->codepoint = 'd';
+            }
+        }
+        if (Glyph_p->mark & TTYR_TTY_MARK_LINE_VERTICAL) {
+            if (i > 0 && (Glyph_p-1)->Attributes.reverse) {
+                Glyph_p->mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
+                Glyph_p->codepoint = 'e';
+            }
+        }
+        if (Glyph_p->mark & TTYR_TTY_MARK_LINE_VERTICAL) {
+            if (i > 0 && (Glyph_p-1)->Attributes.reverse && i < View_p->cols-1 && (Glyph_p+1)->Attributes.reverse) {
+                Glyph_p->Attributes.reverse = true;
+                Glyph_p->mark = 0;
+                Glyph_p->codepoint = 0;
+            }
+        }
+
     }
 
     return TTYR_TTY_SUCCESS;
@@ -285,4 +305,3 @@ TTYR_TTY_RESULT ttyr_tty_refreshGrid2(
 
     return TTYR_TTY_SUCCESS;
 }
-

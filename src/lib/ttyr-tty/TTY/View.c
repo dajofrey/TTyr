@@ -342,6 +342,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
             Box_p->UpperLeft.y = Config.Titlebar.on ? y : y-1;
             Box_p->LowerRight.x = x-2;
             Box_p->LowerRight.y = Config.Titlebar.on ? y : y-1;
+            Box_p->accent = true;
         }
         nh_core_freeList(&MicroTiles, false);
     }
@@ -386,4 +387,3 @@ TTYR_TTY_RESULT ttyr_tty_forwardEvent(
 
     return TTYR_TTY_SUCCESS;
 }
-

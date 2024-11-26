@@ -1025,6 +1025,7 @@ static void ttyr_tty_drawSelectionIfRequired(
             }
             if (Shell_p->Selection.Start.x != Shell_p->Selection.Stop.x || start != stop || Glyphs_p[i].codepoint != ' ') {
                 Glyphs_p[i].Attributes.reverse = true;
+                Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
             }
         }
     }

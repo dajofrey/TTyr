@@ -344,4 +344,3 @@ TTYR_TTY_RESULT ttyr_tty_cmd_sendEvent(
 
     return TTYR_TTY_SUCCESS;
 }
-

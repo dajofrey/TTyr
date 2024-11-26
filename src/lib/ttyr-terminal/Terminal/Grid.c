@@ -221,6 +221,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateCursorTile(
     // Set new cursor.
     Grid_p->Cursor_p = Tile_p;
     Grid_p->Cursor_p->Glyph.Attributes.blink = true;
+    Grid_p->Cursor_p->Glyph.mark |= TTYR_TTY_MARK_ACCENT;
     Grid_p->Cursor_p->dirty = true;
 
     // Trigger blink at move.

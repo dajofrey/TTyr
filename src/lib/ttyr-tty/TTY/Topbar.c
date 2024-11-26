@@ -668,7 +668,6 @@ TTYR_TTY_RESULT ttyr_tty_drawTopbarRow(
             Glyphs_p[i].Attributes.reverse = false;
             Glyphs_p[i].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
         }
-        Glyphs_p[i].mark |= TTYR_TTY_MARK_LINE_HORIZONTAL;
     }
 
     if (Tile_p) {
