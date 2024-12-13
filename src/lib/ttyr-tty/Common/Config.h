@@ -35,6 +35,10 @@
         ttyr_tty_Color Background;
     } ttyr_tty_TitlebarConfig;
 
+    typedef struct ttyr_tty_TopbarConfig {
+        bool on;
+    } ttyr_tty_TopbarConfig;
+
     typedef struct ttyr_tty_ShellConfig {
         bool maxScroll;
     } ttyr_tty_ShellConfig;
@@ -42,6 +46,7 @@
     typedef struct ttyr_tty_Config {
         char *name_p;
         ttyr_tty_TitlebarConfig Titlebar;
+        ttyr_tty_TopbarConfig Topbar;
         ttyr_tty_ShellConfig Shell;
         ttyr_tty_MenuConfig Menu;
         int windows;

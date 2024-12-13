@@ -1052,14 +1052,13 @@ static TTYR_TTY_RESULT ttyr_tty_drawShellTopbar(
     ttyr_tty_Shell *Shell_p = Program_p->handle_p;
 
     char topbar_p[1024];
-    memset(topbar_p, ' ', 1024);
+    memset(topbar_p, 0, 1024);
 
     if (Shell_p->ST_p) {
         char path_p[255] = {0};
         sprintf(path_p, "/proc/%ld/cwd", Shell_p->ST_p->pid);
 
-        char buf_p[1024];
-        memset(buf_p, 0, 1024);
+        char buf_p[1024] = {0};
         readlink(path_p, buf_p, 1024);
 
         int offset = (width / 2) - (strlen(buf_p) / 2);

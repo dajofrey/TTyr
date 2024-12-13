@@ -36,6 +36,7 @@ static const char *TTYR_TTY_SETTING_NAMES_PP[] = {
     "ttyr.tty.titlebar.on",
     "ttyr.tty.titlebar.foreground",
     "ttyr.tty.titlebar.background",
+    "ttyr.tty.topbar.on",
 };
 
 static size_t TTYR_TTY_SETTING_NAMES_PP_COUNT = 
@@ -113,6 +114,10 @@ static TTYR_TTY_RESULT ttyr_tty_getSetting(
             Config_p->Titlebar.Background.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
             Config_p->Titlebar.Background.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
             Config_p->Titlebar.Background.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
+            break;
+        case 13 :
+            if (Values_p->size != 1) {return TTYR_TTY_ERROR_BAD_STATE;}
+            Config_p->Topbar.on = atoi(Values_p->pp[0]);
             break;
     }
 
