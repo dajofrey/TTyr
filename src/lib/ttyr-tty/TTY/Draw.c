@@ -50,7 +50,11 @@ TTYR_TTY_RESULT ttyr_tty_getCursorPosition(
              // Indicates that the program doesn't want the cursor to be shown.
              return TTYR_TTY_SUCCESS;
         }
-        *y_p += 2; 
+
+        *y_p += 1 + (ttyr_tty_getConfig().Topbar.on || ttyr_tty_getConfig().Titlebar.on);
+        *y_p += MicroTile_p->rowPosition > 0;
+        *y_p += (!ttyr_tty_getConfig().Topbar.on && !ttyr_tty_getConfig().Titlebar.on) && MacroTile_p->rowPosition > 0;
+
         if (*x_p > -1 && *y_p > -1) {
             *x_p += MicroTile_p->colPosition;
             *y_p += MicroTile_p->rowPosition;
@@ -102,26 +106,12 @@ static void ttyr_tty_drawVerticalBorderGlyph(
     return;
 }
 
-static TTYR_TTY_RESULT ttyr_tty_draw(
+static TTYR_TTY_RESULT ttyr_tty_drawMicroTile(
     ttyr_tty_Tile *Tile_p, ttyr_tty_View *View_p, int row)
 {
-    // Normalize glyphs.
-    for (int i = 0; i < Tile_p->colSize; ++i) {
-        ttyr_tty_normalizeGlyph(View_p->Row.Glyphs_p+i);
-    }
-
     // Get relative row with 0 being the first row of the tile.
     row = row - Tile_p->rowPosition;
-
     int cols = Tile_p->colSize;
-    bool topbar = false;
-
-    // Check if topbar should be drawn. 
-    if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) {
-        topbar = row == 0;
-    } else {
-        topbar = Tile_p->rowPosition != 0 && row == 0;
-    }
 
     // Draw vertical border and subtract from cols, if necessary.
     if (Tile_p->rightSeparator) {
@@ -129,31 +119,72 @@ static TTYR_TTY_RESULT ttyr_tty_draw(
         cols--;
     }
 
-    if (topbar && !View_p->standardIO) {
-        if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) { 
-            return ttyr_tty_drawTopbarRow(
-                Tile_p, View_p->Row.Glyphs_p, cols, row, View_p->standardIO
-            );
-        } else {
+    int offset = Tile_p->rowPosition != 0;
+ 
+    // Draw topbar, if necessary.
+    if (!View_p->standardIO) {
+        bool topbar = row == 0;
+        if (Tile_p->rowPosition == 0) {topbar = false;}
+ 
+        if (topbar) {
             return ttyr_tty_drawTopbarRow(
                 NULL, View_p->Row.Glyphs_p, cols, row, View_p->standardIO
             );
         }
     }
  
-    if (Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO) { 
-        TTYR_CHECK(ttyr_tty_drawMicroWindow(
-            &TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow, View_p->Row.Glyphs_p, cols, Tile_p->rowSize, row, View_p->standardIO
-        ))
-    } else if (TTYR_TTY_MICRO_TILE(Tile_p)->Program_p) {
+    if (TTYR_TTY_MICRO_TILE(Tile_p)->Program_p) {
         TTYR_CHECK(TTYR_TTY_MICRO_TILE(Tile_p)->Program_p->Prototype_p->Callbacks.draw_f(
             TTYR_TTY_MICRO_TILE(Tile_p)->Program_p, View_p->Row.Glyphs_p, cols, 
-            View_p->standardIO ? Tile_p->rowSize : Tile_p->rowSize-1, 
-            View_p->standardIO ? row : row-1
+            Tile_p->rowSize-offset,
+            row-offset
         ))
     }
 
     return TTYR_TTY_SUCCESS;
+}
+
+static TTYR_TTY_RESULT ttyr_tty_drawMacroTile(
+    ttyr_tty_Tile *Tile_p, ttyr_tty_View *View_p, int row)
+{
+    // Get relative row with 0 being the first row of the tile.
+    row = row - Tile_p->rowPosition;
+
+    int cols = Tile_p->colSize;
+    bool topbar = Tile_p->rowPosition != 0 || ttyr_tty_getConfig().Topbar.on ||ttyr_tty_getConfig().Titlebar.on;
+
+    // Draw vertical border and subtract from cols, if necessary.
+    if (Tile_p->rightSeparator) {
+        ttyr_tty_drawVerticalBorderGlyph(&View_p->Row.Glyphs_p[cols-1]);
+        cols--;
+    }
+
+    if (topbar && row == 0 && !View_p->standardIO) {
+        return ttyr_tty_drawTopbarRow(
+            Tile_p, View_p->Row.Glyphs_p, cols, row, View_p->standardIO
+        );
+    }
+ 
+    TTYR_CHECK(ttyr_tty_drawMicroWindow(
+        &TTYR_TTY_MACRO_TAB(Tile_p)->MicroWindow, View_p->Row.Glyphs_p, cols,
+        topbar ? Tile_p->rowSize-1 : Tile_p->rowSize, 
+        topbar ? row-1 : row, 
+        View_p->standardIO
+    ))
+
+    return TTYR_TTY_SUCCESS;
+}
+
+static TTYR_TTY_RESULT ttyr_tty_draw(
+    ttyr_tty_Tile *Tile_p, ttyr_tty_View *View_p, int row)
+{
+    // Normalize glyphs.
+    for (int i = 0; i < Tile_p->colSize; ++i) {
+        ttyr_tty_normalizeGlyph(View_p->Row.Glyphs_p+i);
+    }
+ 
+    return Tile_p->type == TTYR_TTY_TILE_TYPE_MACRO ? 
+        ttyr_tty_drawMacroTile(Tile_p, View_p, row) : ttyr_tty_drawMicroTile(Tile_p, View_p, row);
 }
 
 // REFRESH =========================================================================================
