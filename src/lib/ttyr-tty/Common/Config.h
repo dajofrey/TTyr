@@ -40,7 +40,7 @@
     } ttyr_tty_TopbarConfig;
 
     typedef struct ttyr_tty_ShellConfig {
-        bool maxScroll;
+        unsigned int maxScroll;
     } ttyr_tty_ShellConfig;
 
     typedef struct ttyr_tty_Config {
