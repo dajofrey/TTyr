@@ -92,7 +92,19 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
     ttyr_tty_Config Config = ttyr_tty_getConfig();
     if (Config.Titlebar.on == false) {return TTYR_TTY_SUCCESS;}
 
-    for (int i = 1; i < (Config.windows+1) && i < cols ; ++i) {
+    // Set titlebar color.
+    for (int i = 0; i < cols ; ++i) {
+        Row_p->Glyphs_p[i].Foreground.Color.r = Config.Titlebar.Foreground.r;
+        Row_p->Glyphs_p[i].Foreground.Color.g = Config.Titlebar.Foreground.g;
+        Row_p->Glyphs_p[i].Foreground.Color.b = Config.Titlebar.Foreground.b;
+        Row_p->Glyphs_p[i].Foreground.custom = true;
+        Row_p->Glyphs_p[i].Background.Color.r = Config.Titlebar.Background.r;
+        Row_p->Glyphs_p[i].Background.Color.g = Config.Titlebar.Background.g;
+        Row_p->Glyphs_p[i].Background.Color.b = Config.Titlebar.Background.b;
+        Row_p->Glyphs_p[i].Background.custom = true;
+    }
+
+    for (int i = 1; ttyr_tty_getConfig().Topbar.on == 1 && i < (Config.windows+1) && i < cols ; ++i) {
         Row_p->Glyphs_p[i].codepoint = 0x25a1;
         Row_p->update_p[i] = true;
         if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
@@ -100,22 +112,26 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         }
     }
 
+    for (int i = 1, j = 1; ttyr_tty_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=2) {
+        Row_p->Glyphs_p[j].codepoint = i+48;
+        Row_p->Glyphs_p[j].Foreground.Color.r = 1.0f;
+        Row_p->Glyphs_p[j].Foreground.Color.g = 0.0f;
+        Row_p->Glyphs_p[j].Foreground.Color.b = 0.0f;
+        Row_p->Glyphs_p[j].Foreground.custom = true;
+        Row_p->update_p[j] = true;
+        if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
+            Row_p->Glyphs_p[j].codepoint = i+48;
+            Row_p->Glyphs_p[j].Foreground.Color.r = 0.0f;
+            Row_p->Glyphs_p[j].Foreground.Color.g = 1.0f;
+            Row_p->Glyphs_p[j].Foreground.Color.b = 0.0f;
+            Row_p->Glyphs_p[j].Foreground.custom = true;
+        }
+    }
+
     Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
 
     for (int i = 1; i < cols ; ++i) {
         Row_p->update_p[i] = 1;
-    }
-
-    for (int i = 0; i < cols ; ++i) {
-        Row_p->Glyphs_p[i].Foreground.Color.r = Config.Titlebar.Foreground.r;
-        Row_p->Glyphs_p[i].Foreground.Color.g = Config.Titlebar.Foreground.g;
-        Row_p->Glyphs_p[i].Foreground.Color.b = Config.Titlebar.Foreground.b;
-        Row_p->Glyphs_p[i].Foreground.custom = true;
-
-        Row_p->Glyphs_p[i].Background.Color.r = Config.Titlebar.Background.r;
-        Row_p->Glyphs_p[i].Background.Color.g = Config.Titlebar.Background.g;
-        Row_p->Glyphs_p[i].Background.Color.b = Config.Titlebar.Background.b;
-        Row_p->Glyphs_p[i].Background.custom = true;
     }
 
     char rightSide_p[255] = {};

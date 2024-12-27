@@ -682,6 +682,31 @@ TTYR_TTY_RESULT ttyr_tty_drawTopbarRow(
         }
     }
 
+    if (Tile_p && ttyr_tty_getConfig().Topbar.on == false && ttyr_tty_getConfig().Titlebar.on == true) {
+        ttyr_tty_GlyphColor Active;
+        Active.Color.r = 0.0f;
+        Active.Color.g = 1.0f;
+        Active.Color.b = 0.0f;
+        Active.custom = true;
+
+        ttyr_tty_GlyphColor Inactive = Active;
+        Inactive.Color.r = 1.0f;
+        Inactive.Color.g = 0.0f;
+        Inactive.Color.b = 0.0f;
+ 
+        for (int i = 1, j = 1; i <= ttyr_tty_getConfig().tabs; ++i, j+=2) {
+            Glyphs_p[cols-(i+j)].Foreground = Inactive;
+            Glyphs_p[cols-(i+j+1)].Foreground = Inactive;
+            Glyphs_p[cols-(i+j)].mark &= ~TTYR_TTY_MARK_ACCENT;
+            Glyphs_p[cols-(i+j+1)].mark &= ~TTYR_TTY_MARK_ACCENT;
+
+            if (ttyr_tty_getConfig().tabs - TTYR_TTY_MACRO_TILE(Tile_p)->current == i) {
+                Glyphs_p[cols-(i+j)].Foreground = Active;
+                Glyphs_p[cols-(i+j+1)].Foreground = Active;
+            }
+        }
+    }
+
     return TTYR_TTY_SUCCESS;
 }
 
