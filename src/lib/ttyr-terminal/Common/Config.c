@@ -23,12 +23,12 @@
 // NAMES ===========================================================================================
 
 const char *TTYR_TERMINAL_SETTING_NAMES_PP[] = {
-    "ttyr.terminal.font.size",
-    "ttyr.terminal.blink.frequency",
-    "ttyr.terminal.color.foreground",
-    "ttyr.terminal.color.background",
-    "ttyr.terminal.color.accent",
-    "ttyr.terminal.border",
+    "ttyr-terminal.font.size",
+    "ttyr-terminal.blink.frequency",
+    "ttyr-terminal.color.foreground",
+    "ttyr-terminal.color.background",
+    "ttyr-terminal.color.accent",
+    "ttyr-terminal.border",
 };
 
 size_t TTYR_TERMINAL_SETTING_NAMES_PP_COUNT = 

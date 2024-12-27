@@ -23,20 +23,20 @@
 // NAMES ===========================================================================================
 
 static const char *TTYR_TTY_SETTING_NAMES_PP[] = {
-    "ttyr.tty.shell.maxScroll",
-    "ttyr.tty.windows",
-    "ttyr.tty.tabs",
-    "ttyr.tty.menu.program",
-    "ttyr.tty.menu.split",
-    "ttyr.tty.menu.append",
-    "ttyr.tty.menu.window",
-    "ttyr.tty.menu.tab",
-    "ttyr.tty.menu.close",
-    "ttyr.tty.menu.debug",
-    "ttyr.tty.titlebar.on",
-    "ttyr.tty.titlebar.foreground",
-    "ttyr.tty.titlebar.background",
-    "ttyr.tty.topbar.on",
+    "ttyr-core.shell.maxScroll",
+    "ttyr-core.windows",
+    "ttyr-core.tabs",
+    "ttyr-core.menu.program",
+    "ttyr-core.menu.split",
+    "ttyr-core.menu.append",
+    "ttyr-core.menu.window",
+    "ttyr-core.menu.tab",
+    "ttyr-core.menu.close",
+    "ttyr-core.menu.debug",
+    "ttyr-core.titlebar.on",
+    "ttyr-core.titlebar.foreground",
+    "ttyr-core.titlebar.background",
+    "ttyr-core.topbar.on",
 };
 
 static size_t TTYR_TTY_SETTING_NAMES_PP_COUNT = 

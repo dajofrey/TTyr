@@ -10,7 +10,7 @@
 
 #include "Initialize.h"
 #include "Macros.h"
-#include "Data/ttyr-tty.conf.inc"
+#include "Data/default.conf.inc"
 
 #include "nh-core/Config/Config.h"
 #include "nh-core/Logger/Logger.h"
@@ -24,7 +24,6 @@
 
 TTYR_TTY_RESULT ttyr_tty_initialize()
 {
-    nh_core_appendConfig(ttyr_tty_conf_inc, ttyr_tty_conf_inc_len, false);
+    nh_core_appendConfig(ttyr_default_conf_inc, ttyr_default_conf_inc_len, false);
     return TTYR_TTY_SUCCESS;
 }
-

@@ -10,7 +10,6 @@
 
 #include "Initialize.h"
 #include "Macros.h"
-#include "Data/ttyr-terminal.conf.inc"
 
 #include "../Vulkan/Pipeline.h"
 
@@ -29,8 +28,6 @@
 
 TTYR_TERMINAL_RESULT ttyr_terminal_initialize()
 {
-    nh_core_appendConfig(ttyr_terminal_conf_inc, ttyr_terminal_conf_inc_len, false);
-
     for (int i = 0; i < NH_VULKAN.GPUs.size; ++i) 
     {
         nh_gfx_VulkanGPU *GPU_p = NH_VULKAN.GPUs.pp[0];
@@ -43,4 +40,3 @@ TTYR_TERMINAL_RESULT ttyr_terminal_initialize()
 
     return TTYR_TERMINAL_SUCCESS;
 }
-

@@ -695,13 +695,17 @@ TTYR_TTY_RESULT ttyr_tty_drawTopbarRow(
         Inactive.Color.b = 0.0f;
  
         for (int i = 1, j = 1; i <= ttyr_tty_getConfig().tabs; ++i, j+=2) {
+            Glyphs_p[cols-(i+j)].codepoint = 'p';
             Glyphs_p[cols-(i+j)].Foreground = Inactive;
             Glyphs_p[cols-(i+j+1)].Foreground = Inactive;
             Glyphs_p[cols-(i+j)].mark &= ~TTYR_TTY_MARK_ACCENT;
             Glyphs_p[cols-(i+j+1)].mark &= ~TTYR_TTY_MARK_ACCENT;
+            Glyphs_p[cols-(i+j+1)].codepoint = 'p';
 
             if (ttyr_tty_getConfig().tabs - TTYR_TTY_MACRO_TILE(Tile_p)->current == i) {
+                Glyphs_p[cols-(i+j)].codepoint = 'p';
                 Glyphs_p[cols-(i+j)].Foreground = Active;
+                Glyphs_p[cols-(i+j+1)].codepoint = 'p';
                 Glyphs_p[cols-(i+j+1)].Foreground = Active;
             }
         }
