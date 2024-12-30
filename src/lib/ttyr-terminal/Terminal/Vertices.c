@@ -525,7 +525,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
             x2 = x + width;
             // Second rectangle.
             y3 = y1;
-            y4 = y;
+            y4 = y1 + (height/2);
             x3 = x1;
             x4 = x2;
             break;
@@ -538,10 +538,37 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
             x2 = x + width;
             // Second rectangle.
             y3 = y1;
-            y4 = y + (height/4);
+            y4 = y1 + (height/4);
             x3 = x1;
             x4 = x2;
             break;
+
+        case 'o' : // -
+            // First rectangle.
+            y1 = (y) - h/2;
+            y2 = (y) + h/2;
+            x1 = x;
+            x2 = x + width;
+            // Second rectangle.
+            y3 = y1;
+            y4 = y1 + (height/2);
+            x3 = x1;
+            x4 = x2;
+            break;
+
+        case 'f' : // -
+            // First rectangle.
+            y1 = (y) - h/2;
+            y2 = (y) + h/2;
+            x1 = x;
+            x2 = x + width;
+            // Second rectangle.
+            y3 = y1;
+            y4 = y1 + (height/4);
+            x3 = x1;
+            x4 = x2;
+            break;
+
     }
 
     if (State_p->Viewport_p->Surface_p->api == NH_API_GRAPHICS_BACKEND_OPENGL) {

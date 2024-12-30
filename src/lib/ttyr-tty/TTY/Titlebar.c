@@ -112,39 +112,34 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         }
     }
 
-    for (int i = 1, j = 1; ttyr_tty_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=2) {
-        Row_p->Glyphs_p[j].codepoint = i+48;
-        Row_p->Glyphs_p[j].Foreground.Color.r = 1.0f;
-        Row_p->Glyphs_p[j].Foreground.Color.g = 0.0f;
-        Row_p->Glyphs_p[j].Foreground.Color.b = 0.0f;
-        Row_p->Glyphs_p[j].Foreground.custom = true;
-        Row_p->update_p[j] = true;
-        if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
-            Row_p->Glyphs_p[j].codepoint = i+48;
-            Row_p->Glyphs_p[j].Foreground.Color.r = 0.0f;
-            Row_p->Glyphs_p[j].Foreground.Color.g = 1.0f;
-            Row_p->Glyphs_p[j].Foreground.Color.b = 0.0f;
-            Row_p->Glyphs_p[j].Foreground.custom = true;
+    for (int i = 1, j = 1; ttyr_tty_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=3) {
+        for (int k = j; k < j+2; ++k) {
+            Row_p->Glyphs_p[k].codepoint = 'f';
+            Row_p->Glyphs_p[k].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
+            Row_p->update_p[k] = true;
+            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
+                Row_p->Glyphs_p[k].codepoint = 'o';
+            }
         }
     }
 
-    Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
-
-    for (int i = 1; i < cols ; ++i) {
-        Row_p->update_p[i] = 1;
-    }
-
-    char rightSide_p[255] = {};
-    sprintf(rightSide_p+strlen(rightSide_p), "RAM:%.1f%%", fabs((((float)NH_SYSTEM.RAM.free)/((float)NH_SYSTEM.RAM.total))*100.0f-100.0f));
-
-    for (int i = 0; i < strlen(rightSide_p); ++i) {
-        if (rightSide_p[i] == 'x') {
-            Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
-        }
-        Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].codepoint = rightSide_p[i];
-        Row_p->update_p[(cols-strlen(rightSide_p))+i-3] = 1;
-    }
-
+//    Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
+//
+//    for (int i = 1; i < cols ; ++i) {
+//        Row_p->update_p[i] = 1;
+//    }
+//
+//    char rightSide_p[255] = {};
+//    sprintf(rightSide_p+strlen(rightSide_p), "RAM:%.1f%%", fabs((((float)NH_SYSTEM.RAM.free)/((float)NH_SYSTEM.RAM.total))*100.0f-100.0f));
+//
+//    for (int i = 0; i < strlen(rightSide_p); ++i) {
+//        if (rightSide_p[i] == 'x') {
+//            Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
+//        }
+//        Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].codepoint = rightSide_p[i];
+//        Row_p->update_p[(cols-strlen(rightSide_p))+i-3] = 1;
+//    }
+//
 //    char ram_p[255] = {};
 //    sprintf(ram_p, "xHelpxSettingsx", (((float)NH_SYSTEM.RAM.free)/((float)NH_SYSTEM.RAM.total))*100.0f);
 //

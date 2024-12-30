@@ -261,15 +261,15 @@ TTYR_TTY_RESULT ttyr_tty_handleTopbarMouseInput(
     if (Event.trigger == NH_API_TRIGGER_PRESS && Event.Position.x-1 < Config.tabs && Event.Position.x > 0) {
         ((ttyr_tty_MacroTile*)Tile_p->p)->current = Event.Position.x-1;
     }
-    if (Event.trigger == NH_API_TRIGGER_PRESS && Event.Position.x == TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
-        TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Tile_p))->Tile_p->close = true;
-    }
-    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x == TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
-        TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitHover = true;
-    }
-    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x != TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
-        TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitHover = false;
-    }
+//    if (Event.trigger == NH_API_TRIGGER_PRESS && Event.Position.x == TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
+//        TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Tile_p))->Tile_p->close = true;
+//    }
+//    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x == TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
+//        TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitHover = true;
+//    }
+//    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x != TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
+//        TTYR_TTY_MACRO_TAB(Tile_p)->Topbar.quitHover = false;
+//    }
 
     return TTYR_TTY_SUCCESS;
 }
@@ -625,9 +625,9 @@ static TTYR_TTY_RESULT ttyr_tty_drawTopbarText(
                 for (int i = 0; i < Config.tabs; ++i) {
                     Glyphs_p[i+1].codepoint = 0x25a1;
                 }
-                Topbar_p->quitPosition = cols-2;
+//                Topbar_p->quitPosition = cols-2;
                 Glyphs_p[TTYR_TTY_MACRO_TILE(Tile_p)->current+1].codepoint = 0x25a0;
-                Glyphs_p[Topbar_p->quitPosition].codepoint = Topbar_p->quitHover ? 0x25cf : 0x25cb;
+//                Glyphs_p[Topbar_p->quitPosition].codepoint = Topbar_p->quitHover ? 0x25cf : 0x25cb;
             }
         }
         return TTYR_TTY_SUCCESS;
@@ -683,30 +683,12 @@ TTYR_TTY_RESULT ttyr_tty_drawTopbarRow(
     }
 
     if (Tile_p && ttyr_tty_getConfig().Topbar.on == false && ttyr_tty_getConfig().Titlebar.on == true) {
-        ttyr_tty_GlyphColor Active;
-        Active.Color.r = 0.0f;
-        Active.Color.g = 1.0f;
-        Active.Color.b = 0.0f;
-        Active.custom = true;
-
-        ttyr_tty_GlyphColor Inactive = Active;
-        Inactive.Color.r = 1.0f;
-        Inactive.Color.g = 0.0f;
-        Inactive.Color.b = 0.0f;
- 
         for (int i = 1, j = 1; i <= ttyr_tty_getConfig().tabs; ++i, j+=2) {
             Glyphs_p[cols-(i+j)].codepoint = 'p';
-            Glyphs_p[cols-(i+j)].Foreground = Inactive;
-            Glyphs_p[cols-(i+j+1)].Foreground = Inactive;
-            Glyphs_p[cols-(i+j)].mark &= ~TTYR_TTY_MARK_ACCENT;
-            Glyphs_p[cols-(i+j+1)].mark &= ~TTYR_TTY_MARK_ACCENT;
             Glyphs_p[cols-(i+j+1)].codepoint = 'p';
-
             if (ttyr_tty_getConfig().tabs - TTYR_TTY_MACRO_TILE(Tile_p)->current == i) {
-                Glyphs_p[cols-(i+j)].codepoint = 'p';
-                Glyphs_p[cols-(i+j)].Foreground = Active;
-                Glyphs_p[cols-(i+j+1)].codepoint = 'p';
-                Glyphs_p[cols-(i+j+1)].Foreground = Active;
+                Glyphs_p[cols-(i+j)].codepoint = 'z';
+                Glyphs_p[cols-(i+j+1)].codepoint = 'z';
             }
         }
     }
