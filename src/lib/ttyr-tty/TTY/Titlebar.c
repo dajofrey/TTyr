@@ -94,14 +94,8 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
 
     // Set titlebar color.
     for (int i = 0; i < cols ; ++i) {
-        Row_p->Glyphs_p[i].Foreground.Color.r = Config.Titlebar.Foreground.r;
-        Row_p->Glyphs_p[i].Foreground.Color.g = Config.Titlebar.Foreground.g;
-        Row_p->Glyphs_p[i].Foreground.Color.b = Config.Titlebar.Foreground.b;
-        Row_p->Glyphs_p[i].Foreground.custom = true;
-        Row_p->Glyphs_p[i].Background.Color.r = Config.Titlebar.Background.r;
-        Row_p->Glyphs_p[i].Background.Color.g = Config.Titlebar.Background.g;
-        Row_p->Glyphs_p[i].Background.Color.b = Config.Titlebar.Background.b;
-        Row_p->Glyphs_p[i].Background.custom = true;
+        Row_p->Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
+        Row_p->Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
     }
 
     for (int i = 1; ttyr_tty_getConfig().Topbar.on == 1 && i < (Config.windows+1) && i < cols ; ++i) {
