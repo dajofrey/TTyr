@@ -239,7 +239,7 @@ TTYR_TTY_RESULT ttyr_tty_forwardCursor(
     return TTYR_TTY_SUCCESS;
 }
 
-static TTYR_TTY_RESULT ttyr_tty_setContextMenus(
+static TTYR_TTY_RESULT ttyr_tty_setContextMenuBoxes(
     ttyr_tty_ContextMenu *Menu_p, nh_core_Array *Boxes_p)
 {
     if (!Menu_p->active || Menu_p->Items.size == 0) {return TTYR_TTY_SUCCESS;}
@@ -259,8 +259,22 @@ static TTYR_TTY_RESULT ttyr_tty_setContextMenus(
     Box_p->LowerRight.y = Menu_p->Position.y+Menu_p->Items.size;
 
     for (int i = 0; i < Menu_p->Items.size; ++i) {
-        ttyr_tty_setContextMenus(Menu_p->Items.pp[i], Boxes_p);
+        ttyr_tty_setContextMenuBoxes(Menu_p->Items.pp[i], Boxes_p);
     }
+
+    return TTYR_TTY_SUCCESS;
+}
+
+static TTYR_TTY_RESULT ttyr_tty_setBox(
+    ttyr_tty_Menu Menu, nh_core_Array *Boxes_p)
+{
+    ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
+
+    memset(Box_p, 0, sizeof(ttyr_terminal_Box));
+    Box_p->UpperLeft.x = Menu.Position.x-1;
+    Box_p->UpperLeft.y = Menu.Position.y;
+    Box_p->LowerRight.x = Menu.Position.x+Menu.width+1;
+    Box_p->LowerRight.y = Menu.Position.y+Menu.height;
 
     return TTYR_TTY_SUCCESS;
 }
@@ -308,10 +322,18 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
         }
     }
 
-    // Forward boxes: Context Menu.
+    // Forward boxes: Tab menu.
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
+    if (TTY_p->alt && TTY_p->ctrl) {
+        ttyr_tty_setBox(TTY_p->WindowSwitchMenu, Boxes_p);
+    }
+    if (TTY_p->alt2 && !TTY_p->ctrl) {
+        ttyr_tty_setBox(TTY_p->TabSwitchMenu, Boxes_p);
+    }
+
+    // Forward boxes: Context Menu.
     if (TTY_p->Window_p->MouseMenu_p) {
-        ttyr_tty_setContextMenus(TTY_p->Window_p->MouseMenu_p, Boxes_p);
+        ttyr_tty_setContextMenuBoxes(TTY_p->Window_p->MouseMenu_p, Boxes_p);
     }
 
     // Forward boxes: Inactive cursor outlines.

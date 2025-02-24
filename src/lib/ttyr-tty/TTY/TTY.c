@@ -119,7 +119,11 @@ static void *ttyr_tty_initTTY(
         &TTY_p->Events, 128, sizeof(nh_api_WSIEvent), NULL 
     ))
 
-    TTYR_CHECK_NULL_2(NULL, ttyr_tty_insertAndFocusWindow(TTY_p, 0))
+    ttyr_tty_Config Config = ttyr_tty_getConfig();
+//    for (int i = 0; i < Config.windows; i++) {
+        TTYR_CHECK_NULL_2(NULL, ttyr_tty_insertAndFocusWindow(TTY_p, 0))
+//    }
+//    TTY_p->Window_p = TTY_p->Windows.pp[0];
 
     if (Args_p->Interface_p == NULL) {
         Args_p->Interface_p = ttyr_tty_createShellInterface();

@@ -574,7 +574,6 @@ static TTYR_TTY_RESULT ttyr_tty_drawTopbarMessage(
         if (Program_p->Prototype_p->Callbacks.drawTopbar_f) {
             TTYR_CHECK(Program_p->Prototype_p->Callbacks.drawTopbar_f(Program_p, Glyphs_p, cols))
         } else {
-            ttyr_tty_Interface *Prototype_p = Program_p->Prototype_p;
             for (int i = 0; i < cols && Program_p->Prototype_p->name_p[i] != 0; ++i) {
                 Glyphs_p[i] = ttyr_tty_getGlyphHelper(Program_p->Prototype_p->name_p[i]);
             }
@@ -682,16 +681,16 @@ TTYR_TTY_RESULT ttyr_tty_drawTopbarRow(
         }
     }
 
-    if (Tile_p && ttyr_tty_getConfig().Topbar.on == false && ttyr_tty_getConfig().Titlebar.on == true) {
-        for (int i = 1, j = 1; i <= ttyr_tty_getConfig().tabs; ++i, j+=2) {
-            Glyphs_p[cols-(i+j)].codepoint = 'p';
-            Glyphs_p[cols-(i+j+1)].codepoint = 'p';
-            if (ttyr_tty_getConfig().tabs - TTYR_TTY_MACRO_TILE(Tile_p)->current == i) {
-                Glyphs_p[cols-(i+j)].codepoint = 'z';
-                Glyphs_p[cols-(i+j+1)].codepoint = 'z';
-            }
-        }
-    }
+//    if (Tile_p && ttyr_tty_getConfig().Topbar.on == false && ttyr_tty_getConfig().Titlebar.on == true) {
+//        for (int i = 1, j = 1; i <= ttyr_tty_getConfig().tabs; ++i, j+=2) {
+//            Glyphs_p[cols-(i+j)].codepoint = 'p';
+//            Glyphs_p[cols-(i+j+1)].codepoint = 'p';
+//            if (ttyr_tty_getConfig().tabs - TTYR_TTY_MACRO_TILE(Tile_p)->current == i) {
+//                Glyphs_p[cols-(i+j)].codepoint = 'z';
+//                Glyphs_p[cols-(i+j+1)].codepoint = 'z';
+//            }
+//        }
+//    }
 
     return TTYR_TTY_SUCCESS;
 }

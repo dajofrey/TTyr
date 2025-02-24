@@ -70,6 +70,7 @@
     typedef void *(*ttyr_tty_init_f)(void *arg_p);
     typedef TTYR_TTY_RESULT (*ttyr_tty_draw_f)(ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width, int height, int row);
     typedef TTYR_TTY_RESULT (*ttyr_tty_drawTopbar_f)(ttyr_tty_Program *Program_p, ttyr_tty_Glyph *Glyphs_p, int width);
+    typedef TTYR_TTY_RESULT (*ttyr_tty_getTitle_f)(ttyr_tty_Program *Program_p, NH_API_UTF32 *title_p, int length);
     typedef TTYR_TTY_RESULT (*ttyr_tty_getCursorPosition_f)(ttyr_tty_Program *Program_p, int *x_p, int *y_p);
     typedef TTYR_TTY_RESULT (*ttyr_tty_handleInput_f)(ttyr_tty_Program *Program_p, nh_api_WSIEvent Event);
     typedef TTYR_TTY_RESULT (*ttyr_tty_update_f)(ttyr_tty_Program *Program_p);
@@ -118,6 +119,7 @@
         ttyr_tty_init_f init_f;
         ttyr_tty_draw_f draw_f;
         ttyr_tty_drawTopbar_f drawTopbar_f;
+        ttyr_tty_getTitle_f getTitle_f;
         ttyr_tty_handleInput_f handleInput_f;
         ttyr_tty_getCursorPosition_f getCursorPosition_f;
         ttyr_tty_update_f update_f;

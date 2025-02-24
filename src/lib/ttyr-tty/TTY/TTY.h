@@ -10,6 +10,7 @@
  */
 
 #include "Macro.h"
+#include "Menu.h"
 #include "../Common/Includes.h"
 #include "../Common/Config.h"
 
@@ -54,13 +55,18 @@
         ttyr_tty_Titlebar Titlebar;
         ttyr_tty_MacroWindow *Window_p;
         ttyr_tty_Tile *InsertTile_p;
+        ttyr_tty_Menu WindowSwitchMenu;
+        ttyr_tty_Menu TabSwitchMenu;
         nh_core_List Views;
         nh_core_List Prototypes;
         nh_core_List Windows;
         bool alt;
+        bool alt2;
         bool ctrl;
         bool close;
+        bool ignoreNext;
         nh_api_KeyboardEvent LastEvent;
+        nh_core_SystemTime LastAlt;
         bool hasFocus;
         char namespace_p[255];
         nh_core_RingBuffer Events;

@@ -1082,6 +1082,29 @@ static TTYR_TTY_RESULT ttyr_tty_drawShellTopbar(
     return TTYR_TTY_SUCCESS;
 }
 
+static TTYR_TTY_RESULT ttyr_tty_getShellTitle(
+    ttyr_tty_Program *Program_p, NH_API_UTF32 *title_p, int length)
+{
+    ttyr_tty_Shell *Shell_p = Program_p->handle_p;
+
+    char topbar_p[1024];
+    memset(topbar_p, 0, 1024);
+
+    if (Shell_p->ST_p) {
+        char path_p[255] = {0};
+        sprintf(path_p, "/proc/%ld/cwd", Shell_p->ST_p->pid);
+
+        char buf_p[1024] = {0};
+        readlink(path_p, buf_p, 1024);
+
+        for (int i = 0; i < strlen(buf_p); ++i) {
+            title_p[i] = buf_p[i];
+        }
+    }
+
+    return TTYR_TTY_SUCCESS;
+}
+
 // COMMANDS ========================================================================================
 
 typedef enum TTYR_TTY_SHELL_COMMAND_E {
@@ -1158,6 +1181,7 @@ ttyr_tty_Interface *ttyr_tty_createShellInterface()
     Prototype_p->Callbacks.init_f = ttyr_tty_initShell;
     Prototype_p->Callbacks.draw_f = ttyr_tty_drawShellRow;
     Prototype_p->Callbacks.drawTopbar_f = ttyr_tty_drawShellTopbar;
+    Prototype_p->Callbacks.getTitle_f = ttyr_tty_getShellTitle;
     Prototype_p->Callbacks.handleInput_f = ttyr_tty_handleShellInput;
     Prototype_p->Callbacks.handleCommand_f = ttyr_tty_handleShellCommand;
     Prototype_p->Callbacks.getCursorPosition_f = ttyr_tty_getShellCursor;

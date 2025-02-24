@@ -103,6 +103,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
 
     // If necessary, Add program prototype instance to all current tiles.
     nh_core_List Tiles = ttyr_tty_getTiles(TTY_p->Window_p->RootTile_p);
+    ttyr_tty_Config Config = ttyr_tty_getConfig();
     for (int i = 0; i < Tiles.size; ++i) {
         ttyr_tty_Tile *Tile_p = Tiles.pp[i];
         bool add = true;
@@ -115,7 +116,7 @@ TTYR_TTY_RESULT ttyr_tty_addProgram(
             }
         }
         if (!add) {continue;}
-        for (int j = 0; j < 9; ++j) {
+        for (int j = 0; j < Config.tabs; ++j) {
             TTYR_CHECK(ttyr_tty_appendMicroTab(
                 &TTYR_TTY_MACRO_TAB_2(Tile_p, j)->MicroWindow, TTY_p->Prototypes.pp[TTY_p->Prototypes.size - 1], once
             ))

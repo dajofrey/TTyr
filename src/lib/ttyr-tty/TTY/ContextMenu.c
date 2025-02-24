@@ -754,4 +754,3 @@ TTYR_TTY_RESULT ttyr_tty_drawContextMenuRecursively(
 
     return TTYR_TTY_SUCCESS;
 }
-

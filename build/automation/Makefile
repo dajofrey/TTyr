@@ -32,6 +32,7 @@ SRC_FILES_TTYR_TTY = \
     TTY/View.c \
     TTY/Micro.c \
     TTY/ContextMenu.c \
+    TTY/Menu.c \
     Editor/TreeListing.c \
     Editor/Editor.c \
     Editor/FileEditor.c \

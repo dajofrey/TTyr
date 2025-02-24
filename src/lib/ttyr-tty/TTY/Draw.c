@@ -20,6 +20,7 @@
 #include "Topbar.h"
 #include "View.h"
 #include "Program.h"
+#include "Menu.h"
 
 #include "../Common/Macros.h"
 
@@ -331,6 +332,13 @@ TTYR_TTY_RESULT ttyr_tty_refreshGrid2(
         memset(View_p->Grid2_p[row].Glyphs_p, 0, sizeof(ttyr_tty_Glyph)*View_p->cols);
     }
  
+    if (TTY_p->alt && TTY_p->ctrl) {
+        TTYR_CHECK(ttyr_tty_drawWindowSwitchMenu(View_p->Grid2_p))
+    }
+    if (TTY_p->alt2 && !TTY_p->ctrl) {
+        TTYR_CHECK(ttyr_tty_drawTabSwitchMenu(View_p->Grid2_p))
+    }
+
     TTYR_CHECK(ttyr_tty_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
     TTYR_CHECK(ttyr_tty_forwardGrid2(View_p))
 

@@ -106,16 +106,16 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         }
     }
 
-    for (int i = 1, j = 1; ttyr_tty_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=3) {
-        for (int k = j; k < j+2; ++k) {
-            Row_p->Glyphs_p[k].codepoint = 'f';
-            Row_p->Glyphs_p[k].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
-            Row_p->update_p[k] = true;
-            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
-                Row_p->Glyphs_p[k].codepoint = 'o';
-            }
-        }
-    }
+//    for (int i = 1, j = 1; ttyr_tty_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=3) {
+//        for (int k = j; k < j+2; ++k) {
+//            Row_p->Glyphs_p[k].codepoint = 'f';
+//            Row_p->Glyphs_p[k].mark |= TTYR_TTY_MARK_LINE_GRAPHICS;
+//            Row_p->update_p[k] = true;
+//            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
+//                Row_p->Glyphs_p[k].codepoint = 'o';
+//            }
+//        }
+//    }
 
 //    Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
 //

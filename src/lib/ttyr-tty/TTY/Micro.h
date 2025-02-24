@@ -27,8 +27,8 @@
 
     typedef struct ttyr_tty_MicroTab {
         ttyr_tty_Interface *Prototype_p; /**<Type of programs spawned by this micro tab.*/
-        ttyr_tty_Tile *RootTile_p;              /**<Root tile.*/
-        ttyr_tty_Tile *Tile_p;                  /**<Current focused tile.*/
+        ttyr_tty_Tile *RootTile_p;       /**<Root tile.*/
+        ttyr_tty_Tile *Tile_p;           /**<Current focused tile.*/
         ttyr_tty_Tile *LastFocus_p;
     } ttyr_tty_MicroTab;
 

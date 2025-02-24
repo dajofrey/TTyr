@@ -460,7 +460,8 @@ static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
             if (Parent_p->type == TTYR_TTY_TILE_TYPE_MACRO) {
                 if (Parent_p->Children.count == 0) {
                     nh_core_List *List_pp[9] = {};
-                    for (int i = 0; i < 9; ++i) {
+                    ttyr_tty_Config Config = ttyr_tty_getConfig();
+                    for (int i = 0; i < Config.tabs; ++i) {
                         List_pp[i] = TTYR_TTY_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
                     }
                     TTY_p->InsertTile_p     = ttyr_tty_createMacroTile(Parent_p, NULL, 0);
@@ -487,7 +488,8 @@ static TTYR_TTY_RESULT ttyr_tty_insertEmptyTile(
             if (Parent_p->type == TTYR_TTY_TILE_TYPE_MACRO) {
                 if (Parent_p->Children.count == 0) {
                     nh_core_List *List_pp[9] = {};
-                    for (int i = 0; i < 9; ++i) {
+                    ttyr_tty_Config Config = ttyr_tty_getConfig();
+                    for (int i = 0; i < Config.tabs; ++i) {
                         List_pp[i] = TTYR_TTY_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
                     }
                     TTY_p->Window_p->Tile_p = ttyr_tty_createMacroTile(Parent_p, List_pp, 0);
@@ -596,7 +598,8 @@ static TTYR_TTY_RESULT ttyr_tty_handlePotentialMacroTileInsertion(
     if (c == 13) 
     {
         // Insert data into new macro tile.
-        for (int i = 0; i < 9; ++i) {
+        ttyr_tty_Config Config = ttyr_tty_getConfig();
+        for (int i = 0; i < Config.tabs; ++i) {
             TTYR_TTY_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.Tabs_p = ttyr_tty_createMicroTabs(TTY_p);
             TTYR_TTY_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.current = 0; 
         }

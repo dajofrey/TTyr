@@ -13,6 +13,7 @@
 #include "Topbar.h"
 #include "Micro.h"
 #include "ContextMenu.h"
+#include "Menu.h"
 
 #include "../Common/Includes.h"
 
