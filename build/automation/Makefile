@@ -140,6 +140,8 @@ INSTALL_DIR = /usr/local/bin
 install: $(BIN_TTYR)
 	install -m 755 $(BIN_TTYR) $(INSTALL_DIR)
 	cp build/data/desktop/ttyr.desktop /usr/share/applications/ttyr.desktop
+	mkdir -p /usr/share/ttyr/icons
+	cp build/data/icons/ttyr.png /usr/share/ttyr/icons
 
 # Clean rule
 clean:

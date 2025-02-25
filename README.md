@@ -1,5 +1,9 @@
+<p align="center">
+ <img src="./build/data/icons/128x128.png"/>
+</p>
+
 # TTýr
- 
+
 Terminal Emulator Written In C99.
 
 ![screenshot](./build/data/image/screenshot.png)
