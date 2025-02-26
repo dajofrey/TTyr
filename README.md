@@ -4,22 +4,24 @@
 
 # TTýr
 
-Terminal Emulator Written In C99.
+Terminal Emulator for conquering the command line.
 
 ![screenshot](./build/data/image/screenshot.png)
 
-What makes TTýr different?
-
- - Minimalistic Design
- - Hybrid Tabing/Tiling
- - GPU Acceleration
- - API
-
 ## Contents
   
+ - [Keypoints](#Keypoints)
  - [Compatibilities](#Compatibilities)
  - [Dependencies](#Dependencies)
  - [Build](#Build)
+
+## Keypoints 
+
+ - Written in C99
+ - Minimal, Flat UI
+ - Hybrid Tabing/Tiling
+ - GPU Acceleration
+ - Cross-Platform with API
 
 ## Compatibilities
 
