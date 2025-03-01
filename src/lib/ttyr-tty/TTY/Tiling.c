@@ -573,15 +573,15 @@ static TTYR_TTY_RESULT ttyr_tty_updateTilingMessages(
 {
     if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MACRO) {
         if (Window_p->Tile_p->Parent_p == NULL) {
-            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASD))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_MACRO_TILING_WASD))
         } else {
-            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASDF))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_MACRO_TILING_WASDF))
         }
     } else if (Window_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
         if (TTYR_TTY_MICRO_TAB(TTYR_TTY_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
-            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASD))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_MICRO_TILING_WASD))
         } else {
-            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_TILING_WASDF))
+            TTYR_CHECK(ttyr_tty_setDefaultMessage(&TTYR_TTY_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_TTY_MESSAGE_MICRO_TILING_WASDF))
         }
     }
 
@@ -767,4 +767,3 @@ TTYR_TTY_RESULT ttyr_tty_handleTilingInput(
 
     return TTYR_TTY_SUCCESS;
 }
-

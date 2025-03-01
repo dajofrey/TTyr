@@ -325,9 +325,6 @@ TTYR_TTY_RESULT ttyr_tty_forwardGrid1(
     // Forward boxes: Tab menu.
     ttyr_tty_TTY *TTY_p = nh_core_getWorkloadArg();
     if (TTY_p->alt && TTY_p->ctrl) {
-        ttyr_tty_setBox(TTY_p->WindowSwitchMenu, Boxes_p);
-    }
-    if (TTY_p->alt2 && !TTY_p->ctrl) {
         ttyr_tty_setBox(TTY_p->TabSwitchMenu, Boxes_p);
     }
 

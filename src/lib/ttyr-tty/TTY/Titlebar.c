@@ -116,8 +116,6 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
 //            }
 //        }
 //    }
-
-//    Row_p->Glyphs_p[cols-2].codepoint = 0x25cb;
 //
 //    for (int i = 1; i < cols ; ++i) {
 //        Row_p->update_p[i] = 1;

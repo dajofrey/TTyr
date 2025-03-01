@@ -148,6 +148,7 @@ static TTYR_TTY_RESULT ttyr_tty_drawMicroTile(
 static TTYR_TTY_RESULT ttyr_tty_drawMacroTile(
     ttyr_tty_Tile *Tile_p, ttyr_tty_View *View_p, int row)
 {
+
     // Get relative row with 0 being the first row of the tile.
     row = row - Tile_p->rowPosition;
 
@@ -333,9 +334,6 @@ TTYR_TTY_RESULT ttyr_tty_refreshGrid2(
     }
  
     if (TTY_p->alt && TTY_p->ctrl) {
-        TTYR_CHECK(ttyr_tty_drawWindowSwitchMenu(View_p->Grid2_p))
-    }
-    if (TTY_p->alt2 && !TTY_p->ctrl) {
         TTYR_CHECK(ttyr_tty_drawTabSwitchMenu(View_p->Grid2_p))
     }
 

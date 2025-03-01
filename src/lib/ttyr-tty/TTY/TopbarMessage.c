@@ -24,8 +24,10 @@
 
 NH_API_UTF32 TTYR_TTY_MESSAGE_EN_TILING_FOCUS_P[] = {93, 32, 102, 111, 99, 117, 115, 32, 116, 105, 108, 101};
 NH_API_UTF32 TTYR_TTY_MESSAGE_EN_TILING_INSERT_P[] = {'[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'm', 'o', 'v', 'e', ' ', '[', 'e', 'n', 't', 'e', 'r', ']', ' ', 'i', 'n', 's', 'e', 'r', 't'};
-NH_API_UTF32 TTYR_TTY_MESSAGE_EN_TILING_WASD_P[] = {'[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'a', 'd', 'd'};
-NH_API_UTF32 TTYR_TTY_MESSAGE_EN_TILING_WASDF_P[] = {'[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'a', 'd', 'd', ' ', '[', 'f', ']', ' ', 's', 'p', 'l', 'i', 't'};
+NH_API_UTF32 TTYR_TTY_MESSAGE_EN_MICRO_TILING_WASD_P[] = {'(', 'm', 'i', 'c', 'r', 'o', ')', ' ', '[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'a', 'd', 'd'};
+NH_API_UTF32 TTYR_TTY_MESSAGE_EN_MICRO_TILING_WASDF_P[] = {'(', 'm', 'i', 'c', 'r', 'o', ')', ' ', '[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'a', 'd', 'd', ' ', '[', 'f', ']', ' ', 's', 'p', 'l', 'i', 't'};
+NH_API_UTF32 TTYR_TTY_MESSAGE_EN_MACRO_TILING_WASD_P[] = {'(', 'm', 'a', 'c', 'r', 'o', ')', ' ', '[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'a', 'd', 'd'};
+NH_API_UTF32 TTYR_TTY_MESSAGE_EN_MACRO_TILING_WASDF_P[] = {'(', 'm', 'a', 'c', 'r', 'o', ')', ' ', '[', 'w', ']', '[', 'a', ']', '[', 's', ']', '[', 'd', ']', ' ', 'a', 'd', 'd', ' ', '[', 'f', ']', ' ', 's', 'p', 'l', 'i', 't'};
 NH_API_UTF32 TTYR_TTY_MESSAGE_EN_TILING_FOCUS_SWITCHED_P[] = {70, 111, 99, 117, 115, 32, 115, 119, 105, 116, 99, 104, 101, 100, 32, 116, 111, 32, 116, 104, 105, 115, 32, 116, 105, 108, 101};
 NH_API_UTF32 TTYR_TTY_MESSAGE_EN_TILING_ALREADY_FOCUSED_P[] = {84, 105, 108, 101, 32, 105, 115, 32, 97, 108, 114, 101, 97, 100, 121, 32, 102, 111, 99, 117, 115, 101, 100};
 
@@ -76,13 +78,21 @@ NH_API_UTF32 *ttyr_tty_getMessage(
             message_p = TTYR_TTY_MESSAGE_EN_TILING_INSERT_P;
             *length_p = sizeof(TTYR_TTY_MESSAGE_EN_TILING_INSERT_P)/sizeof(NH_API_UTF32);
             break;
-        case TTYR_TTY_MESSAGE_TILING_WASD  :
-            message_p = TTYR_TTY_MESSAGE_EN_TILING_WASD_P;
-            *length_p = sizeof(TTYR_TTY_MESSAGE_EN_TILING_WASD_P)/sizeof(NH_API_UTF32);
+        case TTYR_TTY_MESSAGE_MICRO_TILING_WASD  :
+            message_p = TTYR_TTY_MESSAGE_EN_MICRO_TILING_WASD_P;
+            *length_p = sizeof(TTYR_TTY_MESSAGE_EN_MICRO_TILING_WASD_P)/sizeof(NH_API_UTF32);
             break;
-        case TTYR_TTY_MESSAGE_TILING_WASDF :
-            message_p = TTYR_TTY_MESSAGE_EN_TILING_WASDF_P;
-            *length_p = sizeof(TTYR_TTY_MESSAGE_EN_TILING_WASDF_P)/sizeof(NH_API_UTF32);
+        case TTYR_TTY_MESSAGE_MICRO_TILING_WASDF :
+            message_p = TTYR_TTY_MESSAGE_EN_MICRO_TILING_WASDF_P;
+            *length_p = sizeof(TTYR_TTY_MESSAGE_EN_MICRO_TILING_WASDF_P)/sizeof(NH_API_UTF32);
+            break;
+        case TTYR_TTY_MESSAGE_MACRO_TILING_WASD  :
+            message_p = TTYR_TTY_MESSAGE_EN_MACRO_TILING_WASD_P;
+            *length_p = sizeof(TTYR_TTY_MESSAGE_EN_MACRO_TILING_WASD_P)/sizeof(NH_API_UTF32);
+            break;
+        case TTYR_TTY_MESSAGE_MACRO_TILING_WASDF :
+            message_p = TTYR_TTY_MESSAGE_EN_MACRO_TILING_WASDF_P;
+            *length_p = sizeof(TTYR_TTY_MESSAGE_EN_MACRO_TILING_WASDF_P)/sizeof(NH_API_UTF32);
             break;
         case TTYR_TTY_MESSAGE_TILING_FOCUS_SWITCHED : 
             message_p = TTYR_TTY_MESSAGE_EN_TILING_FOCUS_SWITCHED_P;
