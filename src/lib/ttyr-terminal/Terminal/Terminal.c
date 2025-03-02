@@ -34,7 +34,7 @@
 // The next functions comprise the in/exit points of nhterminal.
 
 typedef struct ttyr_terminal_Args {
-    ttyr_tty_TTY *TTY_p;
+    ttyr_core_TTY *TTY_p;
     char *namespace_p;
 } ttyr_terminal_Args;
 
@@ -56,7 +56,7 @@ static void *ttyr_terminal_initTerminal(
     Terminal_p->ctrl = false;
     Terminal_p->leftMouse = false;
     Terminal_p->TTY_p = ((ttyr_terminal_Args*)Workload_p->args_p)->TTY_p;
-    Terminal_p->View_p = ttyr_tty_createView(Terminal_p->TTY_p, Terminal_p, false);
+    Terminal_p->View_p = ttyr_core_createView(Terminal_p->TTY_p, Terminal_p, false);
     TTYR_TERMINAL_CHECK_MEM_2(NULL, Terminal_p->View_p)
 
     if (((ttyr_terminal_Args*)Workload_p->args_p)->namespace_p) {
@@ -242,7 +242,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_handleInputIfRequired(
             if (Update_p->cursor) {
                 TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(
                     &Terminal_p->Grid, &Terminal_p->Graphics.State, Update_p, update_p))
-            } else if (Update_p->Glyph.mark & TTYR_TTY_MARK_ELEVATED) {
+            } else if (Update_p->Glyph.mark & TTYR_CORE_MARK_ELEVATED) {
                 Terminal_p->Grid2.Updates_pp[Update_p->row][Update_p->col] = *Update_p;
                 Terminal_p->Grid2.updates_pp[Update_p->row][Update_p->col] = true;
             } else {
@@ -360,7 +360,7 @@ static NH_SIGNAL ttyr_terminal_runTerminalCommand(
 // The next functions are called by lib/netzhaut/nhterminal.h functions.
 
 ttyr_terminal_Terminal *ttyr_terminal_openTerminal(
-    char *namespace_p, ttyr_tty_TTY *TTY_p)
+    char *namespace_p, ttyr_core_TTY *TTY_p)
 {
     ttyr_terminal_Args Args;
     Args.TTY_p = TTY_p;

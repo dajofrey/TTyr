@@ -132,10 +132,10 @@ ttyr_terminal_Tile *ttyr_terminal_getTile(
 }
 
 bool ttyr_terminal_compareBackgroundAttributes(
-    ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p)
+    ttyr_core_Glyph *Glyph1_p, ttyr_core_Glyph *Glyph2_p)
 {
     // Compare attributes.
-    if ((Glyph1_p->mark & TTYR_TTY_MARK_ACCENT) != (Glyph2_p->mark & TTYR_TTY_MARK_ACCENT)) {
+    if ((Glyph1_p->mark & TTYR_CORE_MARK_ACCENT) != (Glyph2_p->mark & TTYR_CORE_MARK_ACCENT)) {
         return true;
     }
 
@@ -164,9 +164,9 @@ bool ttyr_terminal_compareBackgroundAttributes(
 }
 
 bool ttyr_terminal_compareForegroundAttributes(
-    ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p)
+    ttyr_core_Glyph *Glyph1_p, ttyr_core_Glyph *Glyph2_p)
 {
-    if ((Glyph1_p->mark & TTYR_TTY_MARK_ACCENT) != (Glyph2_p->mark & TTYR_TTY_MARK_ACCENT)) {
+    if ((Glyph1_p->mark & TTYR_CORE_MARK_ACCENT) != (Glyph2_p->mark & TTYR_CORE_MARK_ACCENT)) {
         return true;
     }
 
@@ -221,7 +221,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateCursorTile(
     // Set new cursor.
     Grid_p->Cursor_p = Tile_p;
     Grid_p->Cursor_p->Glyph.Attributes.blink = true;
-    Grid_p->Cursor_p->Glyph.mark |= TTYR_TTY_MARK_ACCENT;
+    Grid_p->Cursor_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
     Grid_p->Cursor_p->dirty = true;
 
     // Trigger blink at move.
@@ -237,7 +237,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateCursorTile(
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateTileVertices(
-    ttyr_tty_Glyph *Glyph_p, ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, int col,
+    ttyr_core_Glyph *Glyph_p, ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, int col,
     int row, ttyr_terminal_Tile *Tile_p, bool foreground)
 {
     if (foreground) {
@@ -284,21 +284,21 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(
     if (Tile_p->dirty) {
         if (Tile_p == Grid_p->Cursor_p) {
             bool blink = Grid_p->Cursor_p->Glyph.Attributes.blink;
-            memcpy(&Tile_p->Glyph, &Update_p->Glyph, sizeof(ttyr_tty_Glyph));
+            memcpy(&Tile_p->Glyph, &Update_p->Glyph, sizeof(ttyr_core_Glyph));
             Tile_p->Glyph.Attributes.blink = blink;
         } else {
             // This may overwrite the cursor tile, which could cause the blink attribute to disappear.
             // Which is why we need the if above.
-            memcpy(&Tile_p->Glyph, &Update_p->Glyph, sizeof(ttyr_tty_Glyph));
+            memcpy(&Tile_p->Glyph, &Update_p->Glyph, sizeof(ttyr_core_Glyph));
         }
         if (update_p) {*update_p = true;}
     }
 
     // Update or reset right gap tile if necessary.
     if (Update_p->col == Grid_p->cols-2) {
-        if (Update_p->Glyph.mark & TTYR_TTY_MARK_LINE_HORIZONTAL) {
+        if (Update_p->Glyph.mark & TTYR_CORE_MARK_LINE_HORIZONTAL) {
             Update_p->col++;
-            if (!(Update_p->Glyph.mark & TTYR_TTY_MARK_LINE_GRAPHICS)) {
+            if (!(Update_p->Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS)) {
                 Update_p->Glyph.codepoint = ' ';
             }
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(Grid_p, state_p, Update_p, update_p))
@@ -314,7 +314,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(
     }
     // Update or reset bottom gap tile if necessary.
     if (Update_p->row == Grid_p->rows-2) {
-        if (Update_p->Glyph.mark & TTYR_TTY_MARK_LINE_VERTICAL) {
+        if (Update_p->Glyph.mark & TTYR_CORE_MARK_LINE_VERTICAL) {
             Update_p->row++;
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(Grid_p, state_p, Update_p, update_p))
         } else if (Update_p->col == 0 && (Update_p->Glyph.codepoint == 0 || Update_p->Glyph.codepoint == ' ')) {
@@ -322,7 +322,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(Grid_p, state_p, Update_p, update_p))
         } else {
             Update_p->row++;
-            memset(&Update_p->Glyph, 0, sizeof(ttyr_tty_Glyph));
+            memset(&Update_p->Glyph, 0, sizeof(ttyr_core_Glyph));
             TTYR_TERMINAL_CHECK(ttyr_terminal_updateTile(Grid_p, state_p, Update_p, update_p))
         }
     }

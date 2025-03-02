@@ -29,7 +29,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBackground(
     int offset = 0;
     for (int i = 0; i < Data_p->Background.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Background.Ranges.p)+i;
-        ttyr_tty_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, false);
+        ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, false);
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
             nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
@@ -62,7 +62,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
     int offset = 0;
     for (int i = 0; i < Data_p->Foreground.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges.p)+i;
-        ttyr_tty_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
+        ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
             nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
@@ -78,7 +78,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
     offset = 0;
     for (int i = 0; i < Data_p->Foreground.Ranges2.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges2.p)+i;
-        ttyr_tty_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
+        ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor2_p->Result, 
             nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 

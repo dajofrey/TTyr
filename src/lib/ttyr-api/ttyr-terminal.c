@@ -16,7 +16,7 @@
 // TYPEDEFS ========================================================================================
 
 typedef ttyr_terminal_Terminal *(*ttyr_terminal_openTerminal_f)( 
-    char *config_p, ttyr_tty_TTY *TTY_p 
+    char *config_p, ttyr_core_TTY *TTY_p 
 ); 
 
 typedef TTYR_TERMINAL_RESULT (*ttyr_terminal_cmd_setViewport_f)( 
@@ -29,7 +29,7 @@ static bool added = false;
 static const char name_p[] = "ttyr-terminal";
 static const char *dependencies_pp[16] = {
     "nh-gfx",
-    "ttyr-tty",
+    "ttyr-core",
 };
 
 static bool ttyr_api_add() {
@@ -45,7 +45,7 @@ static bool ttyr_api_add() {
 }
 
 ttyr_terminal_Terminal *ttyr_api_openTerminal(
-    char *config_p, ttyr_tty_TTY *TTY_p)
+    char *config_p, ttyr_core_TTY *TTY_p)
 {
     if (!ttyr_api_add()) {return NULL;}
     nh_core_Loader *Loader_p = nh_api_getLoader();

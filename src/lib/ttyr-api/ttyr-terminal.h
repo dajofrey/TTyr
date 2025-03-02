@@ -9,7 +9,7 @@
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
 
-#include "ttyr-tty.h"
+#include "ttyr-core.h"
 #include <stdbool.h>
 
 #endif
@@ -65,7 +65,7 @@
      * @return NULL on failure. A pointer to a newly created terminal on success.
      */
     ttyr_terminal_Terminal *ttyr_api_openTerminal(
-        char *config_p, ttyr_tty_TTY *TTY_p
+        char *config_p, ttyr_core_TTY *TTY_p
     );
 
     /**

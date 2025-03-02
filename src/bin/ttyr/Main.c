@@ -26,7 +26,7 @@ typedef struct Arguments {
 static Arguments Args;
 static nh_api_PixelPosition Position = {0};
 static nh_api_Viewport *Viewport_p = NULL;
-static ttyr_tty_TTY *TTY_p = NULL;
+static ttyr_core_TTY *TTY_p = NULL;
 
 // HELPER ==========================================================================================
 

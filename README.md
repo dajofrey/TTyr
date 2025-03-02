@@ -16,6 +16,7 @@ Written in C99 | Noiseless UI | Hybrid Tabing/Tiling | GPU Acceleration | Cross-
  - [Dependencies](#Dependencies)
  - [Build](#Build)
  - [Design](#Design)
+ - [Development](#Development)
 
 ## Compatibilities
 
@@ -91,3 +92,6 @@ Each newly opened Macro-Window
 
 #### Note 
 The hybrid approach makes it necessary to have seperate controls for macro-tabing/micro-tabing and macro-tiling/micro-tiling.
+
+## Development
+If you want to contribute, please run `./scripts/setup-git.sh` which installs a prepare-commit-msg hook for versioning.

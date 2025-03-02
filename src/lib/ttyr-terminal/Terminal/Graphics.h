@@ -26,7 +26,7 @@
  */
 
     typedef struct ttyr_terminal_AttributeRange {
-        ttyr_tty_Glyph Glyph;
+        ttyr_core_Glyph Glyph;
         int indices;
     } ttyr_terminal_AttributeRange;
 
@@ -68,7 +68,7 @@
     } ttyr_terminal_GraphicsBoxes;
  
     typedef struct ttyr_terminal_GraphicsGradient {
-        ttyr_tty_Color Color;
+        ttyr_core_Color Color;
         float ratio;
         int index;
         double interval;
@@ -133,8 +133,8 @@
         ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p
     );
 
-    ttyr_tty_Color ttyr_terminal_getGlyphColor(
-        ttyr_terminal_GraphicsState *State_p, ttyr_tty_Glyph *Glyph_p, bool foreground
+    ttyr_core_Color ttyr_terminal_getGlyphColor(
+        ttyr_terminal_GraphicsState *State_p, ttyr_core_Glyph *Glyph_p, bool foreground
     );
 
     bool ttyr_terminal_updateBlinkOrGradient(

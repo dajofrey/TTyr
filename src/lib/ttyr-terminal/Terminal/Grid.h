@@ -29,7 +29,7 @@
     } ttyr_terminal_Box;
 
     typedef struct ttyr_terminal_TileUpdate {
-        ttyr_tty_Glyph Glyph;
+        ttyr_core_Glyph Glyph;
         int row;
         int col;
         bool cursor;
@@ -46,7 +46,7 @@
     typedef struct ttyr_terminal_Tile {
         ttyr_terminal_TileForeground Foreground;
         ttyr_terminal_TileBackground Background;
-        ttyr_tty_Glyph Glyph;
+        ttyr_core_Glyph Glyph;
         bool dirty;
     } ttyr_terminal_Tile;
 
@@ -85,11 +85,11 @@
     );
 
     bool ttyr_terminal_compareBackgroundAttributes(
-        ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p
+        ttyr_core_Glyph *Glyph1_p, ttyr_core_Glyph *Glyph2_p
     );
     
     bool ttyr_terminal_compareForegroundAttributes(
-        ttyr_tty_Glyph *Glyph1_p, ttyr_tty_Glyph *Glyph2_p
+        ttyr_core_Glyph *Glyph1_p, ttyr_core_Glyph *Glyph2_p
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(

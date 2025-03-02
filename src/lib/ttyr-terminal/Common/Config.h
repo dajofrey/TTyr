@@ -37,9 +37,9 @@
     typedef struct ttyr_terminal_Config {
         int fontSize;
         float blinkFrequency;
-        ttyr_tty_Color Foreground;
-        ttyr_tty_Color Background;
-        ttyr_tty_Color Accents_p[8];
+        ttyr_core_Color Foreground;
+        ttyr_core_Color Background;
+        ttyr_core_Color Accents_p[8];
         int accents;
         int border;
     } ttyr_terminal_Config;

@@ -34,7 +34,7 @@
 // FUNCTIONS =======================================================================================
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Glyph_p, int col, 
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col, 
     int row, float vertices_p[12])
 {
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
@@ -44,7 +44,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
         State_p->Fonts.pp[State_p->font], Config.fontSize
     );
 
-    float depth = Glyph_p->mark & TTYR_TTY_MARK_ELEVATED ? 0.15f : 0.5f;
+    float depth = Glyph_p->mark & TTYR_CORE_MARK_ELEVATED ? 0.15f : 0.5f;
     int pixel = row * Grid_p->TileSize.height;
 
     float x = (float)((float)(col * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
@@ -504,7 +504,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
             x4 = x2;
             break;
  
-        case 'v' : 
+        case 'v' : // inverse T 
             // First rectangle.
             y1 = (y + (height/2)) - h/2;
             y2 = (y + (height/2)) + h/2;
@@ -616,12 +616,12 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVertices(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Glyph_p, int col,
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col,
     int row, float *vertices_p)
 {
-    float depth = Glyph_p->mark & TTYR_TTY_MARK_ELEVATED ? 0.1f : 0.2f;
+    float depth = Glyph_p->mark & TTYR_CORE_MARK_ELEVATED ? 0.1f : 0.2f;
 
-    if (Glyph_p->mark & TTYR_TTY_MARK_LINE_GRAPHICS) {
+    if (Glyph_p->mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
         TTYR_TERMINAL_CHECK(ttyr_terminal_getForegroundVerticesForLineGraphics(
             State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p
         ))

@@ -19,7 +19,7 @@
  */
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
-        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Glyph_p, int col, 
+        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col, 
         int row, float vertices_p[12]
     );
 
@@ -32,7 +32,7 @@
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVertices(
-        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Glyph_p, int col, 
+        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col, 
         int row, float *vertices_p
     );
 

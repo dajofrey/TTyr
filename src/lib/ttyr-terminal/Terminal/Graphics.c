@@ -56,17 +56,17 @@ static ttyr_terminal_GraphicsAction ttyr_terminal_initGraphicsAction()
     return Action;
 }
 
-static ttyr_tty_Color ttyr_terminal_getGradientColor(
+static ttyr_core_Color ttyr_terminal_getGradientColor(
     ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsGradient *Gradient_p)
 {
     if (Config_p->accents == 1) {
         return Config_p->Accents_p[0];
     }
 
-    ttyr_tty_Color Color1 = Config_p->Accents_p[Gradient_p->index];
-    ttyr_tty_Color Color2 = Gradient_p->index == Config_p->accents-1 ? Config_p->Accents_p[0] : Config_p->Accents_p[Gradient_p->index+1];
+    ttyr_core_Color Color1 = Config_p->Accents_p[Gradient_p->index];
+    ttyr_core_Color Color2 = Gradient_p->index == Config_p->accents-1 ? Config_p->Accents_p[0] : Config_p->Accents_p[Gradient_p->index+1];
 
-    ttyr_tty_Color Result;
+    ttyr_core_Color Result;
     Result.r = Color1.r + Gradient_p->ratio * (Color2.r - Color1.r);
     Result.g = Color1.g + Gradient_p->ratio * (Color2.g - Color1.g);
     Result.b = Color1.b + Gradient_p->ratio * (Color2.b - Color1.b);
@@ -180,14 +180,14 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphics(
 // RANGES ==========================================================================================
 
 static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
-    ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Current_p, int *col_p, int *row_p)
+    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p)
 {
     int total = 0;
 
     for (int row = *row_p; row < Grid_p->rows; ++row) {
         for (int col = *col_p; col < Grid_p->cols; ++col) {
-            ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
-            if (!(Glyph.mark & TTYR_TTY_MARK_LINE_GRAPHICS)) {
+            ttyr_core_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
+            if (!(Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS)) {
                 continue;
             }
             if (ttyr_terminal_compareForegroundAttributes(Current_p, &Glyph)) {
@@ -208,14 +208,14 @@ static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
 }
 
 static int ttyr_terminal_getCurrentAttributeRange(
-    ttyr_terminal_Grid *Grid_p, ttyr_tty_Glyph *Current_p, int *col_p, int *row_p, bool foreground)
+    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p, bool foreground)
 {
     int total = 0;
 
     for (int row = *row_p; row < Grid_p->rows; ++row) {
         for (int col = *col_p; col < Grid_p->cols; ++col) {
-            ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
-            if (foreground && (!Glyph.codepoint || Glyph.codepoint == ' ' || Glyph.mark & TTYR_TTY_MARK_LINE_GRAPHICS)) {
+            ttyr_core_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
+            if (foreground && (!Glyph.codepoint || Glyph.codepoint == ' ' || Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS)) {
                 continue;
             }
             if (!foreground && (!Glyph.Background.custom && !Glyph.Attributes.reverse && !Glyph.Attributes.blink)) {
@@ -253,12 +253,12 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRangeForLineGraphics(
     int row = 0;
     int col = 0;
 
-    ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
+    ttyr_core_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
     bool begin = true;
 
     while (true)
     {
-        ttyr_tty_Glyph NextGlyph = Glyph;
+        ttyr_core_Glyph NextGlyph = Glyph;
         total = ttyr_terminal_getCurrentAttributeRangeForLineGraphics(Grid_p, &NextGlyph, &col, &row) * 12;
         if (!total && !begin) {break;}
         begin = false;
@@ -293,13 +293,13 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
     int row = 0;
     int col = 0;
 
-    ttyr_tty_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
+    ttyr_core_Glyph Glyph = ((ttyr_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[0])->pp[0])->Glyph;
     bool begin = true;
 
     // Default Foreground/Background.
     while (true)
     {
-        ttyr_tty_Glyph NextGlyph = Glyph;
+        ttyr_core_Glyph NextGlyph = Glyph;
         total = ttyr_terminal_getCurrentAttributeRange(Grid_p, &NextGlyph, &col, &row, foreground) * 6;
         if (!total && !begin) {break;}
         begin = false;
@@ -341,7 +341,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateForegroundData(
             ttyr_terminal_Tile *Tile_p = Row_p->pp[j];
             if (!Tile_p || !Tile_p->Glyph.codepoint || Tile_p->Glyph.codepoint == ' ') {continue;}
 
-            if (Tile_p->Glyph.mark & TTYR_TTY_MARK_LINE_GRAPHICS) {
+            if (Tile_p->Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
                 nh_core_appendToArray(&Vertices2, Tile_p->Foreground.vertices_p, 24);
                 uint32_t indices_p[12] = {
                     offset1, offset1 + 1, offset1 + 2, offset1, offset1 + 2, offset1 + 3,
@@ -505,8 +505,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
 
 // COLOR ===========================================================================================
 
-ttyr_tty_Color ttyr_terminal_getGlyphColor(
-    ttyr_terminal_GraphicsState *State_p, ttyr_tty_Glyph *Glyph_p, bool foreground)
+ttyr_core_Color ttyr_terminal_getGlyphColor(
+    ttyr_terminal_GraphicsState *State_p, ttyr_core_Glyph *Glyph_p, bool foreground)
 {
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
  
@@ -517,7 +517,7 @@ ttyr_tty_Color ttyr_terminal_getGlyphColor(
             }
             return Config.Background;
         }
-        if (Glyph_p->mark & TTYR_TTY_MARK_ACCENT) {
+        if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
             return State_p->Gradient.Color;
         }
         if (Glyph_p->Foreground.custom) {
@@ -529,7 +529,7 @@ ttyr_tty_Color ttyr_terminal_getGlyphColor(
     // Background.
     if ((Glyph_p->Attributes.reverse && !(Glyph_p->Attributes.blink && State_p->Blink.on)) 
     || (!Glyph_p->Attributes.reverse &&   Glyph_p->Attributes.blink && State_p->Blink.on)) {
-        if (Glyph_p->mark & TTYR_TTY_MARK_ACCENT) {
+        if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
             return State_p->Gradient.Color;
         }
         if (Glyph_p->Foreground.custom) {

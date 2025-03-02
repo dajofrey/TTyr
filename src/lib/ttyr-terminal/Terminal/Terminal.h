@@ -14,7 +14,7 @@
 
 #include "../Common/Config.h"
 #include "../Common/Includes.h"
-#include "../../ttyr-tty/TTY/View.h"
+#include "../../ttyr-core/TTY/View.h"
 
 #include "nh-core/Util/Time.h"
 
@@ -25,14 +25,14 @@
  */
 
     typedef struct ttyr_terminal_Terminal {
-        ttyr_tty_TTY *TTY_p;
+        ttyr_core_TTY *TTY_p;
         char namespace_p[255];
         ttyr_terminal_Config Config;
         ttyr_terminal_Grid Grid;
         ttyr_terminal_Grid Grid2;
         ttyr_terminal_Graphics Graphics;
         ttyr_terminal_Graphics Graphics2;
-        ttyr_tty_View *View_p;
+        ttyr_core_View *View_p;
         bool ctrl;
         bool leftMouse;
         nh_core_SystemTime LastClick;
