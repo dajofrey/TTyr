@@ -21,7 +21,7 @@ TTYR_CORE_RESULT ttyr_core_drawWindowSwitchMenu(
     ttyr_core_Row *Grid_p
 );
 
-TTYR_CORE_RESULT ttyr_core_drawTabSwitchMenu(
+TTYR_CORE_RESULT ttyr_core_drawMicroWindowMenu(
     ttyr_core_Row *Grid_p
 );
 

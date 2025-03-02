@@ -94,4 +94,4 @@ Each newly opened Macro-Window
 The hybrid approach makes it necessary to have seperate controls for macro-tabing/micro-tabing and macro-tiling/micro-tiling.
 
 ## Development
-If you want to contribute, please run `./scripts/setup-git.sh` which installs a prepare-commit-msg hook for versioning.
+If you want to contribute, please run `./scripts/prepare-git.sh` which installs a prepare-commit-msg hook for versioning.

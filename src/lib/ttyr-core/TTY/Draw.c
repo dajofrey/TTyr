@@ -337,7 +337,7 @@ TTYR_CORE_RESULT ttyr_core_refreshGrid2(
     }
  
     if (TTY_p->alt && TTY_p->ctrl) {
-        TTYR_CHECK(ttyr_core_drawTabSwitchMenu(View_p->Grid2_p))
+        TTYR_CHECK(ttyr_core_drawMicroWindowMenu(View_p->Grid2_p))
     }
 
     TTYR_CHECK(ttyr_core_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))

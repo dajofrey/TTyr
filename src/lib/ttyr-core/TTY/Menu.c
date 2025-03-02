@@ -37,7 +37,7 @@ static ttyr_core_Glyph ttyr_core_getGlyphHelper(
     return Glyph; 
 } 
 
-TTYR_CORE_RESULT ttyr_core_drawTabSwitchMenu(
+TTYR_CORE_RESULT ttyr_core_drawMicroWindowMenu(
     ttyr_core_Row *Grid_p)
 {
     ttyr_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -75,7 +75,7 @@ TTYR_CORE_RESULT ttyr_core_drawTabSwitchMenu(
     TTY_p->TabSwitchMenu.width = width;
     TTY_p->TabSwitchMenu.height = height;
 
-    NH_API_UTF32 title_p[] = {'T', 'i', 'l', 'e', ' ', 'T', 'a', 'b', 's'};
+    NH_API_UTF32 title_p[] = {'M', 'i', 'c', 'r', 'o', ' ', 'W', 'i', 'n', 'd', 'o', 'w', 's'};
     int offset = (width-sizeof(title_p)/sizeof(title_p[0]))/2;
     for (int i = 0; i < sizeof(title_p)/sizeof(title_p[0]); ++i) {
         Grid_p[Position.y].Glyphs_p[Position.x+i+offset] = ttyr_core_getGlyphHelper(title_p[i]);
