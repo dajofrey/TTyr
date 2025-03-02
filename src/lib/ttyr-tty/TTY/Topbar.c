@@ -611,21 +611,21 @@ static TTYR_TTY_RESULT ttyr_tty_drawTopbarText(
         if (ttyr_tty_getConfig().Topbar.on) {
             ttyr_tty_Topbar *TopbarCompare_p = &TTYR_TTY_MACRO_TAB(MacroWindow_p->Tile_p)->Topbar;
             if (MacroWindow_p->Tiling.stage != TTYR_TTY_TILING_STAGE_DONE && TopbarCompare_p == Topbar_p) {
-                if (MacroWindow_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
-                    for (int i = cols-15, j = 0; j < 15; ++i, ++j) {
-                        Glyphs_p[i].codepoint = t1_p[j];
-                    }
-                } else if (MacroWindow_p->Tiling.mode == TTYR_TTY_TILING_MODE_MACRO) {
-                    for (int i = cols-15, j = 0; j < 15; ++i, ++j) {
-                        Glyphs_p[i].codepoint = t2_p[j];
-                    }
-                }
+//                if (MacroWindow_p->Tiling.mode == TTYR_TTY_TILING_MODE_MICRO) {
+//                    for (int i = cols-15, j = 0; j < 15; ++i, ++j) {
+//                        Glyphs_p[i].codepoint = t1_p[j];
+//                    }
+//                } else if (MacroWindow_p->Tiling.mode == TTYR_TTY_TILING_MODE_MACRO) {
+//                    for (int i = cols-15, j = 0; j < 15; ++i, ++j) {
+//                        Glyphs_p[i].codepoint = t2_p[j];
+//                    }
+//                }
             } else {
-                for (int i = 0; i < Config.tabs; ++i) {
-                    Glyphs_p[i+1].codepoint = 0x25a1;
-                }
+//                for (int i = 0; i < Config.tabs; ++i) {
+//                    Glyphs_p[i+1].codepoint = 0x25a1;
+//                }
 //                Topbar_p->quitPosition = cols-2;
-                Glyphs_p[TTYR_TTY_MACRO_TILE(Tile_p)->current+1].codepoint = 0x25a0;
+//                Glyphs_p[TTYR_TTY_MACRO_TILE(Tile_p)->current+1].codepoint = 0x25a0;
 //                Glyphs_p[Topbar_p->quitPosition].codepoint = Topbar_p->quitHover ? 0x25cf : 0x25cb;
             }
         }

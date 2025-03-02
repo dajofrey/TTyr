@@ -98,13 +98,13 @@ TTYR_TTY_RESULT ttyr_tty_drawTitlebar(
         Row_p->Glyphs_p[i].mark |= TTYR_TTY_MARK_ACCENT;
     }
 
-    for (int i = 1; ttyr_tty_getConfig().Topbar.on == 1 && i < (Config.windows+1) && i < cols ; ++i) {
-        Row_p->Glyphs_p[i].codepoint = 0x25a1;
-        Row_p->update_p[i] = true;
-        if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
-            Row_p->Glyphs_p[i].codepoint = 0x25a0;
-        }
-    }
+//    for (int i = 1; ttyr_tty_getConfig().Topbar.on == 1 && i < (Config.windows+1) && i < cols ; ++i) {
+//        Row_p->Glyphs_p[i].codepoint = 0x25a1;
+//        Row_p->update_p[i] = true;
+//        if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
+//            Row_p->Glyphs_p[i].codepoint = 0x25a0;
+//        }
+//    }
 
 //    for (int i = 1, j = 1; ttyr_tty_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=3) {
 //        for (int k = j; k < j+2; ++k) {
