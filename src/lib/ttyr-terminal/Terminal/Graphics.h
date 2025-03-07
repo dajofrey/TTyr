@@ -92,7 +92,8 @@
     typedef struct ttyr_terminal_GraphicsState {
         nh_gfx_Viewport *Viewport_p;
         ttyr_terminal_GraphicsBlink Blink;
-        ttyr_terminal_GraphicsGradient Gradient;
+        ttyr_terminal_GraphicsGradient AccentGradient;
+        ttyr_terminal_GraphicsGradient BackgroundGradient;
         nh_core_HashMap Map;
         nh_gfx_FontInstance *FontInstance_p;
         nh_core_List Fonts;

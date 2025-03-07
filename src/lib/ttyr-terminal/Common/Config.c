@@ -65,11 +65,15 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getSetting(
             Config_p->Foreground.a = ((float)atoi(Setting_p->pp[3]))/255.0f;
             break;
         case 3 :
-            if (Setting_p->size != 4) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
-            Config_p->Background.r = ((float)atoi(Setting_p->pp[0]))/255.0f;
-            Config_p->Background.g = ((float)atoi(Setting_p->pp[1]))/255.0f;
-            Config_p->Background.b = ((float)atoi(Setting_p->pp[2]))/255.0f;
-            Config_p->Background.a = ((float)atoi(Setting_p->pp[3]))/255.0f;
+            Config_p->backgrounds = 0;
+            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            for (int i = 0, j = 0; j < Setting_p->size; i++, j += 4) {
+                Config_p->Backgrounds_p[i].r = ((float)atof(Setting_p->pp[j+0]))/255.0f;
+                Config_p->Backgrounds_p[i].g = ((float)atof(Setting_p->pp[j+1]))/255.0f;
+                Config_p->Backgrounds_p[i].b = ((float)atof(Setting_p->pp[j+2]))/255.0f;
+                Config_p->Backgrounds_p[i].a = ((float)atof(Setting_p->pp[j+3]))/255.0f;
+                Config_p->backgrounds++;
+            }
             break;
         case 4 :
             Config_p->accents = 0;

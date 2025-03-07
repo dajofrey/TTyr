@@ -115,9 +115,9 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBoxes(
         // Render inner box.
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", 
            &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
-           nh_gfx_glfloat(NULL, Config.Background.r), 
-           nh_gfx_glfloat(NULL, Config.Background.g), 
-           nh_gfx_glfloat(NULL, Config.Background.b));
+           nh_gfx_glfloat(NULL, State_p->BackgroundGradient.Color.r), 
+           nh_gfx_glfloat(NULL, State_p->BackgroundGradient.Color.g), 
+           nh_gfx_glfloat(NULL, State_p->BackgroundGradient.Color.b));
         nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawArrays", 
             nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glint(NULL, offset), nh_gfx_glsizei(NULL, 6));
         offset += 6;

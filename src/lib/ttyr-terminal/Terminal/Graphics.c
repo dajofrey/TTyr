@@ -57,14 +57,14 @@ static ttyr_terminal_GraphicsAction ttyr_terminal_initGraphicsAction()
 }
 
 static ttyr_core_Color ttyr_terminal_getGradientColor(
-    ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsGradient *Gradient_p)
+    ttyr_terminal_GraphicsGradient *Gradient_p, ttyr_core_Color *Colors_p, int colors)
 {
-    if (Config_p->accents == 1) {
-        return Config_p->Accents_p[0];
+    if (colors == 1) {
+        return Colors_p[0];
     }
 
-    ttyr_core_Color Color1 = Config_p->Accents_p[Gradient_p->index];
-    ttyr_core_Color Color2 = Gradient_p->index == Config_p->accents-1 ? Config_p->Accents_p[0] : Config_p->Accents_p[Gradient_p->index+1];
+    ttyr_core_Color Color1 = Colors_p[Gradient_p->index];
+    ttyr_core_Color Color2 = Gradient_p->index == colors-1 ? Colors_p[0] : Colors_p[Gradient_p->index+1];
 
     ttyr_core_Color Result;
     Result.r = Color1.r + Gradient_p->ratio * (Color2.r - Color1.r);
@@ -108,6 +108,8 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsData(
 static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsState(
     ttyr_terminal_GraphicsState *State_p)
 {
+    memset(State_p, 0, sizeof(ttyr_terminal_GraphicsState));
+
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_getInternalMonospaceFonts(&State_p->Fonts))
@@ -116,14 +118,14 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsState(
     State_p->Glyphs = nh_core_initList(128);
     State_p->Codepoints = nh_core_initList(128);
 
-    State_p->Gradient.Color = ttyr_terminal_getGradientColor(&Config, &State_p->Gradient);
-    State_p->Gradient.interval = 0.1;
-    State_p->Gradient.index = 0;
-    State_p->Gradient.ratio = 0.0f;
-    State_p->Gradient.LastChange = nh_core_getSystemTime();
+    State_p->AccentGradient.Color = ttyr_terminal_getGradientColor(&State_p->AccentGradient, Config.Accents_p, Config.accents);
+    State_p->AccentGradient.interval = 0.1;
+    State_p->AccentGradient.LastChange = nh_core_getSystemTime();
+
+    State_p->BackgroundGradient = State_p->AccentGradient;
+    State_p->BackgroundGradient.Color = ttyr_terminal_getGradientColor(&State_p->BackgroundGradient, Config.Backgrounds_p, Config.backgrounds);
 
     State_p->Blink.LastBlink = nh_core_getSystemTime();
-    State_p->Blink.on = false;
  
     return TTYR_TERMINAL_SUCCESS;
 }
@@ -438,15 +440,30 @@ bool ttyr_terminal_updateBlinkOrGradient(
         State_p->Blink.on = !State_p->Blink.on;
     }
 
-    if (Config.accents > 1 && nh_core_getSystemTimeDiffInSeconds(State_p->Gradient.LastChange, Time) >= State_p->Gradient.interval) { 
+    if (Config.accents > 1 && nh_core_getSystemTimeDiffInSeconds(State_p->AccentGradient.LastChange, Time) >= State_p->AccentGradient.interval) { 
         update = true; 
-        State_p->Gradient.LastChange = Time; 
-        if (State_p->Gradient.ratio >= 1.0f) {
-            State_p->Gradient.index = State_p->Gradient.index == Config.accents-1 ? 0 : State_p->Gradient.index+1; 
-            State_p->Gradient.ratio = 0.0f;
+        State_p->AccentGradient.LastChange = Time; 
+        if (State_p->AccentGradient.ratio >= 1.0f) {
+            State_p->AccentGradient.index = State_p->AccentGradient.index == Config.accents-1 ? 0 : State_p->AccentGradient.index+1; 
+            State_p->AccentGradient.ratio = 0.0f;
         }
-        State_p->Gradient.Color = ttyr_terminal_getGradientColor(&Config, &State_p->Gradient); 
+        State_p->AccentGradient.Color = ttyr_terminal_getGradientColor(&State_p->AccentGradient, Config.Accents_p, Config.accents);
     } 
+
+    if (Config.backgrounds > 1 && nh_core_getSystemTimeDiffInSeconds(State_p->BackgroundGradient.LastChange, Time) >= State_p->BackgroundGradient.interval) { 
+        update = true; 
+        State_p->BackgroundGradient.LastChange = Time; 
+        if (State_p->BackgroundGradient.ratio >= 1.0f) {
+            State_p->BackgroundGradient.index = State_p->BackgroundGradient.index == Config.backgrounds-1 ? 0 : State_p->BackgroundGradient.index+1; 
+            State_p->BackgroundGradient.ratio = 0.0f;
+        }
+        State_p->BackgroundGradient.Color = ttyr_terminal_getGradientColor(&State_p->BackgroundGradient, Config.Backgrounds_p, Config.backgrounds);
+    } 
+
+    // Clear color needs to be updated.
+    State_p->Viewport_p->Settings.ClearColor.r = State_p->BackgroundGradient.Color.r;
+    State_p->Viewport_p->Settings.ClearColor.g = State_p->BackgroundGradient.Color.g;
+    State_p->Viewport_p->Settings.ClearColor.b = State_p->BackgroundGradient.Color.b;
 
     return update;
 }
@@ -472,11 +489,9 @@ TTYR_TERMINAL_RESULT ttyr_terminal_handleViewportChange(
         }
     }
 
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
-    Viewport_p->Settings.ClearColor.r = Config.Background.r;
-    Viewport_p->Settings.ClearColor.g = Config.Background.g;
-    Viewport_p->Settings.ClearColor.b = Config.Background.b;
+    Viewport_p->Settings.ClearColor.r = Graphics_p->State.BackgroundGradient.Color.r;
+    Viewport_p->Settings.ClearColor.g = Graphics_p->State.BackgroundGradient.Color.g;
+    Viewport_p->Settings.ClearColor.b = Graphics_p->State.BackgroundGradient.Color.b;
 
     Graphics_p->State.Viewport_p = Viewport_p;
 
@@ -515,10 +530,10 @@ ttyr_core_Color ttyr_terminal_getGlyphColor(
             if (Glyph_p->Background.custom) {
                 return Glyph_p->Background.Color;
             }
-            return Config.Background;
+            return State_p->BackgroundGradient.Color;
         }
         if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-            return State_p->Gradient.Color;
+            return State_p->AccentGradient.Color;
         }
         if (Glyph_p->Foreground.custom) {
             return Glyph_p->Foreground.Color;
@@ -530,7 +545,7 @@ ttyr_core_Color ttyr_terminal_getGlyphColor(
     if ((Glyph_p->Attributes.reverse && !(Glyph_p->Attributes.blink && State_p->Blink.on)) 
     || (!Glyph_p->Attributes.reverse &&   Glyph_p->Attributes.blink && State_p->Blink.on)) {
         if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-            return State_p->Gradient.Color;
+            return State_p->AccentGradient.Color;
         }
         if (Glyph_p->Foreground.custom) {
             return Glyph_p->Foreground.Color;
@@ -541,5 +556,5 @@ ttyr_core_Color ttyr_terminal_getGlyphColor(
         return Glyph_p->Background.Color;
     }
 
-    return Config.Background;
+    return State_p->BackgroundGradient.Color;
 }

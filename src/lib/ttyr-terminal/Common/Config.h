@@ -38,9 +38,10 @@
         int fontSize;
         float blinkFrequency;
         ttyr_core_Color Foreground;
-        ttyr_core_Color Background;
+        ttyr_core_Color Backgrounds_p[8];
         ttyr_core_Color Accents_p[8];
         int accents;
+        int backgrounds;
         int border;
     } ttyr_terminal_Config;
 

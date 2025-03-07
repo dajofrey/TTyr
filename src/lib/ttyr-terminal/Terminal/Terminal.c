@@ -306,7 +306,7 @@ static NH_SIGNAL ttyr_terminal_runTerminal(
 
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateSizeIfRequired(Terminal_p, &update))
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_handleInputIfRequired(Terminal_p, &update))
-    if (ttyr_terminal_updateBlinkOrGradient(&Terminal_p->Graphics.State)) {
+    if (ttyr_terminal_updateBlinkOrGradient(&Terminal_p->Graphics)) {
         update = true;
     }
 

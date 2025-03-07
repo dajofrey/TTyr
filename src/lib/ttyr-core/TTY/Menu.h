@@ -17,7 +17,7 @@ typedef struct ttyr_core_Menu {
     int width, height;
 } ttyr_core_Menu;
 
-TTYR_CORE_RESULT ttyr_core_drawWindowSwitchMenu(
+TTYR_CORE_RESULT ttyr_core_drawPrompt(
     ttyr_core_Row *Grid_p
 );
 
