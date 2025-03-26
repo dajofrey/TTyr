@@ -13,14 +13,13 @@
 #include "Data/default.conf.inc"
 
 #include "nh-core/Config/Config.h"
-#include "nh-core/Logger/Logger.h"
 #include "nh-core/System/Memory.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-// DEBUG ===========================================================================================
+// FUNCTIONS =======================================================================================
 
 TTYR_CORE_RESULT ttyr_core_initialize()
 {

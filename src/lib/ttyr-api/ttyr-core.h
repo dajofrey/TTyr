@@ -106,7 +106,7 @@
         ttyr_core_GlyphAttributes Attributes;
         ttyr_core_GlyphColor Foreground;
         ttyr_core_GlyphColor Background;
-        NH_API_UTF32 codepoint;       /* character code */
+        NH_API_UTF32 codepoint; /* character code */
         TTYR_CORE_MARK_E mark;
     } ttyr_core_Glyph;
     

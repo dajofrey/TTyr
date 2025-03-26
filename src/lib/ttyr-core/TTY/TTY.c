@@ -28,7 +28,6 @@
 #include "nh-core/System/Thread.h"
 #include "nh-core/System/Memory.h"
 #include "nh-core/System/Process.h"
-#include "nh-core/Logger/Logger.h"
 #include "nh-core/Util/RingBuffer.h"
 
 #include "nh-encoding/Base/UnicodeDataHelper.h"

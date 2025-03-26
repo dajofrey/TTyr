@@ -310,9 +310,9 @@ static NH_SIGNAL ttyr_terminal_runTerminal(
         update = true;
     }
 
-    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.r = Terminal_p->Graphics.State.Gradient.Color.r;
-    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.g = Terminal_p->Graphics.State.Gradient.Color.g;
-    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.b = Terminal_p->Graphics.State.Gradient.Color.b;
+    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.r = Terminal_p->Graphics.State.AccentGradient.Color.r;
+    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.g = Terminal_p->Graphics.State.AccentGradient.Color.g;
+    Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.b = Terminal_p->Graphics.State.AccentGradient.Color.b;
  
     if (update) {
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data1,

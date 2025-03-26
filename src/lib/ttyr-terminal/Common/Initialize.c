@@ -17,7 +17,6 @@
 #include "nh-gfx/Vulkan/Vulkan.h"
 
 #include "nh-core/Config/Config.h"
-#include "nh-core/Logger/Logger.h"
 #include "nh-core/System/Memory.h"
 
 #include <stdlib.h>
