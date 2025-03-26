@@ -143,8 +143,9 @@ ttyr_core_Config ttyr_core_getConfig()
 {
     ttyr_core_Config Config = ttyr_core_getStaticConfig();
     ttyr_core_TTY *TTY_p = nh_core_getWorkloadArg();
-    if (((ttyr_core_View*)TTY_p->Views.pp[0])->standardIO) {
+    if (TTY_p->Views.size > 0 && ((ttyr_core_View*)TTY_p->Views.pp[0])->standardIO) {
         Config.Titlebar.on = false;
+        Config.Topbar.on = false;
     }
     return Config;
 }

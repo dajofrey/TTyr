@@ -21,6 +21,7 @@
 typedef struct Arguments {
     NH_API_GRAPHICS_BACKEND_E renderer;
     bool no_unload;
+    bool stdio;
 } Arguments;
 
 static Arguments Args;
@@ -43,7 +44,11 @@ static int handleArgs(
         if (!strcmp(argv_pp[i], "--no-unload")) {
             Args.no_unload = true;
         }
+        if (!strcmp(argv_pp[i], "--stdio")) {
+            Args.stdio = true;
+        }
         else {
+            puts("--stdio     Bla.");
             puts("--vulkan    Use Vulkan as graphics renderer. Default is OpenGL.");
             puts("--no-unload Don't unload Netzhaut modules at shut-down.");
             puts("            Useful for stack tracing.");
@@ -94,24 +99,28 @@ int main(int argc, char **argv_pp)
     TTY_p = ttyr_api_openTTY(NULL, NULL);
     if (!TTY_p) {return 1;}
 
-    ttyr_terminal_Terminal *Terminal_p = ttyr_api_openTerminal(NULL, TTY_p);
-    if (!Terminal_p) {return 1;}
+    if (Args.stdio) {
+        if (ttyr_api_claimStandardIO(TTY_p)) {return 1;}
+    } else {
+        ttyr_terminal_Terminal *Terminal_p = ttyr_api_openTerminal(NULL, TTY_p);
+        if (!Terminal_p) {return 1;}
 
-    nh_api_Window *Window_p = 
-        nh_api_createWindow(NULL, nh_api_getSurfaceRequirements());
-    if (!Window_p) {return 1;}
+        nh_api_Window *Window_p = 
+            nh_api_createWindow(NULL, nh_api_getSurfaceRequirements());
+        if (!Window_p) {return 1;}
 
-    nh_api_Surface *Surface_p = nh_api_createSurface(Window_p, Args.renderer);
-    if (!Surface_p) {return 1;}
+        nh_api_Surface *Surface_p = nh_api_createSurface(Window_p, Args.renderer);
+        if (!Surface_p) {return 1;}
 
-    Viewport_p = nh_api_createViewport(Surface_p, NULL, NULL);
-    if (!Viewport_p) {return 1;}
+        Viewport_p = nh_api_createViewport(Surface_p, NULL, NULL);
+        if (!Viewport_p) {return 1;}
 
-    if (ttyr_api_setViewport(Terminal_p, Viewport_p) != TTYR_TERMINAL_SUCCESS) {
-        return 1;
+        if (ttyr_api_setViewport(Terminal_p, Viewport_p) != TTYR_TERMINAL_SUCCESS) {
+            return 1;
+        }
+        
+        nh_api_setWindowEventListener(Window_p, handleInput);
     }
-    
-    nh_api_setWindowEventListener(Window_p, handleInput);
 
     while (nh_api_getWorkload(TTY_p)) {
         if (!nh_api_run()) {usleep(10000);} // 10 milliseconds
