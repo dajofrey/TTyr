@@ -143,14 +143,20 @@ install: $(BIN_TTYR)
 	mkdir -p /usr/share/ttyr/icons
 	cp build/data/icons/ttyr.png /usr/share/ttyr/icons
 
-# Clean rule
-clean:
+# Clean rules
+clean-netzhaut:
+	@if [ -d external/Netzhaut ] && [ -n "$$(ls -A external/Netzhaut 2>/dev/null)" ]; then \
+		echo "Cleaning Netzhaut..."; \
+		(cd external/Netzhaut && make -f build/automation/lib.mk clean); \
+	else \
+		echo "Skipping Netzhaut cleanup (directory missing or empty)."; \
+	fi
+clean: clean-netzhaut
 	rm -f $(OBJ_FILES_TTYR_CORE) $(LIB_TTYR_CORE)
 	rm -f $(OBJ_FILES_TTYR_TERMINAL) $(LIB_TTYR_TERMINAL)
 	rm -f $(OBJ_FILES_TTYR_API) $(LIB_TTYR_API)
 	rm -f $(OBJ_FILES_ST) $(LIB_ST)
 	rm -f $(OBJ_FILES_TTYR) $(BIN_TTYR)
 	rm -rf bin lib
-	(cd external/Netzhaut && make -f build/automation/lib.mk clean)
 
 .PHONY: all lib bin clean
