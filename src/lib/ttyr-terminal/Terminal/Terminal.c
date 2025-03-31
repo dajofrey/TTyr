@@ -186,9 +186,8 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_handleEvent(
             Terminal_p->leftMouse = false;
         } 
         if (Event_p->Mouse.type == NH_API_MOUSE_MOVE && Terminal_p->leftMouse) {
-            nh_wsi_moveWindow_f moveWindow_f = nh_core_loadExistingSymbol(NH_MODULE_WSI, 0, "nh_wsi_moveWindow");
-            if (moveWindow_f && Event_p->Mouse.Position.y < Terminal_p->Grid.TileSize.height) {
-                moveWindow_f(Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p);
+            if (Event_p->Mouse.Position.y < Terminal_p->Grid.TileSize.height) {
+                nh_api_moveWindow(Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p);
                 if (Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p->type == NH_WSI_TYPE_X11) {
                     Terminal_p->leftMouse = false;
                 }
