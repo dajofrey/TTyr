@@ -21,6 +21,22 @@
 
 // FUNCTIONS =======================================================================================
 
+float get_color_component(int col, int row, float time, int total_cols, int total_rows) {
+	float wave_length = 100.0f; // How many tiles one full wave spans (same in both axes)
+
+	// Convert to frequency (2π / wavelength)
+	float freq_x = (2.0f * M_PI) / wave_length;
+
+	// Adjust Y frequency to match physical scale
+	float aspect_ratio = (float)total_rows / (float)total_cols;
+	float freq_y = freq_x * ((float)total_cols / (float)total_rows); // or freq_x / aspect_ratio
+
+	float speed = 10.0f;
+
+	float t = (sinf(col * freq_x + row * freq_y + time * speed) + 1.0f) / 2.0f;
+	return t;
+}
+
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBackground(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
@@ -30,12 +46,29 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBackground(
     for (int i = 0; i < Data_p->Background.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Background.Ranges.p)+i;
         ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, false);
-        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
-            nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
-        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
-            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, Range_p->indices), 
-            nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
-            nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*offset)));
+        if (Range_p->Glyph.mark & TTYR_CORE_MARK_ACCENT) {
+            for (int j = 0, k = 0; j < Range_p->indices; j+=6, k++) {
+                float time_now = (float)clock() / CLOCKS_PER_SEC;
+                float intensity = get_color_component(*(((int*)Range_p->Cols.p)+k), *(((int*)Range_p->Rows.p)+k), time_now, Grid_p->cols, Grid_p->rows);
+                Color.r = intensity;
+                Color.g = intensity; 
+                Color.b = 0.7;
+                nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
+                    nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
+                nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
+                    nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, 6), 
+                    nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
+                    nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*(offset+j))));
+            }
+        } else {
+
+            nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
+                nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
+            nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
+                nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, Range_p->indices), 
+                nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
+                nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*offset)));
+        }
         offset += Range_p->indices;
     }
 
@@ -63,12 +96,28 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
     for (int i = 0; i < Data_p->Foreground.Ranges.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges.p)+i;
         ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
-        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
-            nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
-        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
-            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, Range_p->indices), 
-            nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
-            nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*offset)));
+//        if (Range_p->Glyph.mark & TTYR_CORE_MARK_ACCENT) {
+//            for (int j = 0, k = 0; j < Range_p->indices; j+=6, k++) {
+//                float time_now = (float)clock() / CLOCKS_PER_SEC;
+//                float intensity = get_color_component(*(((int*)Range_p->Cols.p)+k), *(((int*)Range_p->Rows.p)+k), time_now, Grid_p->cols, Grid_p->rows);
+//                Color.r = intensity;
+//                Color.g = intensity; 
+//                Color.b = 0.7;
+//                nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
+//                    nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
+//                nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
+//                    nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, 6), 
+//                    nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
+//                    nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*(offset+j))));
+//            }
+//        } else {
+            nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor_p->Result, 
+                nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
+            nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
+                nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, Range_p->indices), 
+                nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
+                nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*offset)));
+//        }
         offset += Range_p->indices;
     }
 
@@ -79,12 +128,28 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
     for (int i = 0; i < Data_p->Foreground.Ranges2.length; ++i) {
         ttyr_terminal_AttributeRange *Range_p = ((ttyr_terminal_AttributeRange*)Data_p->Foreground.Ranges2.p)+i;
         ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Range_p->Glyph, true);
-        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor2_p->Result, 
-            nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
-        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
-            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, Range_p->indices), 
-            nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
-            nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*offset)));
+        if (Range_p->Glyph.mark & TTYR_CORE_MARK_ACCENT) {
+            for (int j = 0, k = 0; j < Range_p->indices; j+=12, k++) {
+                float time_now = (float)clock() / CLOCKS_PER_SEC;
+                float intensity = get_color_component(*(((int*)Range_p->Cols.p)+k), *(((int*)Range_p->Rows.p)+k), time_now, Grid_p->cols, Grid_p->rows);
+                Color.r = intensity;
+                Color.g = intensity; 
+                Color.b = 0.7;
+                nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor2_p->Result, 
+                    nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
+                nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
+                    nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, 12), 
+                    nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
+                    nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*(offset+j))));
+            }
+        } else {
+            nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", &Data_p->Foreground.OpenGL.GetUniformLocationColor2_p->Result, 
+                nh_gfx_glfloat(NULL, Color.r), nh_gfx_glfloat(NULL, Color.g), nh_gfx_glfloat(NULL, Color.b));
+            nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawElements", 
+                nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glsizei(NULL, Range_p->indices), 
+                nh_gfx_glenum(NULL, GL_UNSIGNED_INT),
+                nh_gfx_glpointer(NULL, (void*)(sizeof(uint32_t)*offset)));
+        }
         offset += Range_p->indices;
     }
 

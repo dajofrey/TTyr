@@ -182,7 +182,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphics(
 // RANGES ==========================================================================================
 
 static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
-    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p)
+    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p, 
+    nh_core_Array *Cols_p, nh_core_Array *Rows_p)
 {
     int total = 0;
 
@@ -199,6 +200,10 @@ static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
                 return total;
             }
             ++total;
+            int *c_p = nh_core_incrementArray(Cols_p);
+            *c_p = col;
+            int *r_p = nh_core_incrementArray(Rows_p);
+            *r_p = row;
         }
         *col_p = 0;
     }
@@ -210,7 +215,8 @@ static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
 }
 
 static int ttyr_terminal_getCurrentAttributeRange(
-    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p, bool foreground)
+    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p, bool foreground,
+    nh_core_Array *Cols_p, nh_core_Array *Rows_p)
 {
     int total = 0;
 
@@ -230,6 +236,10 @@ static int ttyr_terminal_getCurrentAttributeRange(
                 *Current_p = Glyph;
                 return total;
             }
+            int *c_p = nh_core_incrementArray(Cols_p);
+            *c_p = col;
+            int *r_p = nh_core_incrementArray(Rows_p);
+            *r_p = row;
             ++total;
         }
         *col_p = 0;
@@ -245,7 +255,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRangeForLineGraphics(
     ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
     nh_core_freeArray(&Data_p->Foreground.Ranges2);
-    Data_p->Foreground.Ranges2 = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 32);
+    Data_p->Foreground.Ranges2 = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 64);
 
     if (Grid_p->rows <= 0 || Grid_p->Rows.size == 0) {
         return TTYR_TERMINAL_SUCCESS;
@@ -261,12 +271,16 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRangeForLineGraphics(
     while (true)
     {
         ttyr_core_Glyph NextGlyph = Glyph;
-        total = ttyr_terminal_getCurrentAttributeRangeForLineGraphics(Grid_p, &NextGlyph, &col, &row) * 12;
+        nh_core_Array Cols = nh_core_initArray(sizeof(int), 255);
+        nh_core_Array Rows = nh_core_initArray(sizeof(int), 255);
+        total = ttyr_terminal_getCurrentAttributeRangeForLineGraphics(Grid_p, &NextGlyph, &col, &row, &Cols, &Rows) * 12;
         if (!total && !begin) {break;}
         begin = false;
 
         ttyr_terminal_AttributeRange *Range_p = nh_core_incrementArray(&Data_p->Foreground.Ranges2);
 
+        Range_p->Cols = Cols;
+        Range_p->Rows = Rows;
         Range_p->Glyph = Glyph;
         Range_p->indices = total;
 
@@ -302,7 +316,10 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
     while (true)
     {
         ttyr_core_Glyph NextGlyph = Glyph;
-        total = ttyr_terminal_getCurrentAttributeRange(Grid_p, &NextGlyph, &col, &row, foreground) * 6;
+        nh_core_Array Cols = nh_core_initArray(sizeof(int), 255);
+        nh_core_Array Rows = nh_core_initArray(sizeof(int), 255);
+ 
+        total = ttyr_terminal_getCurrentAttributeRange(Grid_p, &NextGlyph, &col, &row, foreground, &Cols, &Rows) * 6;
         if (!total && !begin) {break;}
         begin = false;
 
@@ -311,6 +328,8 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
 
         Range_p->Glyph = Glyph;
         Range_p->indices = total;
+        Range_p->Cols = Cols;
+        Range_p->Rows = Rows;
 
         Glyph = NextGlyph;
     }

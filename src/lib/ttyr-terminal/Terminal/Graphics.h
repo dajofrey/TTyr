@@ -27,6 +27,7 @@
 
     typedef struct ttyr_terminal_AttributeRange {
         ttyr_core_Glyph Glyph;
+        nh_core_Array Cols, Rows; // need this for shader stuff lol... 
         int indices;
     } ttyr_terminal_AttributeRange;
 

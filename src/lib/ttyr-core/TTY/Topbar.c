@@ -336,7 +336,8 @@ static ttyr_core_Glyph ttyr_core_getGlyphHelper(
     memset(&Glyph, 0, sizeof(ttyr_core_Glyph));
     Glyph.Attributes.reverse = true;
     Glyph.codepoint = codepoint;
-    Glyph.mark |= TTYR_CORE_MARK_LINE_HORIZONTAL | TTYR_CORE_MARK_ACCENT;
+    Glyph.mark |= TTYR_CORE_MARK_LINE_HORIZONTAL;
+    Glyph.mark |= TTYR_CORE_MARK_ACCENT;
     return Glyph;
 }
 
