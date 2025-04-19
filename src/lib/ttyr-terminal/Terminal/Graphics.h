@@ -107,6 +107,7 @@
         ttyr_terminal_GraphicsState State;
         ttyr_terminal_GraphicsData Data1;
         ttyr_terminal_GraphicsData Data2;
+        ttyr_terminal_GraphicsData BorderData;
     } ttyr_terminal_Graphics;
 
 /** @} */
@@ -132,7 +133,7 @@
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
-        ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p
+        ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p
     );
 
     ttyr_core_Color ttyr_terminal_getGlyphColor(

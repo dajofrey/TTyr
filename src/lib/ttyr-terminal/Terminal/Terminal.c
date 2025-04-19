@@ -115,9 +115,11 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateSize(
     
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGrid(&Terminal_p->Grid, &Terminal_p->Graphics.State, &Text))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGrid(&Terminal_p->Grid2, &Terminal_p->Graphics.State, &Text))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateBorderGrid(&Terminal_p->BorderGrid, &Terminal_p->Graphics.State, &Text))
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data1, &Terminal_p->Grid))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data2, &Terminal_p->Grid2))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid))
 
     // Update view size, subtract gap tiles.
     Terminal_p->View_p->cols = Terminal_p->Grid.cols-1;
@@ -127,6 +129,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateSize(
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data1, &Terminal_p->Grid))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data2, &Terminal_p->Grid2))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid))
 
     nh_gfx_freeText(&Text);
 
@@ -136,8 +139,10 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateSize(
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateSizeIfRequired(
     ttyr_terminal_Terminal *Terminal_p, bool *update_p)
 {
-    if (Terminal_p->Graphics.State.Viewport_p->Settings.Size.width - (Terminal_p->Graphics.State.Viewport_p->Settings.borderWidth*2) == Terminal_p->Grid.Size.width
-    &&  Terminal_p->Graphics.State.Viewport_p->Settings.Size.height - (Terminal_p->Graphics.State.Viewport_p->Settings.borderWidth*2) == Terminal_p->Grid.Size.height) {
+    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
+
+    if (Terminal_p->Graphics.State.Viewport_p->Settings.Size.width - (Config.border*2) == Terminal_p->Grid.Size.width
+    &&  Terminal_p->Graphics.State.Viewport_p->Settings.Size.height - (Config.border*2) == Terminal_p->Grid.Size.height) {
         return TTYR_TERMINAL_SUCCESS;
     }
 
@@ -300,8 +305,6 @@ static NH_SIGNAL ttyr_terminal_runTerminal(
     if (!Terminal_p->Graphics.State.Viewport_p) {return NH_SIGNAL_IDLE;}
 
     bool update = false;
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
-    Terminal_p->Graphics.State.Viewport_p->Settings.borderWidth = Config.border;
 
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateSizeIfRequired(Terminal_p, &update))
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_handleInputIfRequired(Terminal_p, &update))
@@ -319,7 +322,7 @@ static NH_SIGNAL ttyr_terminal_runTerminal(
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.Data2,
             &Terminal_p->Grid2))
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_renderGraphics(&Terminal_p->Graphics, 
-            &Terminal_p->Grid, &Terminal_p->Grid2))
+            &Terminal_p->Grid, &Terminal_p->Grid2, &Terminal_p->BorderGrid))
         return NH_SIGNAL_OK;
     }
 

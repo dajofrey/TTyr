@@ -29,6 +29,7 @@ const char *TTYR_TERMINAL_SETTING_NAMES_PP[] = {
     "ttyr-terminal.color.background",
     "ttyr-terminal.color.accent",
     "ttyr-terminal.border",
+    "ttyr-terminal.style",
 };
 
 size_t TTYR_TERMINAL_SETTING_NAMES_PP_COUNT = 
@@ -89,6 +90,10 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getSetting(
         case 5 :
             if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
             Config_p->border = atoi(Setting_p->pp[0]);
+            break;
+        case 6 :
+            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            Config_p->style = atoi(Setting_p->pp[0]);
             break;
     }
 

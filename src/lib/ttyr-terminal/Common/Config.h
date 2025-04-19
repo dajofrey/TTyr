@@ -26,6 +26,7 @@
         TTYR_TERMINAL_SETTING_BACKGROUND,
         TTYR_TERMINAL_SETTING_ACCENT,
         TTYR_TERMINAL_SETTING_BORDER,
+        TTYR_TERMINAL_SETTING_STYLE,
     } TTYR_TERMINAL_SETTING_E;
 
 /** @} */
@@ -43,6 +44,7 @@
         int accents;
         int backgrounds;
         int border;
+        int style;
     } ttyr_terminal_Config;
 
 /** @} */

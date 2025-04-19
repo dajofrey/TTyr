@@ -35,7 +35,7 @@
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col, 
-    int row, float vertices_p[12])
+    int row, float vertices_p[12], int colPixelOffset, int rowPixelOffset)
 {
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
       
@@ -48,7 +48,11 @@ TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
     int pixel = row * Grid_p->TileSize.height;
 
     float x = (float)((float)(col * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
+    x -= (float)((float)colPixelOffset/(float)Grid_p->Size.width)*2.0f;
+
     float y = (float)((float)(pixel) / (float)Grid_p->Size.height) * 2.0f - 1.0f;
+    y -= (float)((float)rowPixelOffset/(float)Grid_p->Size.height)*2.0f;
+
     float width  = (((float)Grid_p->TileSize.width)/((float)Grid_p->Size.width))*2;
     float height = (((float)Grid_p->TileSize.height)/((float)Grid_p->Size.height))*2;
 

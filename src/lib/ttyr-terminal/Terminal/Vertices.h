@@ -20,7 +20,7 @@
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
         ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col, 
-        int row, float vertices_p[12]
+        int row, float vertices_p[12], int colOffset, int rowOffset
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(

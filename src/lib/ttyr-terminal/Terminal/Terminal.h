@@ -30,6 +30,7 @@
         ttyr_terminal_Config Config;
         ttyr_terminal_Grid Grid;
         ttyr_terminal_Grid Grid2;
+        ttyr_terminal_Grid BorderGrid;
         ttyr_terminal_Graphics Graphics;
         ttyr_terminal_Graphics Graphics2;
         ttyr_core_View *View_p;

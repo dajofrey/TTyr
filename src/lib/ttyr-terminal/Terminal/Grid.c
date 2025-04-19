@@ -52,12 +52,15 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeGrid(
         nh_core_freeList(Cols_p, false);
     }
 
-    for (int row = 0; row < Grid_p->rows; ++row) {
+    for (int row = 0; row < Grid_p->rows && Grid_p->Updates_pp; ++row) {
         nh_core_free(Grid_p->Updates_pp[row]);
         nh_core_free(Grid_p->updates_pp[row]);
     }
-    nh_core_free(Grid_p->Updates_pp);
-    nh_core_free(Grid_p->updates_pp);
+
+    if (Grid_p->Updates_pp) {
+        nh_core_free(Grid_p->Updates_pp);
+        nh_core_free(Grid_p->updates_pp);
+    }
 
     nh_core_freeList(&Grid_p->Rows, true);
     nh_core_freeArray(&Grid_p->Boxes);
@@ -245,7 +248,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateTileVertices(
         ))
     } else {
         TTYR_TERMINAL_CHECK(ttyr_terminal_getBackgroundVertices(
-            State_p, Grid_p, Glyph_p, col, row, Tile_p->Background.vertices_p
+            State_p, Grid_p, Glyph_p, col, row, Tile_p->Background.vertices_p, 0, 0
         ))
     }
 
@@ -329,6 +332,51 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateTile(
     return TTYR_TERMINAL_SUCCESS;
 }
 
+TTYR_TERMINAL_RESULT ttyr_terminal_updateBorderGrid(
+    ttyr_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p)
+{
+    ttyr_terminal_GraphicsState *State_p = state_p;
+    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
+
+    // Free data.
+    ttyr_terminal_freeGrid(Grid_p);
+
+    // Update data.
+    Grid_p->TileSize.width = nh_gfx_getTextWidth(Text_p);
+    Grid_p->TileSize.height = Config.fontSize+abs(State_p->FontInstance_p->descender);
+
+    int borderCols = (Config.border+Grid_p->TileSize.width-1)/Grid_p->TileSize.width;
+    int borderColsPixels = borderCols*Grid_p->TileSize.width;
+    int borderColsPixelsOffset = borderColsPixels-Config.border;
+
+    int borderRows = (Config.border+Grid_p->TileSize.height-1)/Grid_p->TileSize.height;
+    int borderRowsPixels = borderRows*Grid_p->TileSize.height;
+    int borderRowsPixelsOffset = borderRowsPixels-Config.border;
+
+    Grid_p->xOffset = borderColsPixelsOffset;
+    Grid_p->yOffset = borderRowsPixelsOffset;
+
+    Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width+(borderColsPixels*2);
+    Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height+(borderRowsPixels*2);
+
+    Grid_p->cols = Grid_p->Size.width / nh_gfx_getTextWidth(Text_p);
+    Grid_p->rows = Grid_p->Size.height / Grid_p->TileSize.height + 1;
+
+    for (int row = 0; row < Grid_p->rows; ++row) {
+        for (int col = 0; col < Grid_p->cols; ++col) {
+            ttyr_terminal_Tile *Tile_p = ttyr_terminal_getTile(Grid_p, row, col);
+            TTYR_TERMINAL_CHECK_NULL(Tile_p)
+            Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
+            Tile_p->Glyph.Attributes.reverse = true;
+            TTYR_TERMINAL_CHECK(ttyr_terminal_getBackgroundVertices(
+                State_p, Grid_p, &Tile_p->Glyph, col, row, Tile_p->Background.vertices_p, borderColsPixelsOffset, borderRowsPixelsOffset
+            ))
+        }
+    }
+
+    return TTYR_TERMINAL_SUCCESS;
+}
+
 TTYR_TERMINAL_RESULT ttyr_terminal_updateGrid(
     ttyr_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p)
 {
@@ -349,8 +397,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateGrid(
     ttyr_terminal_freeGrid(Grid_p);
 
     // Update data.
-    Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width-(State_p->Viewport_p->Settings.borderWidth*2);
-    Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height-(State_p->Viewport_p->Settings.borderWidth*2);
+    Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width-(Config.border*2);
+    Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height-(Config.border*2);
 
     Grid_p->TileSize.width = nh_gfx_getTextWidth(Text_p);
     Grid_p->TileSize.height = Config.fontSize+abs(State_p->FontInstance_p->descender);

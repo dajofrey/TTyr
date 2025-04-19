@@ -57,6 +57,7 @@
         nh_api_PixelSize Size;
         int cols;
         int rows;
+        int xOffset, yOffset;
         ttyr_terminal_Tile *Cursor_p;
         ttyr_terminal_TileUpdate **Updates_pp;
         bool **updates_pp;
@@ -78,6 +79,10 @@
 
     TTYR_TERMINAL_RESULT ttyr_terminal_freeGrid(
         ttyr_terminal_Grid *Grid_p
+    );
+
+    TTYR_TERMINAL_RESULT ttyr_terminal_updateBorderGrid(
+        ttyr_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateGrid(

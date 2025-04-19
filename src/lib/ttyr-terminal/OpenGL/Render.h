@@ -19,7 +19,7 @@
  */
 
     TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
-        ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p
+        ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p
     );
 
 /** @} */

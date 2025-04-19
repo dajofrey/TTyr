@@ -138,6 +138,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_initGraphics(
     TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsState(&Graphics_p->State))
     TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsData(&Graphics_p->Data1))
     TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsData(&Graphics_p->Data2))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_initGraphicsData(&Graphics_p->BorderData))
  
     return TTYR_TERMINAL_SUCCESS;
 }
@@ -169,6 +170,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphics(
 {
     TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->Data1))
     TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->Data2))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_freeGraphicsData(&Graphics_p->BorderData))
 
     nh_core_freeList(&Graphics_p->State.Fonts, false);
     nh_core_freeList(&Graphics_p->State.Glyphs, true);
@@ -393,7 +395,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateBackgroundData(
     nh_core_freeArray(&Background_p->Vertices);
     nh_core_freeArray(&Background_p->Indices);
 
-    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2000);
+    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2048);
     nh_core_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
 
     int offset = 0;
@@ -520,7 +522,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_handleViewportChange(
 // RENDER ==========================================================================================
 
 TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
-    ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p)
+    ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p, 
+    ttyr_terminal_Grid *BorderGrid_p)
 {
     switch (Graphics_p->State.Viewport_p->Surface_p->api)
     {
@@ -528,7 +531,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
 //            TTYR_TERMINAL_CHECK(ttyr_terminal_renderUsingVulkan(Graphics_p))
             break;
        case NH_API_GRAPHICS_BACKEND_OPENGL :
-            TTYR_TERMINAL_CHECK(ttyr_terminal_renderUsingOpenGL(Graphics_p, Grid_p, Grid2_p))
+            TTYR_TERMINAL_CHECK(ttyr_terminal_renderUsingOpenGL(Graphics_p, Grid_p, Grid2_p, BorderGrid_p))
             break;
         default :
             return TTYR_TERMINAL_ERROR_BAD_STATE;
