@@ -133,8 +133,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
    nh_gfx_addOpenGLCommand(
        Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
        "glViewport",
-       nh_gfx_glint(NULL, -BorderGrid_p->xOffset),
-       nh_gfx_glint(NULL, -BorderGrid_p->yOffset),
+       nh_gfx_glint(NULL, 0),
+       nh_gfx_glint(NULL, 0),
        nh_gfx_glsizei(NULL, BorderGrid_p->Size.width),
        nh_gfx_glsizei(NULL, BorderGrid_p->Size.height));
 

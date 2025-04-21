@@ -216,8 +216,7 @@ static ttyr_core_Color get_crabby_crawlers_color(int col, int row, float time) {
 static ttyr_core_Color ttyr_terminal_getAccentColor(int col, int row, int total_cols, int total_rows, ttyr_core_Color base)
 {
     ttyr_terminal_Config Config = ttyr_terminal_getConfig();
-//    float time_now = (float)clock() / CLOCKS_PER_SEC;
-float time_now = 0;
+    float time_now = 0; // float time_now = (float)clock() / CLOCKS_PER_SEC;
     switch (Config.style) {
         case 1 : return get_wave_color(col, row, time_now, total_cols, total_rows, base);
         case 2 : return get_strobe_color(col, row, time_now, base);

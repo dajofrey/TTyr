@@ -362,7 +362,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateBorderGrid(
     Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height+(borderRowsPixels*2);
 
     Grid_p->cols = Grid_p->Size.width / nh_gfx_getTextWidth(Text_p) + 1;
-    Grid_p->rows = Grid_p->Size.height / Grid_p->TileSize.height + 1;
+    Grid_p->rows = Grid_p->Size.height / Grid_p->TileSize.height + 2;
 
     for (int row = 0; row < Grid_p->rows; ++row) {
         for (int col = 0; col < Grid_p->cols; ++col) {
