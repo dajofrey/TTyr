@@ -212,8 +212,8 @@ static int ttyr_terminal_getCurrentAttributeRangeForLineGraphics(
 }
 
 static int ttyr_terminal_getCurrentAttributeRange(
-    ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, int *row_p, bool foreground,
-    nh_core_Array *Cols_p, nh_core_Array *Rows_p)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Current_p, int *col_p, 
+    int *row_p, bool foreground, nh_core_Array *Cols_p, nh_core_Array *Rows_p)
 {
     int total = 0;
 
@@ -224,6 +224,9 @@ static int ttyr_terminal_getCurrentAttributeRange(
                 continue;
             }
             if (!foreground && (!Glyph.Background.custom && !Glyph.Attributes.reverse && !Glyph.Attributes.blink)) {
+                continue;
+            }
+            if (!foreground && Glyph.Attributes.blink && !State_p->Blink.on) {
                 continue;
             }
             if ((foreground && ttyr_terminal_compareForegroundAttributes(Current_p, &Glyph))
@@ -288,7 +291,8 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRangeForLineGraphics(
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
-    ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, bool foreground)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, 
+    bool foreground)
 {
     if (foreground) {
         nh_core_freeArray(&Data_p->Foreground.Ranges);
@@ -316,7 +320,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
         nh_core_Array Cols = nh_core_initArray(sizeof(int), 255);
         nh_core_Array Rows = nh_core_initArray(sizeof(int), 255);
  
-        total = ttyr_terminal_getCurrentAttributeRange(Grid_p, &NextGlyph, &col, &row, foreground, &Cols, &Rows) * 6;
+        total = ttyr_terminal_getCurrentAttributeRange(State_p, Grid_p, &NextGlyph, &col, &row, foreground, &Cols, &Rows) * 6;
         if (!total && !begin) {break;}
         begin = false;
 
@@ -516,8 +520,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBoxesData(Grid_p, &Data_p->Boxes))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateDimData(State_p, Grid_p, &Data_p->Dim))
 
-    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, true))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, false))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(State_p, Data_p, Grid_p, true))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(State_p, Data_p, Grid_p, false))
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRangeForLineGraphics(Data_p, Grid_p))
 
     return TTYR_TERMINAL_SUCCESS;
