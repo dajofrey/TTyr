@@ -36,7 +36,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundPrograms(
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
         "layout(location=1) in vec2 uv;\n"
-        "uniform vec3 in_color;\n"
+        "layout(location=2) in vec3 in_color;\n"
         "out vec2 texcoord;\n"
         "out vec3 color;\n"
         "void main() {\n"
@@ -96,15 +96,10 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundPrograms(
         nh_gfx_disableOpenGLCommandAutoFree(nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGetUniformLocation",
             &Foreground_p->Program_p->Result, nh_gfx_glchar(NULL, NULL, 0, &textureName_p)));
 
-    static GLchar *colorName_p = "in_color";
-    Foreground_p->GetUniformLocationColor_p =
-        nh_gfx_disableOpenGLCommandAutoFree(nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGetUniformLocation", 
-            &Foreground_p->Program_p->Result, nh_gfx_glchar(NULL, NULL, 0, &colorName_p)));
-
     static const char* vsSource2_p =
         "#version 450\n"
         "layout(location=0) in vec3 position;\n"
-        "uniform vec3 in_color;\n"
+        "layout(location=1) in vec3 in_color;\n"
         "out vec3 color;\n"
         "void main() {\n"
         "    color = in_color;\n"
@@ -146,10 +141,6 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundPrograms(
         &Foreground_p->FragmentShader2_p->Result);
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glLinkProgram", &Foreground_p->Program2_p->Result);
-
-    Foreground_p->GetUniformLocationColor2_p =
-        nh_gfx_disableOpenGLCommandAutoFree(nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGetUniformLocation",
-            &Foreground_p->Program2_p->Result, nh_gfx_glchar(NULL, NULL, 0, &colorName_p)));
 
     return TTYR_TERMINAL_SUCCESS;
 }
@@ -198,7 +189,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1), 
         Foreground_p->VerticesBuffer_p);
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
-        nh_gfx_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Foreground_p->VerticesBuffer_p);
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->VerticesBuffer_p);
 
     Foreground_p->VertexArray2_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenVertexArrays", nh_gfx_gluint(NULL, 1),
@@ -215,8 +206,19 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1), 
         Foreground_p->VerticesBuffer2_p);
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
-        nh_gfx_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Foreground_p->VerticesBuffer2_p);
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->VerticesBuffer2_p);
 
+    Foreground_p->ColorBuffer_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1), 
+        Foreground_p->ColorBuffer_p);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->ColorBuffer_p);
+
+    Foreground_p->ColorBuffer2_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1), 
+        Foreground_p->ColorBuffer2_p);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->ColorBuffer2_p);
 
     return TTYR_TERMINAL_SUCCESS;
 }
@@ -265,18 +267,28 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForegroundVertices(
         nh_gfx_glsizeiptr(NULL, Foreground_p->Vertices.length*sizeof(GLfloat)),
         nh_gfx_glubyte(NULL, Foreground_p->Vertices.p, Foreground_p->Vertices.length*sizeof(GLfloat)),
         nh_gfx_glenum(NULL, GL_STATIC_DRAW));
-
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glEnableVertexAttribArray", nh_gfx_gluint(NULL, 0));
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
         nh_gfx_gluint(NULL, 0), nh_gfx_gluint(NULL, 3), nh_gfx_glenum(NULL, GL_FLOAT),
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*5), 
         nh_gfx_glpointer(NULL, NULL));
-
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glEnableVertexAttribArray", nh_gfx_gluint(NULL, 1));
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
         nh_gfx_gluint(NULL, 1), nh_gfx_gluint(NULL, 2), nh_gfx_glenum(NULL, GL_FLOAT),
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*5),
         nh_gfx_glsizei(NULL, sizeof(float)*3));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->OpenGL.ColorBuffer_p);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBufferData", 
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), 
+        nh_gfx_glsizeiptr(NULL, Foreground_p->Colors.length*sizeof(GLfloat)),
+        nh_gfx_glubyte(NULL, Foreground_p->Colors.p, Foreground_p->Colors.length*sizeof(GLfloat)),
+        nh_gfx_glenum(NULL, GL_DYNAMIC_DRAW));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glEnableVertexAttribArray", nh_gfx_gluint(NULL, 2));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
+        nh_gfx_gluint(NULL, 2), nh_gfx_gluint(NULL, 3), nh_gfx_glenum(NULL, GL_FLOAT),
+        nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*3), 
+        nh_gfx_glpointer(NULL, NULL));
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Foreground_p->OpenGL.VertexArray2_p);
 
@@ -297,10 +309,21 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForegroundVertices(
         nh_gfx_glsizeiptr(NULL, Foreground_p->Vertices2.length*sizeof(GLfloat)),
         nh_gfx_glubyte(NULL, Foreground_p->Vertices2.p, Foreground_p->Vertices2.length*sizeof(GLfloat)),
         nh_gfx_glenum(NULL, GL_STATIC_DRAW));
-
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glEnableVertexAttribArray", nh_gfx_gluint(NULL, 0));
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
         nh_gfx_gluint(NULL, 0), nh_gfx_gluint(NULL, 3), nh_gfx_glenum(NULL, GL_FLOAT),
+        nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*3), 
+        nh_gfx_glpointer(NULL, NULL));
+     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->OpenGL.ColorBuffer2_p);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBufferData", 
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), 
+        nh_gfx_glsizeiptr(NULL, Foreground_p->Colors2.length*sizeof(GLfloat)),
+        nh_gfx_glubyte(NULL, Foreground_p->Colors2.p, Foreground_p->Colors2.length*sizeof(GLfloat)),
+        nh_gfx_glenum(NULL, GL_DYNAMIC_DRAW));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glEnableVertexAttribArray", nh_gfx_gluint(NULL, 1));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
+        nh_gfx_gluint(NULL, 1), nh_gfx_gluint(NULL, 3), nh_gfx_glenum(NULL, GL_FLOAT),
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*3), 
         nh_gfx_glpointer(NULL, NULL));
 
@@ -350,8 +373,6 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLForeground(
     nh_gfx_freeOpenGLCommand(Foreground_p->Program_p);
     nh_gfx_freeOpenGLCommand(Foreground_p->Program2_p);
     nh_gfx_freeOpenGLCommand(Foreground_p->GetUniformLocationTexture_p);
-    nh_gfx_freeOpenGLCommand(Foreground_p->GetUniformLocationColor_p);
-    nh_gfx_freeOpenGLCommand(Foreground_p->GetUniformLocationColor2_p);
  
     nh_gfx_freeOpenGLData(Foreground_p->Texture_p);
     nh_gfx_freeOpenGLData(Foreground_p->VertexArray_p);
@@ -360,6 +381,8 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLForeground(
     nh_gfx_freeOpenGLData(Foreground_p->IndicesBuffer2_p);
     nh_gfx_freeOpenGLData(Foreground_p->VerticesBuffer_p);
     nh_gfx_freeOpenGLData(Foreground_p->VerticesBuffer2_p);
-
+    nh_gfx_freeOpenGLData(Foreground_p->ColorBuffer_p);
+    nh_gfx_freeOpenGLData(Foreground_p->ColorBuffer2_p);
+ 
     return TTYR_TERMINAL_SUCCESS;
 }

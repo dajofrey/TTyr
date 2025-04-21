@@ -54,6 +54,7 @@ SRC_FILES_TTYR_TERMINAL = \
     Terminal/Grid.c \
     Terminal/Graphics.c \
     Terminal/Vertices.c \
+    Terminal/Color.c \
     Vulkan/Pipeline.c \
     Vulkan/Text.c \
     Vulkan/Render.c \
@@ -61,6 +62,7 @@ SRC_FILES_TTYR_TERMINAL = \
     OpenGL/Background.c \
     OpenGL/Boxes.c \
     OpenGL/Render.c \
+    OpenGL/Dim.c \
     Common/Result.c \
     Common/About.c \
     Common/Log.c \

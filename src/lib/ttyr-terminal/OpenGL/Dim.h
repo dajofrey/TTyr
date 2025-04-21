@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_OPENGL_BACKGROUND_H
-#define TTYR_TERMINAL_OPENGL_BACKGROUND_H
+#ifndef TTYR_TERMINAL_OPENGL_DIM_H
+#define TTYR_TERMINAL_OPENGL_DIM_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -26,16 +26,14 @@ typedef struct ttyr_terminal_Graphics ttyr_terminal_Graphics;
  *  @{
  */
 
-    typedef struct ttyr_terminal_OpenGLBackground {
+    typedef struct ttyr_terminal_OpenGLDim {
         nh_gfx_OpenGLCommand *VertexShader_p;
         nh_gfx_OpenGLCommand *FragmentShader_p;
         nh_gfx_OpenGLCommand *Program_p;
         nh_gfx_OpenGLData *VertexArray_p;
-        nh_gfx_OpenGLData *IndicesBuffer_p;
         nh_gfx_OpenGLData *VerticesBuffer_p;
         nh_gfx_OpenGLData *ColorBuffer_p;
-        nh_gfx_OpenGLCommand *BufferData_p;
-    } ttyr_terminal_OpenGLBackground;
+    } ttyr_terminal_OpenGLDim;
 
 /** @} */
 
@@ -43,16 +41,16 @@ typedef struct ttyr_terminal_Graphics ttyr_terminal_Graphics;
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBackground(
+    TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLDim(
         void *state_p, void *data_p
     );
 
-    TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBackground(
-        ttyr_terminal_OpenGLBackground *Background_p
+    TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLDim(
+        ttyr_terminal_OpenGLDim *Dim_p
     );
 
-    TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLBackground(
-        ttyr_terminal_OpenGLBackground *Background_p
+    TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLDim(
+        ttyr_terminal_OpenGLDim *Dim_p
     );
 
 /** @} */

@@ -93,5 +93,21 @@ Each newly opened Macro-Window
 #### Note 
 The hybrid approach makes it necessary to have seperate controls for macro-tabing/micro-tabing and macro-tiling/micro-tiling.
 
+### Rendering
+
+1. Backdrop  
+Render grid of ACCENT color tiles.
+2. Clear (if style == 0)  
+Clear inside borders with BACKGROUND color.
+3. Dim (if style > 0)  
+Render quads for dimming.
+4. TTy Background   
+Render grid of BACKGROUND color tiles.
+5. TTy Foreground  
+Render grid of char tiles with FOREGROUND or ACCENT color.
+6. UI Boxes  
+7. UI Background  
+8. UI Foreground  
+
 ## Development
 If you want to contribute, please run `./scripts/prepare-git.sh` which installs a prepare-commit-msg hook for versioning.

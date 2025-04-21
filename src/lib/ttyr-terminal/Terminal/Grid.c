@@ -345,13 +345,15 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateBorderGrid(
     Grid_p->TileSize.width = nh_gfx_getTextWidth(Text_p);
     Grid_p->TileSize.height = Config.fontSize+abs(State_p->FontInstance_p->descender);
 
-    int borderCols = (Config.border+Grid_p->TileSize.width-1)/Grid_p->TileSize.width;
-    int borderColsPixels = borderCols*Grid_p->TileSize.width;
-    int borderColsPixelsOffset = borderColsPixels-Config.border;
+    Grid_p->borderPixel = Grid_p->TileSize.width/3;
 
-    int borderRows = (Config.border+Grid_p->TileSize.height-1)/Grid_p->TileSize.height;
+    int borderCols = (Grid_p->borderPixel+Grid_p->TileSize.width-1)/Grid_p->TileSize.width;
+    int borderColsPixels = borderCols*Grid_p->TileSize.width;
+    int borderColsPixelsOffset = borderColsPixels-Grid_p->borderPixel;
+
+    int borderRows = (Grid_p->borderPixel+Grid_p->TileSize.height-1)/Grid_p->TileSize.height;
     int borderRowsPixels = borderRows*Grid_p->TileSize.height;
-    int borderRowsPixelsOffset = borderRowsPixels-Config.border;
+    int borderRowsPixelsOffset = borderRowsPixels-Grid_p->borderPixel;
 
     Grid_p->xOffset = borderColsPixelsOffset;
     Grid_p->yOffset = borderRowsPixelsOffset;
@@ -359,7 +361,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateBorderGrid(
     Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width+(borderColsPixels*2);
     Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height+(borderRowsPixels*2);
 
-    Grid_p->cols = Grid_p->Size.width / nh_gfx_getTextWidth(Text_p);
+    Grid_p->cols = Grid_p->Size.width / nh_gfx_getTextWidth(Text_p) + 1;
     Grid_p->rows = Grid_p->Size.height / Grid_p->TileSize.height + 1;
 
     for (int row = 0; row < Grid_p->rows; ++row) {
@@ -397,11 +399,13 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateGrid(
     ttyr_terminal_freeGrid(Grid_p);
 
     // Update data.
-    Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width-(Config.border*2);
-    Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height-(Config.border*2);
-
     Grid_p->TileSize.width = nh_gfx_getTextWidth(Text_p);
     Grid_p->TileSize.height = Config.fontSize+abs(State_p->FontInstance_p->descender);
+
+    Grid_p->borderPixel = Grid_p->TileSize.width/3;
+
+    Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width-(Grid_p->borderPixel*2);
+    Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height-(Grid_p->borderPixel*2);
 
     Grid_p->cols = Grid_p->Size.width / nh_gfx_getTextWidth(Text_p);
     Grid_p->rows = Grid_p->Size.height / Grid_p->TileSize.height;

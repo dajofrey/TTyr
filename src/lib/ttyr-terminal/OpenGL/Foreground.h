@@ -40,11 +40,11 @@ typedef struct ttyr_terminal_Graphics ttyr_terminal_Graphics;
         nh_gfx_OpenGLData *IndicesBuffer2_p;
         nh_gfx_OpenGLData *VerticesBuffer_p;
         nh_gfx_OpenGLData *VerticesBuffer2_p;
+        nh_gfx_OpenGLData *ColorBuffer_p;
+        nh_gfx_OpenGLData *ColorBuffer2_p;
         nh_gfx_OpenGLCommand *BufferData_p;
         nh_gfx_OpenGLCommand *BufferData2_p;
         nh_gfx_OpenGLCommand *GetUniformLocationTexture_p;
-        nh_gfx_OpenGLCommand *GetUniformLocationColor_p;
-        nh_gfx_OpenGLCommand *GetUniformLocationColor2_p;
     } ttyr_terminal_OpenGLForeground;
 
 /** @} */

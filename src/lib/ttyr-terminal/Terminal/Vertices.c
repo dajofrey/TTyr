@@ -317,7 +317,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
     float width  = (float)((float)(Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f;
     float height = (float)((float)(Grid_p->TileSize.height) / (float)Grid_p->Size.height) * 2.0f;
 
-    float lineWidthInPixel = 2.0;
+    float lineWidthInPixel = (float)Grid_p->borderPixel;
     float w = (lineWidthInPixel / (float)Grid_p->Size.width) * 2.0f;
     float h = (lineWidthInPixel / (float)Grid_p->Size.height) * 2.0f;
 

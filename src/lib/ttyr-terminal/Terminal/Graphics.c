@@ -9,6 +9,7 @@
 // INCLUDES ========================================================================================
 
 #include "Graphics.h"
+#include "Color.h"
 
 #include "../Vulkan/Render.h"
 #include "../OpenGL/Render.h"
@@ -56,27 +57,6 @@ static ttyr_terminal_GraphicsAction ttyr_terminal_initGraphicsAction()
     return Action;
 }
 
-static ttyr_core_Color ttyr_terminal_getGradientColor(
-    ttyr_terminal_GraphicsGradient *Gradient_p, ttyr_core_Color *Colors_p, int colors)
-{
-    if (colors == 1) {
-        return Colors_p[0];
-    }
-
-    ttyr_core_Color Color1 = Colors_p[Gradient_p->index];
-    ttyr_core_Color Color2 = Gradient_p->index == colors-1 ? Colors_p[0] : Colors_p[Gradient_p->index+1];
-
-    ttyr_core_Color Result;
-    Result.r = Color1.r + Gradient_p->ratio * (Color2.r - Color1.r);
-    Result.g = Color1.g + Gradient_p->ratio * (Color2.g - Color1.g);
-    Result.b = Color1.b + Gradient_p->ratio * (Color2.b - Color1.b);
-    Result.a = 1.0f;
-
-    Gradient_p->ratio += 0.01f;
-
-    return Result;
-}
-
 // INIT/FREE =======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsData(
@@ -89,11 +69,14 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsData(
     Data_p->Foreground.Indices2  = nh_core_initArray(sizeof(uint32_t), 1024);
     Data_p->Foreground.Ranges = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 32);
     Data_p->Foreground.Ranges2 = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 32);
+    Data_p->Foreground.Colors = nh_core_initArray(sizeof(float), 2048);
+    Data_p->Foreground.Colors2 = nh_core_initArray(sizeof(float), 2048);
 
     ttyr_terminal_initOpenGLForeground(&Data_p->Foreground.OpenGL);
 
     Data_p->Background.Action = ttyr_terminal_initGraphicsAction();
     Data_p->Background.Vertices = nh_core_initArray(sizeof(float), 1024);
+    Data_p->Background.Colors = nh_core_initArray(sizeof(float), 2048);
     Data_p->Background.Indices  = nh_core_initArray(sizeof(uint32_t), 1024);
     Data_p->Background.Ranges = nh_core_initArray(sizeof(ttyr_terminal_AttributeRange), 32);
 
@@ -102,6 +85,12 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initGraphicsData(
     Data_p->Boxes.Action = ttyr_terminal_initGraphicsAction();
     ttyr_terminal_initOpenGLBoxes(&Data_p->Boxes.OpenGL);
  
+    Data_p->Dim.Action = ttyr_terminal_initGraphicsAction();
+    Data_p->Dim.Vertices = nh_core_initArray(sizeof(float), 255);
+    Data_p->Dim.Colors = nh_core_initArray(sizeof(float), 255);
+
+    ttyr_terminal_initOpenGLDim(&Data_p->Dim.OpenGL);
+
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -152,16 +141,22 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphicsData(
     nh_core_freeArray(&Data_p->Foreground.Vertices2);
     nh_core_freeArray(&Data_p->Foreground.Indices2);
     nh_core_freeArray(&Data_p->Foreground.Ranges2);
+    nh_core_freeArray(&Data_p->Foreground.Colors);
+    nh_core_freeArray(&Data_p->Foreground.Colors2);
 
     ttyr_terminal_freeOpenGLForeground(&Data_p->Foreground.OpenGL);
 
     nh_core_freeArray(&Data_p->Background.Vertices);
+    nh_core_freeArray(&Data_p->Background.Colors);
     nh_core_freeArray(&Data_p->Background.Indices);
     nh_core_freeArray(&Data_p->Background.Ranges);
  
     ttyr_terminal_freeOpenGLBackground(&Data_p->Background.OpenGL);
     ttyr_terminal_freeOpenGLBoxes(&Data_p->Boxes.OpenGL);
 
+    nh_core_freeArray(&Data_p->Dim.Vertices);
+    nh_core_freeArray(&Data_p->Dim.Colors);
+ 
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -342,17 +337,21 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_computeRange(
 // UPDATE ==========================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateForegroundData(
-    ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsForeground *Foreground_p)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsForeground *Foreground_p)
 {
     nh_core_freeArray(&Foreground_p->Vertices);
     nh_core_freeArray(&Foreground_p->Indices);
     nh_core_freeArray(&Foreground_p->Vertices2);
     nh_core_freeArray(&Foreground_p->Indices2);
+    nh_core_freeArray(&Foreground_p->Colors);
+    nh_core_freeArray(&Foreground_p->Colors2);
 
     nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2000);
     nh_core_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
     nh_core_Array Vertices2 = nh_core_initArray(sizeof(float), 2000);
     nh_core_Array Indices2 = nh_core_initArray(sizeof(uint32_t), 1024);
+    nh_core_Array Colors = nh_core_initArray(sizeof(float), 2048);
+    nh_core_Array Colors2 = nh_core_initArray(sizeof(float), 2048);
 
     int offset1 = 0;
     int offset2 = 0;
@@ -372,11 +371,27 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateForegroundData(
                 };
                 nh_core_appendToArray(&Indices2, indices_p, 12);
                 offset1 += 8;
+
+                // add color data
+                ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Tile_p->Glyph, true, j, i, Grid_p);
+                for (int v = 0; v < 8; ++v) {
+                    nh_core_appendToArray(&Colors2, &Color.r, 1);
+                    nh_core_appendToArray(&Colors2, &Color.g, 1);
+                    nh_core_appendToArray(&Colors2, &Color.b, 1);
+                }
             } else {
                 nh_core_appendToArray(&Vertices, Tile_p->Foreground.vertices_p, 20);
                 uint32_t indices_p[6] = {offset2, offset2 + 1, offset2 + 2, offset2, offset2 + 2, offset2 + 3};
                 nh_core_appendToArray(&Indices, indices_p, 6);
                 offset2 += 4;
+
+                // add color data
+                ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Tile_p->Glyph, true, j, i, Grid_p);
+                for (int v = 0; v < 4; ++v) {
+                    nh_core_appendToArray(&Colors, &Color.r, 1);
+                    nh_core_appendToArray(&Colors, &Color.g, 1);
+                    nh_core_appendToArray(&Colors, &Color.b, 1);
+                }
             }
         }
     }
@@ -385,17 +400,21 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateForegroundData(
     Foreground_p->Indices = Indices;
     Foreground_p->Vertices2 = Vertices2;
     Foreground_p->Indices2 = Indices2;
+    Foreground_p->Colors = Colors;
+    Foreground_p->Colors2 = Colors2;
 
     return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateBackgroundData(
-    ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsBackground *Background_p)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsBackground *Background_p)
 {
     nh_core_freeArray(&Background_p->Vertices);
+    nh_core_freeArray(&Background_p->Colors);
     nh_core_freeArray(&Background_p->Indices);
 
     nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2048);
+    nh_core_Array Colors = nh_core_initArray(sizeof(float), 2048);
     nh_core_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
 
     int offset = 0;
@@ -405,14 +424,24 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateBackgroundData(
         for (int j = 0; j < Row_p->size; ++j) {
             ttyr_terminal_Tile *Tile_p = Row_p->pp[j];
             if (!Tile_p->Glyph.Background.custom && !Tile_p->Glyph.Attributes.reverse && !Tile_p->Glyph.Attributes.blink) {continue;}
+
             nh_core_appendToArray(&Vertices, Tile_p->Background.vertices_p, 12);
             uint32_t indices_p[6] = {offset, offset + 1, offset + 2, offset, offset + 2, offset + 3};
             nh_core_appendToArray(&Indices, indices_p, 6);
             offset += 4;
+
+            // add color data
+            ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Tile_p->Glyph, false, j, i, Grid_p);
+            for (int v = 0; v < 4; ++v) {
+                nh_core_appendToArray(&Colors, &Color.r, 1);
+                nh_core_appendToArray(&Colors, &Color.g, 1);
+                nh_core_appendToArray(&Colors, &Color.b, 1);
+            }
         }
     }
 
     Background_p->Vertices = Vertices;
+    Background_p->Colors = Colors;
     Background_p->Indices = Indices;
 
     return TTYR_TERMINAL_SUCCESS;
@@ -434,12 +463,58 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateBoxesData(
     return TTYR_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
-    ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
+static TTYR_TERMINAL_RESULT ttyr_terminal_updateDimData(
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsDim *Dim_p)
 {
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateForegroundData(Grid_p, &Data_p->Foreground))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateBackgroundData(Grid_p, &Data_p->Background))
+    nh_core_freeArray(&Dim_p->Vertices);
+    nh_core_freeArray(&Dim_p->Colors);
+
+    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 255);
+    nh_core_Array Colors = nh_core_initArray(sizeof(float), 255);
+
+    float z = 0.45f; // or whatever z-layer you want for dimming
+    
+    float vertices[] = {
+        // x, y, z
+        -1.0f, -1.0f, z,
+         1.0f, -1.0f, z,
+         1.0f,  1.0f, z,
+        -1.0f, -1.0f, z,
+         1.0f,  1.0f, z,
+        -1.0f,  1.0f, z
+    };
+
+    float quadColors[24] = {
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f,
+    
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f
+    };
+
+    for (int i = 0; i < 18; ++i) {
+        nh_core_appendToArray(&Vertices, &vertices[i], 1);
+    }
+
+    for (int i = 0; i < 24; ++i) {
+        nh_core_appendToArray(&Colors, &quadColors[i], 1);
+    }
+
+    Dim_p->Vertices = Vertices;
+    Dim_p->Colors = Colors;
+
+    return TTYR_TERMINAL_SUCCESS;
+}
+
+TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
+{
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateForegroundData(State_p, Grid_p, &Data_p->Foreground))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateBackgroundData(State_p, Grid_p, &Data_p->Background))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBoxesData(Grid_p, &Data_p->Boxes))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateDimData(State_p, Grid_p, &Data_p->Dim))
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, true))
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(Data_p, Grid_p, false))
@@ -538,45 +613,4 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
     }
 
     return TTYR_TERMINAL_SUCCESS;
-}
-
-// COLOR ===========================================================================================
-
-ttyr_core_Color ttyr_terminal_getGlyphColor(
-    ttyr_terminal_GraphicsState *State_p, ttyr_core_Glyph *Glyph_p, bool foreground)
-{
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
-    if (foreground) {
-        if (Glyph_p->Attributes.reverse || (Glyph_p->Attributes.blink && State_p->Blink.on)) {
-            if (Glyph_p->Background.custom) {
-                return Glyph_p->Background.Color;
-            }
-            return State_p->BackgroundGradient.Color;
-        }
-        if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-            return State_p->AccentGradient.Color;
-        }
-        if (Glyph_p->Foreground.custom) {
-            return Glyph_p->Foreground.Color;
-        }
-        return Config.Foreground;
-    }
-
-    // Background.
-    if ((Glyph_p->Attributes.reverse && !(Glyph_p->Attributes.blink && State_p->Blink.on)) 
-    || (!Glyph_p->Attributes.reverse &&   Glyph_p->Attributes.blink && State_p->Blink.on)) {
-        if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-            return State_p->AccentGradient.Color;
-        }
-        if (Glyph_p->Foreground.custom) {
-            return Glyph_p->Foreground.Color;
-        }
-        return Config.Foreground;
-    }
-    if (Glyph_p->Background.custom) {
-        return Glyph_p->Background.Color;
-    }
-
-    return State_p->BackgroundGradient.Color;
 }

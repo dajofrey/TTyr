@@ -61,6 +61,7 @@
         ttyr_terminal_Tile *Cursor_p;
         ttyr_terminal_TileUpdate **Updates_pp;
         bool **updates_pp;
+        int borderPixel;
     } ttyr_terminal_Grid;
 
 /** @} */
