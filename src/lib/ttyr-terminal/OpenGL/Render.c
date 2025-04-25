@@ -36,7 +36,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLDim(
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBackground(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p)
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
 
@@ -56,7 +56,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBackground(
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p)
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
 
@@ -87,39 +87,68 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLForeground(
     return TTYR_TERMINAL_SUCCESS;
 }
 
-//static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLBoxes(
-//    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
-//{
-//    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
-//
-//    nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
-//    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUseProgram", &Data_p->Background.OpenGL.Program_p->Result);
-//
-//    int offset = 0;
-//    for (int i = 0; i < Grid_p->Boxes.length; ++i) {
-//        ttyr_terminal_Box *Box_p = ((ttyr_terminal_Box*)Grid_p->Boxes.p)+i;
-//        // Render inner box.
-//        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", 
-//           &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
-//           nh_gfx_glfloat(NULL, State_p->BackgroundGradient.Color.r), 
-//           nh_gfx_glfloat(NULL, State_p->BackgroundGradient.Color.g), 
-//           nh_gfx_glfloat(NULL, State_p->BackgroundGradient.Color.b));
-//        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawArrays", 
-//            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glint(NULL, offset), nh_gfx_glsizei(NULL, 6));
-//        offset += 6;
-//        // Render outer box.
-//        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUniform3f", 
-//           &Data_p->Background.OpenGL.GetUniformLocation_p->Result, 
-//           nh_gfx_glfloat(NULL, Box_p->accent ? State_p->AccentGradient.Color.r : Config.Foreground.r), 
-//           nh_gfx_glfloat(NULL, Box_p->accent ? State_p->AccentGradient.Color.g : Config.Foreground.g), 
-//           nh_gfx_glfloat(NULL, Box_p->accent ? State_p->AccentGradient.Color.b : Config.Foreground.b));
-//        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawArrays", 
-//            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glint(NULL, offset), nh_gfx_glsizei(NULL, 6));
-//        offset += 6;
-//    }
-//
-//    return TTYR_TERMINAL_SUCCESS;
-//}
+static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLMenuBackground(
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_GraphicsData *Data1_p, 
+    ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p)
+{
+    for (int i = 0; i < Grid2_p->Boxes.length; ++i) {
+        ttyr_terminal_Box *Box_p = ((ttyr_terminal_Box*)Grid2_p->Boxes.p)+i;
+        if (Box_p->UpperLeft.x == Box_p->LowerRight.x) {continue;}
+        nh_gfx_addOpenGLCommand(
+            State_p->Viewport_p->OpenGL.CommandBuffer_p,
+            "glScissor",
+            nh_gfx_glint(NULL, ((Box_p->UpperLeft.x)*Grid_p->TileSize.width)+Grid2_p->borderPixel+Grid2_p->TileSize.width/2),
+            nh_gfx_glint(NULL, ((Grid2_p->Size.height-((Box_p->LowerRight.y)*Grid2_p->TileSize.height))+Grid2_p->borderPixel)-Grid2_p->TileSize.height/2),
+            nh_gfx_glsizei(NULL, ((((Box_p->LowerRight.x)-Box_p->UpperLeft.x)*Grid2_p->TileSize.width-Grid2_p->borderPixel)-Grid2_p->TileSize.width/2)),
+            nh_gfx_glsizei(NULL, (((Box_p->LowerRight.y)-Box_p->UpperLeft.y)*Grid2_p->TileSize.height)+Grid2_p->TileSize.height));
+        nh_gfx_addOpenGLCommand(
+            State_p->Viewport_p->OpenGL.CommandBuffer_p,
+            "glViewport",
+            nh_gfx_glint(NULL, 0),
+            nh_gfx_glint(NULL, 0),
+            nh_gfx_glsizei(NULL, Grid_p->Size.width),
+            nh_gfx_glsizei(NULL, Grid_p->Size.height));
+        ttyr_terminal_drawOpenGLBackground(State_p, Data_p);
+        ttyr_terminal_drawOpenGLDim(State_p, Data1_p, Grid2_p);
+    }
+
+    return TTYR_TERMINAL_SUCCESS;
+}
+
+static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLInactiveCursor(
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
+{
+    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
+
+    nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUseProgram", &Data_p->Background.OpenGL.Program_p->Result);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Data_p->Boxes.OpenGL.VertexArray_p);
+
+    int offset = 0;
+    for (int i = 0; i < Grid_p->Boxes.length; ++i) {
+        ttyr_terminal_Box *Box_p = ((ttyr_terminal_Box*)Grid_p->Boxes.p)+i;
+        if (Box_p->UpperLeft.x < 0 || Box_p->UpperLeft.y < 0 || Box_p->LowerRight.x < 0 || Box_p->LowerRight.y < 0) {continue;}
+        if (Box_p->UpperLeft.x != Box_p->LowerRight.x) {continue;}
+        // Render inner box.
+        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawArrays", 
+            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glint(NULL, offset), nh_gfx_glsizei(NULL, 6));
+        offset += 6;
+        // Render outer box.
+        nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawArrays", 
+            nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glint(NULL, offset), nh_gfx_glsizei(NULL, 6));
+        offset += 6;
+        nh_gfx_addOpenGLCommand(
+            State_p->Viewport_p->OpenGL.CommandBuffer_p,
+            "glScissor",
+            nh_gfx_glint(NULL, ((Box_p->UpperLeft.x+1)*Grid_p->TileSize.width)+Grid_p->borderPixel*1.5f),
+            nh_gfx_glint(NULL, Grid_p->Size.height-((Box_p->LowerRight.y+1)*Grid_p->TileSize.height)+Grid_p->borderPixel*1.5f),
+            nh_gfx_glsizei(NULL, Grid_p->TileSize.width-Grid_p->borderPixel),
+            nh_gfx_glsizei(NULL, Grid_p->TileSize.height-Grid_p->borderPixel));
+        ttyr_terminal_drawOpenGLDim(State_p, Data_p, Grid_p);
+    }
+
+    return TTYR_TERMINAL_SUCCESS;
+}
 
 TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
     ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p)
@@ -139,7 +168,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
        nh_gfx_glsizei(NULL, BorderGrid_p->Size.height));
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->BorderData))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->BorderData, BorderGrid_p))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->BorderData))
 
 // clear except borders
 
@@ -192,29 +221,64 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBlendFunc", nh_gfx_glenum(NULL, GL_SRC_ALPHA),
         nh_gfx_glenum(NULL, GL_ONE_MINUS_SRC_ALPHA));
 
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLDim(&Graphics_p->State, &Graphics_p->Data1))
+ 
     if (ttyr_terminal_getConfig().style > 0) {
-        TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLDim(&Graphics_p->State, &Graphics_p->Data1))
         TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLDim(&Graphics_p->State, &Graphics_p->Data1, Grid_p))
     }
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDisable", nh_gfx_glenum(NULL, GL_DEPTH_TEST));
  
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->Data1))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->Data1, Grid_p))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->Data1))
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDisable", nh_gfx_glenum(NULL, GL_DEPTH_TEST));
  
-//    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLBoxes(&Graphics_p->State, &Graphics_p->Data1))
-//    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBoxes(&Graphics_p->State, &Graphics_p->Data1, Grid_p))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLBoxes(&Graphics_p->State, &Graphics_p->Data1))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLInactiveCursor(&Graphics_p->State, &Graphics_p->Data1, Grid_p))
 
+    nh_gfx_addOpenGLCommand(
+        Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
+        "glScissor",
+        nh_gfx_glint(NULL, 0),
+        nh_gfx_glint(NULL, 0),
+        nh_gfx_glsizei(NULL, Grid_p->Size.width),
+        nh_gfx_glsizei(NULL, Grid_p->Size.height));
+ 
+    nh_gfx_addOpenGLCommand(
+        Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
+        "glViewport",
+        nh_gfx_glint(NULL, Grid_p->borderPixel),
+        nh_gfx_glint(NULL, Grid_p->borderPixel),
+        nh_gfx_glsizei(NULL, Grid_p->Size.width),
+        nh_gfx_glsizei(NULL, Grid_p->Size.height));
+ 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLForeground(&Graphics_p->State, &Graphics_p->Data1))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->Data1, Grid_p))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->Data1))
 
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLMenuBackground(&Graphics_p->State, &Graphics_p->BorderData, &Graphics_p->Data1, BorderGrid_p, Grid_p))
+
+    nh_gfx_addOpenGLCommand(
+        Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
+        "glScissor",
+        nh_gfx_glint(NULL, 0),
+        nh_gfx_glint(NULL, 0),
+        nh_gfx_glsizei(NULL, Grid_p->Size.width),
+        nh_gfx_glsizei(NULL, Grid_p->Size.height));
+ 
+    nh_gfx_addOpenGLCommand(
+        Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
+        "glViewport",
+        nh_gfx_glint(NULL, Grid_p->borderPixel),
+        nh_gfx_glint(NULL, Grid_p->borderPixel),
+        nh_gfx_glsizei(NULL, Grid_p->Size.width),
+        nh_gfx_glsizei(NULL, Grid_p->Size.height));
+ 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->Data2))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->Data2, Grid2_p))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->Data2))
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLForeground(&Graphics_p->State, &Graphics_p->Data2))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->Data2, Grid2_p))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->Data2))
  
     nh_gfx_endRecording(Graphics_p->State.Viewport_p, blockUntilRender);
 

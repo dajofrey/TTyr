@@ -23,6 +23,7 @@
     typedef struct ttyr_terminal_OpenGLBoxes {
         nh_gfx_OpenGLData *VertexArray_p;
         nh_gfx_OpenGLData *VerticesBuffer_p;
+        nh_gfx_OpenGLData *ColorBuffer_p;
         nh_gfx_OpenGLCommand *BufferData_p;
     } ttyr_terminal_OpenGLBoxes;
 

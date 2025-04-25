@@ -41,6 +41,10 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLBoxesVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
         nh_gfx_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Boxes_p->VerticesBuffer_p);
 
+    Boxes_p->ColorBuffer_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1),
+        Boxes_p->ColorBuffer_p);
+
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -62,6 +66,20 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLBoxesVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
         nh_gfx_gluint(NULL, 0), nh_gfx_gluint(NULL, 3), nh_gfx_glenum(NULL, GL_FLOAT),
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*3), 
+        nh_gfx_glpointer(NULL, NULL));
+
+    // Colors
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Boxes_p->OpenGL.ColorBuffer_p);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBufferData", 
+        nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), 
+        nh_gfx_glsizeiptr(NULL, Boxes_p->Colors.length * sizeof(GLfloat)),
+        nh_gfx_glubyte(NULL, Boxes_p->Colors.p, Boxes_p->Colors.length * sizeof(GLfloat)),
+        nh_gfx_glenum(NULL, GL_DYNAMIC_DRAW));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glEnableVertexAttribArray", nh_gfx_gluint(NULL, 1));
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glVertexAttribPointer",
+        nh_gfx_gluint(NULL, 1), nh_gfx_gluint(NULL, 3), nh_gfx_glenum(NULL, GL_FLOAT),
+        nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float) * 3),
         nh_gfx_glpointer(NULL, NULL));
 
     return TTYR_TERMINAL_SUCCESS;
@@ -98,6 +116,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_freeOpenGLBoxes(
 {
     nh_gfx_freeOpenGLData(Boxes_p->VertexArray_p);
     nh_gfx_freeOpenGLData(Boxes_p->VerticesBuffer_p);
+    nh_gfx_freeOpenGLData(Boxes_p->ColorBuffer_p);
     nh_gfx_freeOpenGLCommand(Boxes_p->BufferData_p);
  
     return TTYR_TERMINAL_SUCCESS;

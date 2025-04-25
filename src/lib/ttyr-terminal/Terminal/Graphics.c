@@ -417,9 +417,9 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateBackgroundData(
     nh_core_freeArray(&Background_p->Colors);
     nh_core_freeArray(&Background_p->Indices);
 
-    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 2048);
-    nh_core_Array Colors = nh_core_initArray(sizeof(float), 2048);
-    nh_core_Array Indices = nh_core_initArray(sizeof(uint32_t), 1024);
+    Background_p->Vertices = nh_core_initArray(sizeof(float), 2048);
+    Background_p->Colors = nh_core_initArray(sizeof(float), 2048);
+    Background_p->Indices = nh_core_initArray(sizeof(uint32_t), 1024);
 
     int offset = 0;
 
@@ -429,39 +429,50 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateBackgroundData(
             ttyr_terminal_Tile *Tile_p = Row_p->pp[j];
             if (!Tile_p->Glyph.Background.custom && !Tile_p->Glyph.Attributes.reverse && !Tile_p->Glyph.Attributes.blink) {continue;}
 
-            nh_core_appendToArray(&Vertices, Tile_p->Background.vertices_p, 12);
+            nh_core_appendToArray(&Background_p->Vertices, Tile_p->Background.vertices_p, 12);
             uint32_t indices_p[6] = {offset, offset + 1, offset + 2, offset, offset + 2, offset + 3};
-            nh_core_appendToArray(&Indices, indices_p, 6);
+            nh_core_appendToArray(&Background_p->Indices, indices_p, 6);
             offset += 4;
 
             // add color data
             ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Tile_p->Glyph, false, j, i, Grid_p);
             for (int v = 0; v < 4; ++v) {
-                nh_core_appendToArray(&Colors, &Color.r, 1);
-                nh_core_appendToArray(&Colors, &Color.g, 1);
-                nh_core_appendToArray(&Colors, &Color.b, 1);
+                nh_core_appendToArray(&Background_p->Colors, &Color.r, 1);
+                nh_core_appendToArray(&Background_p->Colors, &Color.g, 1);
+                nh_core_appendToArray(&Background_p->Colors, &Color.b, 1);
             }
         }
     }
-
-    Background_p->Vertices = Vertices;
-    Background_p->Colors = Colors;
-    Background_p->Indices = Indices;
 
     return TTYR_TERMINAL_SUCCESS;
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateBoxesData(
-    ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsBoxes *Boxes_p)
+     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_GraphicsBoxes *Boxes_p)
 {
     nh_core_freeArray(&Boxes_p->Vertices);
+    nh_core_freeArray(&Boxes_p->Colors);
+
     Boxes_p->Vertices = nh_core_initArray(sizeof(float), 64);
+    Boxes_p->Colors = nh_core_initArray(sizeof(float), 64);
  
     for (int i = 0; i < Grid_p->Boxes.length; ++i) {
-        nh_core_appendToArray(
-            &Boxes_p->Vertices, ((ttyr_terminal_Box*)Grid_p->Boxes.p)[i].innerVertices_p, 18);
-        nh_core_appendToArray(
-            &Boxes_p->Vertices, ((ttyr_terminal_Box*)Grid_p->Boxes.p)[i].outerVertices_p, 18);
+        ttyr_terminal_Box *Box_p = ((ttyr_terminal_Box*)Grid_p->Boxes.p)+i;
+        if (Box_p->UpperLeft.x < 0 || Box_p->UpperLeft.y < 0 || Box_p->LowerRight.x < 0 || Box_p->LowerRight.y < 0) {continue;}
+        nh_core_appendToArray(&Boxes_p->Vertices, Box_p->innerVertices_p, 18);
+        nh_core_appendToArray(&Boxes_p->Vertices, Box_p->outerVertices_p, 18);
+        // add color data
+        ttyr_terminal_Tile *Tile_p = ttyr_terminal_getTile(Grid_p, Box_p->UpperLeft.y, Box_p->UpperLeft.x);
+        Tile_p->Glyph.Attributes.reverse = true;
+        Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
+        ttyr_core_Color Color = ttyr_terminal_getGlyphColor(State_p, &Tile_p->Glyph, false, Box_p->UpperLeft.x, Box_p->UpperLeft.y, Grid_p);
+        Tile_p->Glyph.Attributes.reverse = false;
+        Tile_p->Glyph.mark &= TTYR_CORE_MARK_ACCENT;
+        for (int v = 0; v < 12; ++v) {
+            nh_core_appendToArray(&Boxes_p->Colors, &Color.r, 1);
+            nh_core_appendToArray(&Boxes_p->Colors, &Color.g, 1);
+            nh_core_appendToArray(&Boxes_p->Colors, &Color.b, 1);
+        }
     }
 
     return TTYR_TERMINAL_SUCCESS;
@@ -517,7 +528,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
 {
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateForegroundData(State_p, Grid_p, &Data_p->Foreground))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBackgroundData(State_p, Grid_p, &Data_p->Background))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateBoxesData(Grid_p, &Data_p->Boxes))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateBoxesData(State_p, Grid_p, &Data_p->Boxes))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateDimData(State_p, Grid_p, &Data_p->Dim))
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_computeRange(State_p, Data_p, Grid_p, true))

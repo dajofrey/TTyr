@@ -77,6 +77,7 @@
         ttyr_terminal_GraphicsAction Action;
         ttyr_terminal_OpenGLBoxes OpenGL;
         nh_core_Array Vertices;
+        nh_core_Array Colors;
     } ttyr_terminal_GraphicsBoxes;
  
     typedef struct ttyr_terminal_GraphicsGradient {

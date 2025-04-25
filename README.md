@@ -8,7 +8,7 @@ Terminal Emulator for conquering the command line.
 
 ![screenshot](./build/data/image/screenshot.png)
 
-Written in C99 | Noiseless UI | Hybrid Tabing/Tiling | GPU Acceleration | Cross-Platform with API
+Written in C | Noiseless UI | Hybrid Tabing/Tiling | GPU Acceleration | Cross-Platform with API
 
 ## README Contents
   
@@ -105,9 +105,7 @@ Render quads for dimming.
 Render grid of BACKGROUND color tiles.
 5. TTy Foreground  
 Render grid of char tiles with FOREGROUND or ACCENT color.
-6. UI Boxes  
-7. UI Background  
-8. UI Foreground  
+TODO
 
 ## Development
 If you want to contribute, please run `./scripts/prepare-git.sh` which installs a prepare-commit-msg hook for versioning.
