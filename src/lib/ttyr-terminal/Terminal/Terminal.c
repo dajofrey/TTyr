@@ -117,9 +117,9 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateSize(
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateGrid(&Terminal_p->Grid2, &Terminal_p->Graphics.State, &Text))
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateBorderGrid(&Terminal_p->BorderGrid, &Terminal_p->Graphics.State, &Text))
 
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data1, &Terminal_p->Grid))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data2, &Terminal_p->Grid2))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data1, &Terminal_p->Grid, 1))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data2, &Terminal_p->Grid2, 1))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid, 0))
 
     // Update view size, subtract gap tiles.
     Terminal_p->View_p->cols = Terminal_p->Grid.cols-1;
@@ -127,9 +127,9 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateSize(
     Terminal_p->View_p->Size = Terminal_p->Grid.Size;
     Terminal_p->View_p->TileSize = Terminal_p->Grid.TileSize;
 
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data1, &Terminal_p->Grid))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data2, &Terminal_p->Grid2))
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data1, &Terminal_p->Grid, 1))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data2, &Terminal_p->Grid2, 1))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid, 0))
 
     nh_gfx_freeText(&Text);
 
@@ -318,11 +318,11 @@ static NH_SIGNAL ttyr_terminal_runTerminal(
  
     if (update) {
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data1,
-            &Terminal_p->Grid))
+            &Terminal_p->Grid, 1))
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.Data2,
-            &Terminal_p->Grid2))
+            &Terminal_p->Grid2, 1))
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateGraphicsData(&Terminal_p->Graphics.State, &Terminal_p->Graphics.BorderData, 
-            &Terminal_p->BorderGrid))
+            &Terminal_p->BorderGrid, 0))
         TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_renderGraphics(&Terminal_p->Graphics, 
             &Terminal_p->Grid, &Terminal_p->Grid2, &Terminal_p->BorderGrid))
         return NH_SIGNAL_OK;

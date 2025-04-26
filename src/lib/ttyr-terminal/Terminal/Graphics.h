@@ -142,7 +142,7 @@
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
-        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p
+        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, int offset
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
