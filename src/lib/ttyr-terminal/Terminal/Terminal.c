@@ -48,7 +48,7 @@ static void *ttyr_terminal_initTerminal(
     Workload_p->path_p = path_p;
     Workload_p->module = -1;
 
-    ttyr_terminal_Terminal *Terminal_p = nh_core_allocate(sizeof(ttyr_terminal_Terminal));
+    ttyr_terminal_Terminal *Terminal_p = (ttyr_terminal_Terminal*)nh_core_allocate(sizeof(ttyr_terminal_Terminal));
     TTYR_TERMINAL_CHECK_MEM_2(NULL, Terminal_p)
 
     memset(Terminal_p, 0, sizeof(ttyr_terminal_Terminal));
@@ -192,7 +192,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_handleEvent(
         } 
         if (Event_p->Mouse.type == NH_API_MOUSE_MOVE && Terminal_p->leftMouse) {
             if (Event_p->Mouse.Position.y < Terminal_p->Grid.TileSize.height) {
-                nh_api_moveWindow(Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p);
+                nh_api_moveWindow((nh_api_Window*)Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p);
                 if (Terminal_p->Graphics.State.Viewport_p->Surface_p->Window_p->type == NH_WSI_TYPE_X11) {
                     Terminal_p->leftMouse = false;
                 }
@@ -232,7 +232,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_handleInputIfRequired(
     }
 
     do {
-        Array_p = nh_core_incrementRingBufferMarker(
+        Array_p = (nh_core_Array*)nh_core_incrementRingBufferMarker(
             &Terminal_p->View_p->Forward.Tiles, &Terminal_p->View_p->Forward.Tiles.Marker);
 
         if (!Array_p) {break;}
@@ -274,7 +274,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_handleInputIfRequired(
     }
 
     do {
-        Array_p = nh_core_incrementRingBufferMarker(
+        Array_p = (nh_core_Array*)nh_core_incrementRingBufferMarker(
             &Terminal_p->View_p->Forward.Boxes, &Terminal_p->View_p->Forward.Boxes.Marker);
 
         if (!Array_p) {break;}
@@ -284,7 +284,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_handleInputIfRequired(
     } while (Array_p);
 
     do {
-        Event_p = nh_core_incrementRingBufferMarker(
+        Event_p = (nh_api_WSIEvent*)nh_core_incrementRingBufferMarker(
             &Terminal_p->View_p->Forward.Events, &Terminal_p->View_p->Forward.Events.Marker);
 
         if (!Event_p) {break;}
@@ -308,7 +308,7 @@ static NH_SIGNAL ttyr_terminal_runTerminal(
 
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_updateSizeIfRequired(Terminal_p, &update))
     TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, ttyr_terminal_handleInputIfRequired(Terminal_p, &update))
-    if (ttyr_terminal_updateBlinkOrGradient(&Terminal_p->Graphics)) {
+    if (ttyr_terminal_updateBlinkOrGradient(&Terminal_p->Graphics.State)) {
         update = true;
     }
 

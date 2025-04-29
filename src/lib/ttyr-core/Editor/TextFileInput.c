@@ -124,7 +124,7 @@ static TTYR_CORE_RESULT ttyr_core_handleFileCursorXTarget(
     ttyr_core_TextFileLine *Line_p = nh_core_getFromList(&TextFile_p->Lines, TextFile_p->fileCursorY);
     TTYR_CHECK_NULL(Line_p)
 
-    int *colOffsets_p = nh_core_allocate(sizeof(int) * Views_p->size);
+    int *colOffsets_p = (int*)nh_core_allocate(sizeof(int) * Views_p->size);
     TTYR_CHECK_MEM(colOffsets_p)
 
     for (int i = 0; i < Views_p->size; ++i) {

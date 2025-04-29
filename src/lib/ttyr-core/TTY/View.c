@@ -79,7 +79,7 @@ TTYR_CORE_RESULT ttyr_core_updateView(
     if (View_p->Row.Glyphs_p) {
         nh_core_free(View_p->Row.Glyphs_p);
     }
-    View_p->Row.Glyphs_p = nh_core_allocate(sizeof(ttyr_core_Glyph)*View_p->cols);
+    View_p->Row.Glyphs_p = (ttyr_core_Glyph*)nh_core_allocate(sizeof(ttyr_core_Glyph)*View_p->cols);
 
     for (int i = 0; i < (Config.Titlebar.on && macro && View_p->previousRows > 0 ? View_p->previousRows+1 : View_p->previousRows); ++i) {
         nh_core_free(View_p->Grid1_p[i].Glyphs_p);
@@ -92,18 +92,18 @@ TTYR_CORE_RESULT ttyr_core_updateView(
         nh_core_free(View_p->Grid2_p);
     }
 
-    View_p->Grid1_p = nh_core_allocate(sizeof(ttyr_core_Row)*View_p->rows);
-    View_p->Grid2_p = nh_core_allocate(sizeof(ttyr_core_Row)*View_p->rows);
+    View_p->Grid1_p = (ttyr_core_Row*)nh_core_allocate(sizeof(ttyr_core_Row)*View_p->rows);
+    View_p->Grid2_p = (ttyr_core_Row*)nh_core_allocate(sizeof(ttyr_core_Row)*View_p->rows);
  
     for (int i = 0; i < View_p->rows; ++i) {
-        View_p->Grid1_p[i].Glyphs_p = nh_core_allocate(sizeof(ttyr_core_Glyph)*View_p->cols);
+        View_p->Grid1_p[i].Glyphs_p = (ttyr_core_Glyph*)nh_core_allocate(sizeof(ttyr_core_Glyph)*View_p->cols);
         memset(View_p->Grid1_p[i].Glyphs_p, 0, sizeof(ttyr_core_Glyph)*View_p->cols);
-        View_p->Grid1_p[i].update_p = nh_core_allocate(sizeof(bool)*View_p->cols);
+        View_p->Grid1_p[i].update_p = (bool*)nh_core_allocate(sizeof(bool)*View_p->cols);
         memset(View_p->Grid1_p[i].update_p, true, sizeof(bool)*View_p->cols);
 
-        View_p->Grid2_p[i].Glyphs_p = nh_core_allocate(sizeof(ttyr_core_Glyph)*View_p->cols);
+        View_p->Grid2_p[i].Glyphs_p = (ttyr_core_Glyph*)nh_core_allocate(sizeof(ttyr_core_Glyph)*View_p->cols);
         memset(View_p->Grid2_p[i].Glyphs_p, 0, sizeof(ttyr_core_Glyph)*View_p->cols);
-        View_p->Grid2_p[i].update_p = nh_core_allocate(sizeof(bool)*View_p->cols);
+        View_p->Grid2_p[i].update_p = (bool*)nh_core_allocate(sizeof(bool)*View_p->cols);
         memset(View_p->Grid2_p[i].update_p, true, sizeof(bool)*View_p->cols);
     }
 
@@ -127,7 +127,7 @@ static void ttyr_core_initTilesBuffer(
     nh_core_RingBuffer *Buffer_p, int itemCount)
 {
     for (int i = 0; i < itemCount; ++i) {
-        nh_core_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
+        nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(Buffer_p);
         *Array_p = nh_core_initArray(sizeof(ttyr_terminal_TileUpdate), 255);
     }
 }
@@ -136,7 +136,7 @@ static void ttyr_core_initBoxesBuffer(
     nh_core_RingBuffer *Buffer_p, int itemCount)
 {
     for (int i = 0; i < itemCount; ++i) {
-        nh_core_Array *Array_p = nh_core_advanceRingBuffer(Buffer_p);
+        nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(Buffer_p);
         *Array_p = nh_core_initArray(sizeof(ttyr_terminal_Box), 16);
     }
 }
@@ -160,7 +160,7 @@ ttyr_core_View *ttyr_core_createView(
         &View.Forward.Boxes, 16, sizeof(nh_core_Array), ttyr_core_initBoxesBuffer 
     ))
 
-    ttyr_core_View *View_p = nh_core_allocate(sizeof(ttyr_core_View));
+    ttyr_core_View *View_p = (ttyr_core_View*)nh_core_allocate(sizeof(ttyr_core_View));
     TTYR_CHECK_MEM_2(NULL, View_p)
 
     *View_p = View;
@@ -176,11 +176,11 @@ TTYR_CORE_RESULT ttyr_core_destroyView(
     ttyr_core_TTY *TTY_p, ttyr_core_View *View_p)
 {
     for (int i = 0; i < 64; ++i) {
-        nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+        nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
         nh_core_freeArray(Array_p);
     }
     for (int i = 0; i < 16; ++i) {
-        nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
+        nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
         nh_core_freeArray(Array_p);
     }
 
@@ -225,7 +225,7 @@ TTYR_CORE_RESULT ttyr_core_forwardCursor(
     memset(&Glyph, 0, sizeof(ttyr_core_Glyph));
 
     // Write to nhterminal.
-    nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
 
     ttyr_terminal_TileUpdate Update;
@@ -244,7 +244,7 @@ static TTYR_CORE_RESULT ttyr_core_setContextMenuBoxes(
 {
     if (!Menu_p->active || Menu_p->Items.size == 0) {return TTYR_CORE_SUCCESS;}
 
-    ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
+    ttyr_terminal_Box *Box_p = (ttyr_terminal_Box*)nh_core_incrementArray(Boxes_p);
 
     int width = 0;
     for (int i = 0; i < Menu_p->Items.size; ++i) {
@@ -268,7 +268,7 @@ static TTYR_CORE_RESULT ttyr_core_setContextMenuBoxes(
 static TTYR_CORE_RESULT ttyr_core_setBox(
     ttyr_core_Menu Menu, nh_core_Array *Boxes_p)
 {
-    ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
+    ttyr_terminal_Box *Box_p = (ttyr_terminal_Box*)nh_core_incrementArray(Boxes_p);
 
     memset(Box_p, 0, sizeof(ttyr_terminal_Box));
     Box_p->UpperLeft.x = Menu.Position.x-1;
@@ -289,8 +289,8 @@ TTYR_CORE_RESULT ttyr_core_forwardGrid1(
     ttyr_core_Config Config = ttyr_core_getConfig();
 
     // Write to nhterminal.
-    nh_core_Array *Boxes_p = nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
-    nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_Array *Boxes_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
+    nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
     nh_core_freeArray(Boxes_p);
 
@@ -355,7 +355,7 @@ TTYR_CORE_RESULT ttyr_core_forwardGrid1(
             int x = 0, y = 0;
             TTYR_CHECK(ttyr_core_getCursorPosition(MacroTiles.pp[i], MicroTiles.pp[j], View_p->standardIO, &x, &y))
 
-            ttyr_terminal_Box *Box_p = nh_core_incrementArray(Boxes_p);
+            ttyr_terminal_Box *Box_p = (ttyr_terminal_Box*)nh_core_incrementArray(Boxes_p);
             memset(Box_p, 0, sizeof(ttyr_terminal_Box));
             Box_p->UpperLeft.x = x-2;
             Box_p->UpperLeft.y = Config.Titlebar.on ? y : y-1;
@@ -374,7 +374,7 @@ TTYR_CORE_RESULT ttyr_core_forwardGrid2(
     ttyr_core_View *View_p)
 {
     // Write to nhterminal.
-    nh_core_Array *Array_p = nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
 
     for (int row = 0; row < View_p->rows; ++row) {
@@ -400,7 +400,7 @@ TTYR_CORE_RESULT ttyr_core_forwardEvent(
     }
 
     // Write to nhterminal.
-    nh_api_WSIEvent *Event_p = nh_core_advanceRingBuffer(&View_p->Forward.Events);
+    nh_api_WSIEvent *Event_p = (nh_api_WSIEvent*)nh_core_advanceRingBuffer(&View_p->Forward.Events);
     TTYR_CHECK_MEM(Event_p)
     *Event_p = Event;
 

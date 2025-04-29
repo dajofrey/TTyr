@@ -30,7 +30,7 @@
 ttyr_core_Program *ttyr_core_createProgramInstance(
     ttyr_core_Interface *Interface_p, bool once)
 {
-    ttyr_core_Program *Program_p = nh_core_allocate(sizeof(ttyr_core_Program));
+    ttyr_core_Program *Program_p = (ttyr_core_Program*)nh_core_allocate(sizeof(ttyr_core_Program));
     TTYR_CHECK_MEM_2(NULL, Program_p)
 
     Program_p->once        = once;

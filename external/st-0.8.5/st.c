@@ -1,4 +1,7 @@
 /* See LICENSE for license details. */
+
+#define _XOPEN_SOURCE 700
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>

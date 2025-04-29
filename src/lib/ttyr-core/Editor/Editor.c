@@ -411,7 +411,7 @@ static TTYR_CORE_RESULT ttyr_core_executeEditorCommand(
 static void *ttyr_core_initEditor(
     void *arg_p)
 {
-    ttyr_core_Editor *Editor_p = nh_core_allocate(sizeof(ttyr_core_Editor));
+    ttyr_core_Editor *Editor_p = (ttyr_core_Editor*)nh_core_allocate(sizeof(ttyr_core_Editor));
     TTYR_CHECK_MEM_2(NULL, Editor_p)
 
     Editor_p->View        = ttyr_core_initEditorView();
@@ -456,7 +456,7 @@ static void ttyr_core_destroyEditorPrototype(
 
 ttyr_core_Interface *ttyr_core_createEditorPrototype()
 {
-    ttyr_core_Interface *Prototype_p = nh_core_allocate(sizeof(ttyr_core_Interface));
+    ttyr_core_Interface *Prototype_p = (ttyr_core_Interface*)nh_core_allocate(sizeof(ttyr_core_Interface));
     TTYR_CHECK_MEM_2(NULL, Prototype_p)
 
     memset(Prototype_p, 0, sizeof(ttyr_core_Interface));

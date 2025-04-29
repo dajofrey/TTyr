@@ -414,16 +414,16 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateGrid(
     Grid_p->cols += 1;
     Grid_p->rows += 1;
 
-    Grid_p->Updates_pp = nh_core_allocate(sizeof(void*) * Grid_p->rows);
+    Grid_p->Updates_pp = (ttyr_terminal_TileUpdate**)nh_core_allocate(sizeof(ttyr_terminal_TileUpdate*) * Grid_p->rows);
     TTYR_TERMINAL_CHECK_MEM(Grid_p->Updates_pp)
 
-    Grid_p->updates_pp = nh_core_allocate(sizeof(void*) * Grid_p->rows);
+    Grid_p->updates_pp = (bool**)nh_core_allocate(sizeof(bool*) * Grid_p->rows);
     TTYR_TERMINAL_CHECK_MEM(Grid_p->updates_pp)
 
     for (int row = 0; row < Grid_p->rows; ++row) {
-        Grid_p->Updates_pp[row] = nh_core_allocate(sizeof(ttyr_terminal_TileUpdate) * Grid_p->cols);
+        Grid_p->Updates_pp[row] = (ttyr_terminal_TileUpdate*)nh_core_allocate(sizeof(ttyr_terminal_TileUpdate) * Grid_p->cols);
         TTYR_TERMINAL_CHECK_MEM(Grid_p->Updates_pp[row])
-        Grid_p->updates_pp[row] = nh_core_allocate(sizeof(bool) * Grid_p->cols);
+        Grid_p->updates_pp[row] = (bool*)nh_core_allocate(sizeof(bool) * Grid_p->cols);
         TTYR_TERMINAL_CHECK_MEM(Grid_p->updates_pp[row])
         memset(Grid_p->updates_pp[row], 0, sizeof(bool)*Grid_p->cols);
     }
@@ -452,7 +452,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateBoxes(
 
     for (int i = 0; i < Boxes_p->length; ++i) 
     {
-        ttyr_terminal_Box *Box_p = nh_core_incrementArray(&Grid_p->Boxes);
+        ttyr_terminal_Box *Box_p = (ttyr_terminal_Box*)nh_core_incrementArray(&Grid_p->Boxes);
         TTYR_TERMINAL_CHECK_MEM(Box_p)
         *Box_p = ((ttyr_terminal_Box*)Boxes_p->p)[i];
 

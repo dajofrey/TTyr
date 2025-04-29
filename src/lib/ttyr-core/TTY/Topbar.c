@@ -200,7 +200,7 @@ static TTYR_CORE_RESULT ttyr_core_getArguments(
             Argument_p = NULL;
         }
         if (!Argument_p && Topbar_p->Command.p[i] != ' ') {
-            Argument_p = nh_core_allocate(sizeof(nh_encoding_UTF32String));
+            Argument_p = (nh_encoding_UTF32String*)nh_core_allocate(sizeof(nh_encoding_UTF32String));
             TTYR_CHECK_MEM(Argument_p)
             *Argument_p = nh_encoding_initUTF32(64);
         }

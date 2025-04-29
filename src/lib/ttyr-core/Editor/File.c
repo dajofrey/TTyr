@@ -56,7 +56,7 @@ ttyr_core_FileView ttyr_core_initFileView(
 TTYR_CORE_RESULT ttyr_core_createFileViews(
     ttyr_core_FileEditorView *View_p, ttyr_core_File *File_p)
 {
-    ttyr_core_FileView *FileView_p = nh_core_allocate(sizeof(ttyr_core_FileView));
+    ttyr_core_FileView *FileView_p = (ttyr_core_FileView*)nh_core_allocate(sizeof(ttyr_core_FileView));
     TTYR_CHECK_MEM(FileView_p)
     *FileView_p = ttyr_core_initFileView(File_p);
     nh_core_appendToList(&View_p->FileViews, FileView_p);

@@ -19,7 +19,7 @@
 
 // FUNCTIONS =======================================================================================
 
-char TTYR_API_PATH_P[255] = {NULL};
+char TTYR_API_PATH_P[255] = {0};
 
 void ttyr_api_initialize() 
 {

@@ -59,7 +59,7 @@ nh_encoding_UTF32String *ttyr_core_newClipboardLine()
 {
     ttyr_core_TTY *TTY_p = nh_core_getWorkloadArg();
 
-    nh_encoding_UTF32String *Line_p = nh_core_incrementArray(&TTY_p->Clipboard.Lines);
+    nh_encoding_UTF32String *Line_p = (nh_encoding_UTF32String*)nh_core_incrementArray(&TTY_p->Clipboard.Lines);
 
     TTYR_CHECK_NULL_2(NULL, Line_p)
     *Line_p = nh_encoding_initUTF32(32);
@@ -91,7 +91,7 @@ static void *ttyr_core_initTTY(
     Workload_p->name_p = name_p;
     Workload_p->module = -1;
 
-    ttyr_core_TTY *TTY_p = nh_core_allocate(sizeof(ttyr_core_TTY));
+    ttyr_core_TTY *TTY_p = (ttyr_core_TTY*)nh_core_allocate(sizeof(ttyr_core_TTY));
     TTYR_CHECK_MEM_2(NULL, TTY_p)
 
     memset(TTY_p, 0, sizeof(ttyr_core_TTY));
@@ -170,7 +170,7 @@ static TTYR_CORE_RESULT ttyr_core_handleInput(
     while (1)
     {
         nh_api_WSIEvent *Event_p =
-            nh_core_incrementRingBufferMarker(&TTY_p->Events, &TTY_p->Events.Marker);
+            (nh_api_WSIEvent*)nh_core_incrementRingBufferMarker(&TTY_p->Events, &TTY_p->Events.Marker);
 
         if (Event_p == NULL) {break;}
 
@@ -282,7 +282,7 @@ static NH_SIGNAL ttyr_core_runTTYCommand(
             TTYR_CHECK(ttyr_core_unclaimStandardIO(TTY_p))
             break;
         case TTYR_CORE_COMMAND_SEND_EVENT :
-            nh_api_WSIEvent *Event2_p = nh_core_advanceRingBuffer(&TTY_p->Events);
+            nh_api_WSIEvent *Event2_p = (nh_api_WSIEvent*)nh_core_advanceRingBuffer(&TTY_p->Events);
             TTYR_CHECK_NULL(Event2_p)
             *Event2_p = *((nh_api_WSIEvent*)Command_p->p);
             break;

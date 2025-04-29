@@ -97,7 +97,7 @@ static ttyr_core_TreeListingNode *ttyr_core_getTreeListingNode(
 static ttyr_core_TreeListingNode *ttyr_core_createTreeListingNode(
     ttyr_core_TreeListingNode *Parent_p, nh_encoding_UTF32String Path, ttyr_core_File *File_p)
 {
-    ttyr_core_TreeListingNode *Node_p = nh_core_allocate(sizeof(ttyr_core_TreeListingNode));
+    ttyr_core_TreeListingNode *Node_p = (ttyr_core_TreeListingNode*)nh_core_allocate(sizeof(ttyr_core_TreeListingNode));
     TTYR_CHECK_MEM_2(NULL, Node_p)
 
     Node_p->open      = false;
@@ -673,7 +673,7 @@ static TTYR_CORE_RESULT ttyr_core_renderTreeListing(
 
     for (int row = 0; row < Nodes.size; ++row) 
     {
-        nh_core_Array *Line_p = nh_core_incrementArray(&Listing_p->RenderLines);
+        nh_core_Array *Line_p = (nh_core_Array*)nh_core_incrementArray(&Listing_p->RenderLines);
         *Line_p = nh_core_initArray(sizeof(ttyr_core_Glyph), 32);
         ttyr_core_TreeListingNode *Node_p = nh_core_getFromList(&Nodes, row);
         TTYR_CHECK_NULL(Node_p)

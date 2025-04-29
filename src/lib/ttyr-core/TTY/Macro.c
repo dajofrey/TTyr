@@ -38,14 +38,14 @@
 ttyr_core_Tile *ttyr_core_createMacroTile(
     ttyr_core_Tile *Parent_p, nh_core_List **MicroTabs_pp, int index)
 {
-    ttyr_core_MacroTile *Tile_p = nh_core_allocate(sizeof(ttyr_core_MacroTile));
+    ttyr_core_MacroTile *Tile_p = (ttyr_core_MacroTile*)nh_core_allocate(sizeof(ttyr_core_MacroTile));
     TTYR_CHECK_MEM_2(NULL, Tile_p)
 
     nh_core_List MacroTabs = nh_core_initList(9);
     ttyr_core_Config Config = ttyr_core_getConfig();
  
     for (int i = 0; i < Config.tabs; ++i) {
-        ttyr_core_MacroTab *MacroTab_p = nh_core_allocate(sizeof(ttyr_core_MacroTab));
+        ttyr_core_MacroTab *MacroTab_p = (ttyr_core_MacroTab*)nh_core_allocate(sizeof(ttyr_core_MacroTab));
         TTYR_CHECK_MEM_2(NULL, MacroTab_p)
         MacroTab_p->Topbar = ttyr_core_initTopbar();
         MacroTab_p->MicroWindow = MicroTabs_pp == NULL || Parent_p == NULL ?
@@ -81,7 +81,7 @@ void ttyr_core_destroyMacroTile(
 static ttyr_core_MacroWindow *ttyr_core_createMacroWindow(
     void *TTY_p)
 {
-    ttyr_core_MacroWindow *Window_p = nh_core_allocate(sizeof(ttyr_core_MacroWindow));
+    ttyr_core_MacroWindow *Window_p = (ttyr_core_MacroWindow*)nh_core_allocate(sizeof(ttyr_core_MacroWindow));
     TTYR_CHECK_MEM_2(NULL, Window_p)
 
     ttyr_core_Config Config = ttyr_core_getConfig();
@@ -144,7 +144,7 @@ ttyr_core_MacroWindow *ttyr_core_insertAndFocusWindow(
 
     for (int i = ((ttyr_core_TTY*)TTY_p)->Windows.size; i <= index; ++i) {
         Window_p = ttyr_core_createMacroWindow(TTY_p);
-        TTYR_CHECK_NULL(Window_p)
+        TTYR_CHECK_NULL_2(NULL, Window_p)
         nh_core_appendToList(&((ttyr_core_TTY*)TTY_p)->Windows, Window_p);
         // Automatically switch to new window. 
         ((ttyr_core_TTY*)TTY_p)->Window_p = Window_p;

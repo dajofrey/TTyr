@@ -31,7 +31,7 @@
 ttyr_core_Tile *ttyr_core_createTile(
     void *p, TTYR_CORE_TILE_TYPE_E type, ttyr_core_Tile *Parent_p, int index)
 {
-    ttyr_core_Tile *Tile_p = nh_core_allocate(sizeof(ttyr_core_Tile));
+    ttyr_core_Tile *Tile_p = (ttyr_core_Tile*)nh_core_allocate(sizeof(ttyr_core_Tile));
     TTYR_CHECK_MEM_2(NULL, Tile_p)
 
     Tile_p->type = type;

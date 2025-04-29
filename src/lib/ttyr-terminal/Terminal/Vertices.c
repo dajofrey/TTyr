@@ -115,37 +115,37 @@ TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(
         y2 = -y2;
     }
 
-    nh_Vertex *Vertex_p = nh_core_incrementArray(&Vertices);
+    nh_Vertex *Vertex_p = (nh_Vertex*)nh_core_incrementArray(&Vertices);
     Vertex_p->x = x + w;
     Vertex_p->y = y1 + h;
     Vertex_p->z = depth;
 
-    Vertex_p = nh_core_incrementArray(&Vertices);
+    Vertex_p = (nh_Vertex*)nh_core_incrementArray(&Vertices);
     Vertex_p->x = x + w;
     Vertex_p->y = y2 - h;
     Vertex_p->z = depth;
 
-    Vertex_p = nh_core_incrementArray(&Vertices);
+    Vertex_p = (nh_Vertex*)nh_core_incrementArray(&Vertices);
     Vertex_p->x = x + width - w;
     Vertex_p->y = y2 - h;
     Vertex_p->z = depth;
 
-    Vertex_p = nh_core_incrementArray(&Vertices);
+    Vertex_p = (nh_Vertex*)nh_core_incrementArray(&Vertices);
     Vertex_p->x = x + w;
     Vertex_p->y = y1 + h;
     Vertex_p->z = depth;
 
-    Vertex_p = nh_core_incrementArray(&Vertices);
+    Vertex_p = (nh_Vertex*)nh_core_incrementArray(&Vertices);
     Vertex_p->x = x + width - w;
     Vertex_p->y = y2 - h;
     Vertex_p->z = depth;
 
-    Vertex_p = nh_core_incrementArray(&Vertices);
+    Vertex_p = (nh_Vertex*)nh_core_incrementArray(&Vertices);
     Vertex_p->x = x + width - w;
     Vertex_p->y = y1 + h;
     Vertex_p->z = depth;
 
-    nh_verticesToArray(Vertices.p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, Vertices.length, false, 0);
+    nh_verticesToArray((nh_Vertex*)Vertices.p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, Vertices.length, false, 0);
     nh_core_freeArray(&Vertices);
 
     return TTYR_TERMINAL_SUCCESS;
@@ -235,7 +235,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesDefault(
 
         nh_gfx_Glyph Glyph = nh_gfx_getGlyph(State_p->FontInstance_p, Infos_p[0].id);
 
-        Glyph_p = nh_core_allocate(sizeof(nh_gfx_Glyph));
+        Glyph_p = (nh_gfx_Glyph*)nh_core_allocate(sizeof(nh_gfx_Glyph));
         TTYR_TERMINAL_CHECK_MEM(Glyph_p)
         char *codepoint_p = nh_core_allocate(sizeof(char)*4);
         TTYR_TERMINAL_CHECK_MEM(codepoint_p)

@@ -100,7 +100,7 @@ bin: build_netzhaut $(BIN_TTYR)
 
 build_netzhaut:
 ifeq ($(NETZHAUT_PATH),$(CURDIR)/external/Netzhaut)
-	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk nh-api.so nh-core.so nh-encoding.so nh-wsi.so nh-gfx.so)
+	(cd external/Netzhaut && git submodule update --init --recursive && make -f build/automation/lib.mk lib-nh-api lib-nh-core lib-nh-encoding lib-nh-wsi lib-nh-gfx)
 endif
 create_lib_dir:
 	mkdir -p lib

@@ -144,7 +144,7 @@ TTYR_CORE_RESULT ttyr_core_readStandardInput(
 #endif
 
     for (int i = 0; i < count; ++i) {
-        nh_api_WSIEvent *Event_p = nh_core_advanceRingBuffer(&TTY_p->Events);
+        nh_api_WSIEvent *Event_p = (nh_api_WSIEvent*)nh_core_advanceRingBuffer(&TTY_p->Events);
         Event_p->type = NH_API_WSI_EVENT_KEYBOARD;
         Event_p->Keyboard.codepoint = codepoints_p[i];
         Event_p->Keyboard.trigger = NH_API_TRIGGER_PRESS;

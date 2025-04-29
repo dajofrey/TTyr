@@ -26,7 +26,7 @@
 ttyr_core_Tile *ttyr_core_createMicroTile(
     ttyr_core_Tile *Parent_p, ttyr_core_Program *Program_p, int index)
 {
-    ttyr_core_MicroTile *Tile_p = nh_core_allocate(sizeof(ttyr_core_MicroTile));
+    ttyr_core_MicroTile *Tile_p = (ttyr_core_MicroTile*)nh_core_allocate(sizeof(ttyr_core_MicroTile));
     TTYR_CHECK_MEM_2(NULL, Tile_p)
 
     Tile_p->Program_p = Program_p == NULL || Parent_p == NULL ? 
@@ -63,7 +63,7 @@ TTYR_CORE_RESULT ttyr_core_getMicroTiles(
 static ttyr_core_MicroTab *ttyr_core_createMicroTab(
     ttyr_core_Interface *Prototype_p, bool once)
 {
-    ttyr_core_MicroTab *Tab_p = nh_core_allocate(sizeof(ttyr_core_MicroTab));
+    ttyr_core_MicroTab *Tab_p = (ttyr_core_MicroTab*)nh_core_allocate(sizeof(ttyr_core_MicroTab));
     TTYR_CHECK_MEM_2(NULL, Tab_p)
 
     ttyr_core_Tile *Tile_p = ttyr_core_createMicroTile(NULL, ttyr_core_createProgramInstance(Prototype_p, once), 0);
@@ -80,7 +80,7 @@ static ttyr_core_MicroTab *ttyr_core_createMicroTab(
 nh_core_List *ttyr_core_createMicroTabs(
     ttyr_core_TTY *TTY_p)
 {
-    nh_core_List *Tabs_p = nh_core_allocate(sizeof(nh_core_List));
+    nh_core_List *Tabs_p = (nh_core_List*)nh_core_allocate(sizeof(nh_core_List));
     TTYR_CHECK_MEM_2(NULL, Tabs_p)
 
     *Tabs_p = nh_core_initList(8); // Don't change size to TTY_p->Prototypes.size, it might not be initialized.

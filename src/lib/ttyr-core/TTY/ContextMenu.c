@@ -246,7 +246,7 @@ static int ttyr_core_handleContextMenuTiling(
 static ttyr_core_ContextMenu *ttyr_core_parseContextMenu(
     NH_API_UTF32 **menu_pp, ttyr_core_ContextMenu *Parent_p)
 {
-    ttyr_core_ContextMenu *Menu_p = nh_core_allocate(sizeof(ttyr_core_ContextMenu));
+    ttyr_core_ContextMenu *Menu_p = (ttyr_core_ContextMenu*)nh_core_allocate(sizeof(ttyr_core_ContextMenu));
     TTYR_CHECK_MEM_2(NULL, Menu_p)
 
     Menu_p->Parent_p = Parent_p;

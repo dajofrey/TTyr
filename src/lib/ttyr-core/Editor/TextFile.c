@@ -42,7 +42,7 @@
 ttyr_core_TextFileLine *ttyr_core_newTextFileLine(
     ttyr_core_TextFile *TextFile_p, int index)
 {
-    ttyr_core_TextFileLine *New_p = nh_core_allocate(sizeof(ttyr_core_TextFileLine));
+    ttyr_core_TextFileLine *New_p = (ttyr_core_TextFileLine*)nh_core_allocate(sizeof(ttyr_core_TextFileLine));
     TTYR_CHECK_MEM_2(NULL, New_p)
     New_p->copy = false;
     New_p->Copy = nh_core_initArray(sizeof(bool), 128);
@@ -95,7 +95,7 @@ TTYR_CORE_RESULT ttyr_core_removeFromTextFileLine(
 
 static ttyr_core_TextFile *ttyr_core_createTextFile()
 {
-    ttyr_core_TextFile *TextFile_p = malloc(sizeof(ttyr_core_TextFile));
+    ttyr_core_TextFile *TextFile_p = (ttyr_core_TextFile*)malloc(sizeof(ttyr_core_TextFile));
     TTYR_CHECK_MEM_2(NULL, TextFile_p)
 
     TextFile_p->textType          = 0;

@@ -636,9 +636,9 @@ static TTYR_CORE_RESULT ttyr_core_handleShellSelection(
     for (int i = start; i <= stop; ++i) {Shell_p->Selection.lines++;}
 
     if (Shell_p->Selection.doubleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
-        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
+        Shell_p->Selection.buffer_pp = (NH_API_UTF32**)nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
         TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
-        NH_API_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
+        NH_API_UTF32 *buffer_p = (NH_API_UTF32*)nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         TTYR_CHECK_MEM(buffer_p)
         memset(buffer_p, 0, sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         Shell_p->Selection.buffer_pp[0] = buffer_p;
@@ -672,9 +672,9 @@ static TTYR_CORE_RESULT ttyr_core_handleShellSelection(
         }
 
     } else if (Shell_p->Selection.trippleClick && Shell_p->Selection.lines == 1 && Shell_p->Selection.Start.x == Shell_p->Selection.Stop.x) {
-        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
+        Shell_p->Selection.buffer_pp = (NH_API_UTF32**)nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
         TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
-        NH_API_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
+        NH_API_UTF32 *buffer_p = (NH_API_UTF32*)nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         TTYR_CHECK_MEM(buffer_p)
         memset(buffer_p, 0, sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
         Shell_p->Selection.buffer_pp[0] = buffer_p;
@@ -708,11 +708,11 @@ static TTYR_CORE_RESULT ttyr_core_handleShellSelection(
         }
 
     } else {
-        Shell_p->Selection.buffer_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
+        Shell_p->Selection.buffer_pp = (NH_API_UTF32**)nh_core_allocate(sizeof(NH_API_UTF32*)*Shell_p->Selection.lines);
         TTYR_CHECK_MEM(Shell_p->Selection.buffer_pp)
     
         for (int i = 0; i < Shell_p->Selection.lines; ++i) {
-            NH_API_UTF32 *buffer_p = nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
+            NH_API_UTF32 *buffer_p = (NH_API_UTF32*)nh_core_allocate(sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
             TTYR_CHECK_MEM(buffer_p)
             memset(buffer_p, 0, sizeof(NH_API_UTF32)*Shell_p->ST_p->col);
             Shell_p->Selection.buffer_pp[i] = buffer_p;
@@ -960,11 +960,11 @@ static TTYR_CORE_RESULT ttyr_core_resizeShellIfRequired(
         nh_core_free(Shell_p->Rows_p);
     }
 
-    Shell_p->Rows_p = nh_core_allocate(sizeof(ttyr_core_Row)*height);
+    Shell_p->Rows_p = (ttyr_core_Row*)nh_core_allocate(sizeof(ttyr_core_Row)*height);
     memset(Shell_p->Rows_p, 0, sizeof(ttyr_core_Row)*height);
 
     for (int row = 0; row < height; ++row) {
-        Shell_p->Rows_p[row].Glyphs_p = nh_core_allocate(sizeof(ttyr_core_Glyph)*width);
+        Shell_p->Rows_p[row].Glyphs_p = (ttyr_core_Glyph*)nh_core_allocate(sizeof(ttyr_core_Glyph)*width);
         memset(Shell_p->Rows_p[row].Glyphs_p, 0, sizeof(ttyr_core_Glyph)*width);
     }
 
@@ -1136,7 +1136,7 @@ static TTYR_CORE_RESULT ttyr_core_handleShellCommand(
 static void *ttyr_core_initShell(
     void *arg_p)
 {
-    ttyr_core_Shell *Shell_p = nh_core_allocate(sizeof(ttyr_core_Shell));
+    ttyr_core_Shell *Shell_p = (ttyr_core_Shell*)nh_core_allocate(sizeof(ttyr_core_Shell));
     memset(Shell_p, 0, sizeof(ttyr_core_Shell));
     return Shell_p;
 }
@@ -1173,7 +1173,7 @@ static void ttyr_core_destroyShellPrototype(
 
 ttyr_core_Interface *ttyr_core_createShellInterface()
 {
-    ttyr_core_Interface *Prototype_p = nh_core_allocate(sizeof(ttyr_core_Interface));
+    ttyr_core_Interface *Prototype_p = (ttyr_core_Interface*)nh_core_allocate(sizeof(ttyr_core_Interface));
     TTYR_CHECK_MEM_2(NULL, Prototype_p)
 
     memset(Prototype_p, 0, sizeof(ttyr_core_Interface));
@@ -1195,12 +1195,12 @@ ttyr_core_Interface *ttyr_core_createShellInterface()
     NH_API_UTF32 command1_p[5] = {'c', 'o', 'p', 'y', 0};
     NH_API_UTF32 command2_p[6] = {'p', 'a', 's', 't', 'e', 0};
  
-    NH_API_UTF32 **commands_pp = nh_core_allocate(sizeof(NH_API_UTF32*)*2);
+    NH_API_UTF32 **commands_pp = (NH_API_UTF32**)nh_core_allocate(sizeof(NH_API_UTF32*)*2);
     TTYR_CHECK_MEM_2(NULL, commands_pp)
 
-    commands_pp[0] = nh_core_allocate(sizeof(command1_p));
+    commands_pp[0] = (NH_API_UTF32*)nh_core_allocate(sizeof(command1_p));
     TTYR_CHECK_MEM_2(NULL, commands_pp[0])
-    commands_pp[1] = nh_core_allocate(sizeof(command2_p));
+    commands_pp[1] = (NH_API_UTF32*)nh_core_allocate(sizeof(command2_p));
     TTYR_CHECK_MEM_2(NULL, commands_pp[1])
 
     memcpy(commands_pp[0], command1_p, sizeof(command1_p));

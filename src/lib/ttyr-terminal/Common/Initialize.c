@@ -31,7 +31,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_initialize()
     {
         nh_gfx_VulkanGPU *GPU_p = NH_VULKAN.GPUs.pp[0];
 
-        GPU_p->Term.Pipelines_p = nh_core_allocate(sizeof(nh_gfx_VulkanPipeline) * _TTYR_TERMINAL_VULKAN_PIPELINE_COUNT);
+        GPU_p->Term.Pipelines_p = (nh_gfx_VulkanPipeline*)nh_core_allocate(sizeof(nh_gfx_VulkanPipeline) * _TTYR_TERMINAL_VULKAN_PIPELINE_COUNT);
         TTYR_TERMINAL_CHECK_MEM(GPU_p->Term.Pipelines_p)
  
         TTYR_TERMINAL_CHECK(ttyr_terminal_createVulkanPipelines(&GPU_p->Driver, GPU_p->Term.Pipelines_p))

@@ -99,7 +99,7 @@ ttyr_core_File *ttyr_core_openFile(
     ttyr_core_FileEditor *FileEditor_p = &((ttyr_core_Editor*)Program_p->handle_p)->FileEditor;
     ttyr_core_FileEditorView *FileEditorView_p = &((ttyr_core_Editor*)Program_p->handle_p)->View.FileEditor;
 
-    ttyr_core_File *File_p = nh_core_allocate(sizeof(ttyr_core_File));
+    ttyr_core_File *File_p = (ttyr_core_File*)nh_core_allocate(sizeof(ttyr_core_File));
     TTYR_CHECK_MEM_2(NULL, File_p)
 
     File_p->type      = ttyr_core_getFileType(&Node_p->Path);
