@@ -81,6 +81,7 @@ static void ttyr_terminal_freeTerminal(
     ttyr_terminal_freeGraphics(&Terminal_p->Graphics);
     ttyr_terminal_freeGrid(&Terminal_p->Grid);
     ttyr_terminal_freeGrid(&Terminal_p->Grid2);
+    ttyr_terminal_freeGrid(&Terminal_p->BorderGrid);
 
     nh_core_free(Terminal_p);
 }
