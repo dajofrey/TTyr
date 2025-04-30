@@ -54,27 +54,27 @@ static void ttyr_terminal_recordText(
 TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingVulkan(
     ttyr_terminal_Graphics *Graphics_p)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
-    nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
-        Graphics_p->State.Fonts.pp[Graphics_p->State.font], Config.fontSize
-    );
-
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateVulkanText(
-        Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p, FontInstance_p, &Graphics_p->Data1.Foreground.Vulkan, 
-        &Graphics_p->Data1.Foreground.Vertices, &Graphics_p->Data1.Foreground.Indices
-    ))
-
-    nh_gfx_beginRecording(Graphics_p->State.Viewport_p);
-
-    for (int i = 0; i < Graphics_p->State.Viewport_p->Vulkan.images; ++i) {
-        ttyr_terminal_recordText(
-            &Graphics_p->Data1.Foreground.Vulkan, Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p,
-            Graphics_p->State.Viewport_p->Vulkan.CommandBuffers_pp[i], Graphics_p->Data1.Foreground.Indices.length 
-        );
-    }
-
-    nh_gfx_endRecording(Graphics_p->State.Viewport_p, false);
+//    ttyr_terminal_Config Config = ttyr_terminal_getConfig(NULL);
+// 
+//    nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
+//        Graphics_p->State.Fonts.pp[Graphics_p->State.font], Config.fontSize
+//    );
+//
+//    TTYR_TERMINAL_CHECK(ttyr_terminal_updateVulkanText(
+//        Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p, FontInstance_p, &Graphics_p->Data1.Foreground.Vulkan, 
+//        &Graphics_p->Data1.Foreground.Vertices, &Graphics_p->Data1.Foreground.Indices
+//    ))
+//
+//    nh_gfx_beginRecording(Graphics_p->State.Viewport_p);
+//
+//    for (int i = 0; i < Graphics_p->State.Viewport_p->Vulkan.images; ++i) {
+//        ttyr_terminal_recordText(
+//            &Graphics_p->Data1.Foreground.Vulkan, Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p,
+//            Graphics_p->State.Viewport_p->Vulkan.CommandBuffers_pp[i], Graphics_p->Data1.Foreground.Indices.length 
+//        );
+//    }
+//
+//    nh_gfx_endRecording(Graphics_p->State.Viewport_p, false);
 
     return TTYR_TERMINAL_SUCCESS;
 }

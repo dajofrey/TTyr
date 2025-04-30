@@ -118,8 +118,6 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLMenuBackground(
 static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLInactiveCursor(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
-
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUseProgram", &Data_p->Background.OpenGL.Program_p->Result);
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Data_p->Boxes.OpenGL.VertexArray_p);
@@ -151,7 +149,8 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_drawOpenGLInactiveCursor(
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
-    ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p)
+    ttyr_terminal_Config *Config_p, ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p,
+    ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p)
 {
     bool blockUntilRender = Graphics_p->Data1.Background.Action.init || Graphics_p->Data1.Foreground.Action.init;
 
@@ -172,7 +171,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
 
 // clear except borders
 
-    if (ttyr_terminal_getConfig().style == 0) {
+    if (Config_p->style == 0) {
         nh_gfx_addOpenGLCommand(
             Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
             "glViewport",
@@ -223,7 +222,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLDim(&Graphics_p->State, &Graphics_p->Data1))
  
-    if (ttyr_terminal_getConfig().style > 0) {
+    if (Config_p->style > 0) {
         TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLDim(&Graphics_p->State, &Graphics_p->Data1, Grid_p))
     }
 
@@ -253,7 +252,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
         nh_gfx_glsizei(NULL, Grid_p->Size.width),
         nh_gfx_glsizei(NULL, Grid_p->Size.height));
  
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLForeground(&Graphics_p->State, &Graphics_p->Data1))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->Data1))
     TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->Data1))
 
     TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLMenuBackground(&Graphics_p->State, &Graphics_p->BorderData, &Graphics_p->Data1, BorderGrid_p, Grid_p))
@@ -277,7 +276,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_renderUsingOpenGL(
     TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->Data2))
     TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->Data2))
 
-    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLForeground(&Graphics_p->State, &Graphics_p->Data2))
+    TTYR_TERMINAL_CHECK(ttyr_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->Data2))
     TTYR_TERMINAL_CHECK(ttyr_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->Data2))
  
     nh_gfx_endRecording(Graphics_p->State.Viewport_p, blockUntilRender);

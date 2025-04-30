@@ -20,32 +20,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-// NAMES ===========================================================================================
-
-const char *TTYR_TERMINAL_SETTING_NAMES_PP[] = {
-    "ttyr-terminal.font.size",
-    "ttyr-terminal.blink.frequency",
-    "ttyr-terminal.color.foreground",
-    "ttyr-terminal.color.background",
-    "ttyr-terminal.color.accent",
-    "ttyr-terminal.style",
-};
-
-size_t TTYR_TERMINAL_SETTING_NAMES_PP_COUNT = 
-    sizeof(TTYR_TERMINAL_SETTING_NAMES_PP) / sizeof(TTYR_TERMINAL_SETTING_NAMES_PP[0]);
-
-const char *ttyr_terminal_getSettingName(
-    TTYR_TERMINAL_SETTING_E setting)
-{
-    return TTYR_TERMINAL_SETTING_NAMES_PP[setting];
-}
-
 // FUNCTIONS =======================================================================================
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getSetting(
-    ttyr_terminal_Config *Config_p, char namespace_p[255], int setting)
+    ttyr_terminal_Config *Config_p, char namespace_p[255], int setting, char *setting_p)
 {
-    nh_core_List *Setting_p = nh_core_getGlobalConfigSetting(namespace_p, -1, TTYR_TERMINAL_SETTING_NAMES_PP[setting]);
+    nh_core_List *Setting_p = nh_core_getGlobalConfigSetting(namespace_p, -1, setting_p);
     TTYR_TERMINAL_CHECK_NULL(Setting_p)
 
     switch (setting) {
@@ -100,18 +80,30 @@ static ttyr_terminal_Config ttyr_terminal_getStaticConfig()
     ttyr_terminal_Config Config;
     memset(&Config, 0, sizeof(ttyr_terminal_Config));
 
+    static const char *options_pp[] = {
+        "ttyr-terminal.font.size",
+        "ttyr-terminal.blink.frequency",
+        "ttyr-terminal.color.foreground",
+        "ttyr-terminal.color.background",
+        "ttyr-terminal.color.accent",
+        "ttyr-terminal.style",
+    };
+
+    int options = sizeof(options_pp)/sizeof(options_pp[0]);
+ 
     ttyr_terminal_Terminal *Terminal_p = nh_core_getWorkloadArg();
     TTYR_TERMINAL_CHECK_NULL_2(Config, Terminal_p)
 
-    for (int i = 0; i < TTYR_TERMINAL_SETTING_NAMES_PP_COUNT; ++i) {
-        TTYR_TERMINAL_CHECK_2(Config, ttyr_terminal_getSetting(&Config, Terminal_p->namespace_p, i))
+    for (int i = 0; i < options; ++i) {
+        TTYR_TERMINAL_CHECK_2(Config, ttyr_terminal_getSetting(&Config, Terminal_p->namespace_p, i, options_pp[i]))
     }
 
     return Config;
 }
 
-ttyr_terminal_Config ttyr_terminal_getConfig() 
-{ 
-    ttyr_terminal_Config Config = ttyr_terminal_getStaticConfig(); 
-    return Config; 
+ttyr_terminal_Config ttyr_terminal_updateConfig(
+    void *Terminal_p) 
+{
+    ((ttyr_terminal_Terminal*)Terminal_p)->Config = ttyr_terminal_getStaticConfig(); 
+    return ((ttyr_terminal_Terminal*)Terminal_p)->Config;
 }

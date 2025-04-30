@@ -213,12 +213,12 @@ static ttyr_core_Color get_crabby_crawlers_color(int col, int row, float time) {
     return color;
 }
 
-static ttyr_core_Color ttyr_terminal_getAccentColor(int col, int row, int total_cols, int total_rows, ttyr_core_Color base)
+static ttyr_core_Color ttyr_terminal_getAccentColor(
+    ttyr_terminal_Config *Config_p, int col, int row, int total_cols, int total_rows, ttyr_core_Color base)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
 //    float time_now = (float)clock() / CLOCKS_PER_SEC;
 float time_now = 0;
-    switch (Config.style) {
+    switch (Config_p->style) {
         case 1 : return get_wave_color(col, row, time_now, total_cols, total_rows, base);
         case 2 : return get_strobe_color(col, row, time_now, base);
         case 3 : return get_rainbow_color(col, row, time_now, base);
@@ -229,17 +229,15 @@ float time_now = 0;
 }
 
 ttyr_core_Color ttyr_terminal_getGlyphColor(
-    ttyr_terminal_GraphicsState *State_p, ttyr_core_Glyph *Glyph_p, bool foreground, int col, int row, ttyr_terminal_Grid *Grid_p)
+    ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsState *State_p, ttyr_core_Glyph *Glyph_p, bool foreground, int col, int row, ttyr_terminal_Grid *Grid_p)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
     if (foreground) {
         if (Glyph_p->Attributes.reverse || (Glyph_p->Attributes.blink && State_p->Blink.on)) {
             if (Glyph_p->Background.custom) {
                 return Glyph_p->Background.Color;
             }
             if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-                ttyr_core_Color Color = ttyr_terminal_getAccentColor(col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
+                ttyr_core_Color Color = ttyr_terminal_getAccentColor(Config_p, col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
                 Color.r *= 0.3f;
                 Color.g *= 0.3f;
                 Color.b *= 0.3f;
@@ -248,24 +246,24 @@ ttyr_core_Color ttyr_terminal_getGlyphColor(
             return State_p->BackgroundGradient.Color;
         }
         if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-            return ttyr_terminal_getAccentColor(col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
+            return ttyr_terminal_getAccentColor(Config_p, col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
         }
         if (Glyph_p->Foreground.custom) {
             return Glyph_p->Foreground.Color;
         }
-        return Config.Foreground;
+        return Config_p->Foreground;
     }
 
     // Background.
     if ((Glyph_p->Attributes.reverse && !(Glyph_p->Attributes.blink && State_p->Blink.on)) 
     || (!Glyph_p->Attributes.reverse &&   Glyph_p->Attributes.blink && State_p->Blink.on)) {
         if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
-            return ttyr_terminal_getAccentColor(col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
+            return ttyr_terminal_getAccentColor(Config_p, col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
         }
         if (Glyph_p->Foreground.custom) {
             return Glyph_p->Foreground.Color;
         }
-        return Config.Foreground;
+        return Config_p->Foreground;
     }
     if (Glyph_p->Background.custom) {
         return Glyph_p->Background.Color;

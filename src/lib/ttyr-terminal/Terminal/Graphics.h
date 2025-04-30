@@ -129,7 +129,7 @@
  */
 
     TTYR_TERMINAL_RESULT ttyr_terminal_initGraphics(
-        ttyr_terminal_Graphics *Graphics_p
+        ttyr_terminal_Config *Config_p, ttyr_terminal_Graphics *Graphics_p
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_freeGraphics(
@@ -141,15 +141,17 @@
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateGraphicsData(
-        ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p, ttyr_terminal_Grid *Grid_p, int offset
+        ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsData *Data_p,
+        ttyr_terminal_Grid *Grid_p, int offset
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_renderGraphics(
-        ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p
+        ttyr_terminal_Config *Config_p, ttyr_terminal_Graphics *Graphics_p, ttyr_terminal_Grid *Grid_p,
+        ttyr_terminal_Grid *Grid2_p, ttyr_terminal_Grid *BorderGrid_p
     );
 
     bool ttyr_terminal_updateBlinkOrGradient(
-        ttyr_terminal_GraphicsState *State_p
+        ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsState *State_p
     );
 
 /** @} */

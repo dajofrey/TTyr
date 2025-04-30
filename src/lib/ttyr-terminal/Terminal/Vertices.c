@@ -15,7 +15,6 @@
 
 #include "../Common/Log.h"
 #include "../Common/Macros.h"
-#include "../Common/Config.h"
 
 #include "nh-gfx/Base/Viewport.h"
 #include "nh-gfx/Fonts/HarfBuzz.h"
@@ -35,13 +34,11 @@
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col, 
-    int row, float vertices_p[12], int colPixelOffset, int rowPixelOffset)
+    int row, float vertices_p[12], int colPixelOffset, int rowPixelOffset, int fontSize)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
-      
     nh_Vertex Vertices_p[4];
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
-        State_p->Fonts.pp[State_p->font], Config.fontSize
+        State_p->Fonts.pp[State_p->font], fontSize
     );
 
     float depth = Glyph_p->mark & TTYR_CORE_MARK_ELEVATED ? 0.15f : 0.5f;
@@ -86,13 +83,12 @@ TTYR_TERMINAL_RESULT ttyr_terminal_getBackgroundVertices(
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, 
+    bool inner, int fontSize)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
     nh_core_Array Vertices = nh_core_initArray(sizeof(nh_Vertex), 8);
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
-        State_p->Fonts.pp[State_p->font], Config.fontSize
+        State_p->Fonts.pp[State_p->font], fontSize
     );
 
     float depth = 0.2f;
@@ -152,13 +148,12 @@ TTYR_TERMINAL_RESULT ttyr_terminal_getBoxVertices(
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getOutlineVertices(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p, bool inner)
+    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_terminal_Box *Box_p,
+    bool inner, int fontSize)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
     nh_Vertex Vertices_p[6];
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
-        State_p->Fonts.pp[State_p->font], Config.fontSize
+        State_p->Fonts.pp[State_p->font], fontSize
     );
 
     float depth = inner ? 0.4f : 0.45f;
@@ -300,12 +295,10 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesDefault(
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col,
-    int row, float depth, float vertices_p[24])
+    int row, float depth, float vertices_p[24], int fontSize)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
-
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
-        State_p->Fonts.pp[State_p->font], Config.fontSize
+        State_p->Fonts.pp[State_p->font], fontSize
     );
 
     nh_Vertex Vertices_p[8];
@@ -621,13 +614,13 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVerticesForLineGraphics(
 
 TTYR_TERMINAL_RESULT ttyr_terminal_getForegroundVertices(
     ttyr_terminal_GraphicsState *State_p, ttyr_terminal_Grid *Grid_p, ttyr_core_Glyph *Glyph_p, int col,
-    int row, float *vertices_p)
+    int row, float *vertices_p, int fontSize)
 {
     float depth = Glyph_p->mark & TTYR_CORE_MARK_ELEVATED ? 0.1f : 0.2f;
 
     if (Glyph_p->mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
         TTYR_TERMINAL_CHECK(ttyr_terminal_getForegroundVerticesForLineGraphics(
-            State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p
+            State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p, fontSize
         ))
     } else {
         TTYR_TERMINAL_CHECK(ttyr_terminal_getForegroundVerticesDefault(

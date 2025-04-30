@@ -224,13 +224,11 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForegroundVertices(
 }
 
 static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForegroundFont(
-    ttyr_terminal_GraphicsState *State_p, ttyr_terminal_GraphicsForeground *Foreground_p, 
-    nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
+    ttyr_terminal_Config *Config_p, ttyr_terminal_GraphicsState *State_p, 
+    ttyr_terminal_GraphicsForeground *Foreground_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
-    ttyr_terminal_Config Config = ttyr_terminal_getConfig();
- 
     nh_gfx_FontInstance *FontInstance_p = 
-        nh_gfx_claimFontInstance(State_p->Fonts.pp[State_p->font], Config.fontSize);
+        nh_gfx_claimFontInstance(State_p->Fonts.pp[State_p->font], Config_p->fontSize);
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindTexture",
         nh_gfx_glenum(NULL, GL_TEXTURE_2D), Foreground_p->OpenGL.Texture_p);
@@ -331,7 +329,7 @@ static TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForegroundVertices(
 }
 
 TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForeground(
-    void *state_p, void *data_p)
+    void *Config_p, void *state_p, void *data_p)
 {
     ttyr_terminal_GraphicsState *State_p = state_p;
     ttyr_terminal_GraphicsData *Data_p = data_p;
@@ -347,7 +345,7 @@ TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForeground(
     }
 
     ttyr_terminal_updateOpenGLForegroundFont(
-        State_p, &Data_p->Foreground, State_p->Viewport_p->OpenGL.CommandBuffer_p);
+        Config_p, State_p, &Data_p->Foreground, State_p->Viewport_p->OpenGL.CommandBuffer_p);
 
     ttyr_terminal_updateOpenGLForegroundVertices(
         &Data_p->Foreground, State_p->Viewport_p->OpenGL.CommandBuffer_p);

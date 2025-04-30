@@ -54,7 +54,7 @@ typedef struct ttyr_terminal_Graphics ttyr_terminal_Graphics;
  */
 
     TTYR_TERMINAL_RESULT ttyr_terminal_updateOpenGLForeground(
-        void *state_p, void *data_p
+        void *Config_p, void *state_p, void *data_p
     );
 
     TTYR_TERMINAL_RESULT ttyr_terminal_initOpenGLForeground(
