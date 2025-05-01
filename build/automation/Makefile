@@ -141,14 +141,14 @@ $(BIN_TK): create_bin_dir $(OBJ_FILES_TK)
 INSTALL_DIR = /usr/local/bin
 install: $(BIN_TK)
 	install -m 755 $(BIN_TK) $(INSTALL_DIR)
-	cp build/data/desktop/termoskanne.desktop /usr/share/applications/termoskanne.desktop
+	cp build/desktop/termoskanne.desktop /usr/share/applications/termoskanne.desktop
 	mkdir -p /usr/share/termoskanne/icons
-	cp build/data/icons/gradient512x512.png /usr/share/termoskanne/icons
-	cp build/data/icons/gradient512x512.png /usr/share/pixmaps
-	cp build/data/icons/gradient256x256.png /usr/share/icons/hicolor/256x256/apps/termoskanne.png
-	cp build/data/icons/gradient128x128.png /usr/share/icons/hicolor/128x128/apps/termoskanne.png
-	cp build/data/icons/64x64.png /usr/share/icons/hicolor/64x64/apps/termoskanne.png
-	cp build/data/icons/32x32.png /usr/share/icons/hicolor/32x32/apps/termoskanne.png
+	cp build/icons/color512x512.png /usr/share/termoskanne/icons
+	cp build/icons/color512x512.png /usr/share/pixmaps
+	cp build/icons/color256x256.png /usr/share/icons/hicolor/256x256/apps/termoskanne.png
+	cp build/icons/color128x128.png /usr/share/icons/hicolor/128x128/apps/termoskanne.png
+	cp build/icons/64x64.png /usr/share/icons/hicolor/64x64/apps/termoskanne.png
+	cp build/icons/32x32.png /usr/share/icons/hicolor/32x32/apps/termoskanne.png
 
 # Clean rules
 clean-netzhaut:

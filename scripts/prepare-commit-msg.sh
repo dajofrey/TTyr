@@ -6,8 +6,8 @@ misc="false"
 
 # Run 'git diff --staged --name-only' and process each line
 while IFS= read -r line; do
-  # Check if the line contains the substring "src/lib/ttyr"
-  if [[ $line == *src/lib/ttyr* ]]; then
+  # Check if the line contains the substring "src/lib/tk"
+  if [[ $line == *src/lib/tk* ]]; then
     # Add the line to the array
     files_to_process+=("$line")
   else
