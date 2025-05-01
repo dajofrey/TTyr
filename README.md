@@ -1,5 +1,5 @@
 <p align="center">
- <img src="./build/data/icons/128x128.png"/>
+ <img src="./build/icons/128x128.png"/>
 </p>
 
 # Termoskanne
