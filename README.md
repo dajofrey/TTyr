@@ -4,7 +4,13 @@
 
 # Termoskanne
 
-Terminal Emulator  
+Terminal Emulator
+
+&#x2714; Noiseless and uniform UI  
+&#x2714; Versatile tabbing and tiling  
+&#x2714; Speedy   
+&#x2714; Customizable  
+&#x2714; Cross-Platform  
 
 ## README Content
 
