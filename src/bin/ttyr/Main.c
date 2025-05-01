@@ -8,7 +8,7 @@
 
 // INCLUDES ========================================================================================
 
-#include "ttyr-api/ttyr-api.h"
+#include "tk-api/tk-api.h"
 #include "nh-api/nh-api.h"
 
 #include <stdlib.h>
@@ -27,7 +27,7 @@ typedef struct Arguments {
 static Arguments Args;
 static nh_api_PixelPosition Position = {0};
 static nh_api_Viewport *Viewport_p = NULL;
-static ttyr_core_TTY *TTY_p = NULL;
+static tk_core_TTY *TTY_p = NULL;
 
 // HELPER ==========================================================================================
 
@@ -66,7 +66,7 @@ static void handleInput(
     {
         case NH_API_WSI_EVENT_MOUSE :
         case NH_API_WSI_EVENT_KEYBOARD :
-            ttyr_api_sendEvent(TTY_p, Event);
+            tk_api_sendEvent(TTY_p, Event);
             break;
         case NH_API_WSI_EVENT_WINDOW :
             switch (Event.Window.type) 
@@ -78,7 +78,7 @@ static void handleInput(
                     break;
                 case NH_API_WINDOW_FOCUS_OUT :
                 case NH_API_WINDOW_FOCUS_IN :
-                    ttyr_api_sendEvent(TTY_p, Event);
+                    tk_api_sendEvent(TTY_p, Event);
                     break;
             }
             break;
@@ -92,17 +92,17 @@ int main(int argc, char **argv_pp)
     if (handleArgs(argc, argv_pp)) {return 1;}
     if (nh_api_initialize(NULL, NULL, 0) != NH_API_SUCCESS) {return 1;}
 
-    nh_api_registerConfig("/etc/ttyr.conf", 14);
+    tk_api_initialize();
 
-    ttyr_api_initialize();
-
-    TTY_p = ttyr_api_openTTY(NULL, NULL);
+    TTY_p = tk_api_openTTY(NULL, NULL);
     if (!TTY_p) {return 1;}
 
+    nh_api_registerConfig("/etc/termoskanne.conf", 21);
+
     if (Args.stdio) {
-        if (ttyr_api_claimStandardIO(TTY_p)) {return 1;}
+        if (tk_api_claimStandardIO(TTY_p)) {return 1;}
     } else {
-        ttyr_terminal_Terminal *Terminal_p = ttyr_api_openTerminal(NULL, TTY_p);
+        tk_terminal_Terminal *Terminal_p = tk_api_openTerminal(NULL, TTY_p);
         if (!Terminal_p) {return 1;}
 
         nh_api_Window *Window_p = 
@@ -115,7 +115,7 @@ int main(int argc, char **argv_pp)
         Viewport_p = nh_api_createViewport(Surface_p, NULL, NULL);
         if (!Viewport_p) {return 1;}
 
-        if (ttyr_api_setViewport(Terminal_p, Viewport_p) != TTYR_TERMINAL_SUCCESS) {
+        if (tk_api_setViewport(Terminal_p, Viewport_p) != TTYR_TERMINAL_SUCCESS) {
             return 1;
         }
         

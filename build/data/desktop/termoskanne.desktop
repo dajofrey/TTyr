@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Termoskanne
+GenericName=Terminal Emulator
+Comment=Terminal Emulator
+Exec=termoskanne
+Terminal=false
+Type=Application
+Icon=termoskanne
+Keywords=terminal;shell;prompt;command;commandline;
+Categories=Utility;TerminalEmulator;System;

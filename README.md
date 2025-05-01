@@ -2,16 +2,12 @@
  <img src="./build/data/icons/128x128.png"/>
 </p>
 
-# TTýr
+# Termoskanne
 
-Terminal Emulator for conquering the command line.
+Terminal Emulator  
 
-![screenshot](./build/data/image/screenshot.png)
+## README Content
 
-Written in C | Noiseless UI | Hybrid Tabing/Tiling | GPU Acceleration | Cross-Platform with API
-
-## README Contents
-  
  - [Compatibilities](#Compatibilities)
  - [Dependencies](#Dependencies)
  - [Build](#Build)
@@ -58,26 +54,26 @@ For shell functionality, TTýr uses parts of the great [st](https://st.suckless.
 ### Linux
 
 ```bash
-git clone https://github.com/dajofrey/TTyr   
-cd TTyr && git submodule update --init --recursive    
+git clone https://github.com/dajofrey/termoskanne
+cd termoskanne && git submodule update --init --recursive    
 make -f build/automation/Makefile all
 ```
 
 ## Design
 
 ### Noiseless UI
-TTyr's graphics focus on mono-space font drawing, which is primarily used in terminals. Even TTyr's UI is made using the same technique. This makes everything look proportional and clean, even after scaling. Also, it simplifies development a lot. 
+Termoskanne's graphics focus on mono-space font drawing, which is primarily used in terminals. Even Termoskanne's UI is made using the same technique. This makes everything look proportional and clean, even after scaling. Also, it simplifies development a lot. 
    
-A big failure point when designing a UI is clutter. Sometimes even terminals have too much UI elements which make the experience distracting and annoying. TTyr tries to avoid this.
+A big failure point when designing a UI is clutter. Sometimes even terminals have too much UI elements which make the experience distracting and annoying. Termoskanne tries to avoid this.
 
 ### Tabing and Tiling
-TTyr uses a hybrid approach for tabing and tiling:   
+Termoskanne uses a hybrid approach for tabing and tiling:   
   
 The user can tab between windows, and split these windows into tiles. This is quite common. However, each tile can be tabbed and tiled individually.
 
 #### Rules
 
-* TTyr consists of multiple Macro-Windows. 
+* Termoskanne consists of multiple Macro-Windows. 
 * Macro-Windows can be macro-split into multiple Macro-Tiles.
 * Macro-Tiles contain multiple Micro-Windows.  
 * Micro-Windows can be micro-split into Micro-Tiles.   
