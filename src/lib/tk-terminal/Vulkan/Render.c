@@ -61,16 +61,16 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
 //    );
 //
 //    TTYR_TERMINAL_CHECK(tk_terminal_updateVulkanText(
-//        Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p, FontInstance_p, &Graphics_p->Data1.Foreground.Vulkan, 
-//        &Graphics_p->Data1.Foreground.Vertices, &Graphics_p->Data1.Foreground.Indices
+//        Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p, FontInstance_p, &Graphics_p->MainData.Foreground.Vulkan, 
+//        &Graphics_p->MainData.Foreground.Vertices, &Graphics_p->MainData.Foreground.Indices
 //    ))
 //
 //    nh_gfx_beginRecording(Graphics_p->State.Viewport_p);
 //
 //    for (int i = 0; i < Graphics_p->State.Viewport_p->Vulkan.images; ++i) {
 //        tk_terminal_recordText(
-//            &Graphics_p->Data1.Foreground.Vulkan, Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p,
-//            Graphics_p->State.Viewport_p->Vulkan.CommandBuffers_pp[i], Graphics_p->Data1.Foreground.Indices.length 
+//            &Graphics_p->MainData.Foreground.Vulkan, Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p,
+//            Graphics_p->State.Viewport_p->Vulkan.CommandBuffers_pp[i], Graphics_p->MainData.Foreground.Indices.length 
 //        );
 //    }
 //

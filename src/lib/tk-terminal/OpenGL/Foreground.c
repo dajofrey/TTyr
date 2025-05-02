@@ -293,7 +293,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundVertices(
     // Indices.
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
         nh_gfx_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER), Foreground_p->OpenGL.IndicesBuffer2_p);
-    Foreground_p->OpenGL.BufferData2_p = nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBufferData",
+    Foreground_p->OpenGL.BufferElevatedData_p = nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBufferData",
         nh_gfx_glenum(NULL, GL_ELEMENT_ARRAY_BUFFER),
         nh_gfx_glsizeiptr(NULL, Foreground_p->Indices2.length*sizeof(uint32_t)),
         nh_gfx_glubyte(NULL, Foreground_p->Indices2.p, Foreground_p->Indices2.length*sizeof(uint32_t)),

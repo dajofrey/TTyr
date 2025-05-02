@@ -43,7 +43,7 @@ typedef struct tk_terminal_Graphics tk_terminal_Graphics;
         nh_gfx_OpenGLData *ColorBuffer_p;
         nh_gfx_OpenGLData *ColorBuffer2_p;
         nh_gfx_OpenGLCommand *BufferData_p;
-        nh_gfx_OpenGLCommand *BufferData2_p;
+        nh_gfx_OpenGLCommand *BufferElevatedData_p;
         nh_gfx_OpenGLCommand *GetUniformLocationTexture_p;
     } tk_terminal_OpenGLForeground;
 

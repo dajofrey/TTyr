@@ -1,9 +1,9 @@
 // LICENSE NOTICE ==================================================================================
 
 /**
- * TTýr - Terminal Emulator
+ * Termoskanne - Terminal Emulator
  * Copyright (C) 2022  Dajo Frey
- * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
+ * Published under GNU LGPL. See LICENSE.LGPL file.
  */
 
 // INCLUDES ========================================================================================
@@ -85,12 +85,6 @@ static TTYR_TERMINAL_RESULT tk_terminal_initGraphicsData(
     Data_p->Boxes.Action = tk_terminal_initGraphicsAction();
     tk_terminal_initOpenGLBoxes(&Data_p->Boxes.OpenGL);
  
-    Data_p->Dim.Action = tk_terminal_initGraphicsAction();
-    Data_p->Dim.Vertices = nh_core_initArray(sizeof(float), 255);
-    Data_p->Dim.Colors = nh_core_initArray(sizeof(float), 255);
-
-    tk_terminal_initOpenGLDim(&Data_p->Dim.OpenGL);
-
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -123,10 +117,15 @@ TTYR_TERMINAL_RESULT tk_terminal_initGraphics(
     memset(Graphics_p, 0, sizeof(tk_terminal_Graphics));
 
     TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsState(Config_p, &Graphics_p->State))
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->Data1))
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->Data2))
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->BorderData))
+    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->MainData))
+    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->ElevatedData))
+    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->BackdropData))
  
+    Graphics_p->Dim.Action = tk_terminal_initGraphicsAction();
+    Graphics_p->Dim.Vertices = nh_core_initArray(sizeof(float), 255);
+    Graphics_p->Dim.Colors = nh_core_initArray(sizeof(float), 255);
+    tk_terminal_initOpenGLDim(&Graphics_p->Dim.OpenGL);
+
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -152,19 +151,19 @@ static TTYR_TERMINAL_RESULT tk_terminal_freeGraphicsData(
     tk_terminal_freeOpenGLBackground(&Data_p->Background.OpenGL);
     tk_terminal_freeOpenGLBoxes(&Data_p->Boxes.OpenGL);
 
-    nh_core_freeArray(&Data_p->Dim.Vertices);
-    nh_core_freeArray(&Data_p->Dim.Colors);
- 
     return TTYR_TERMINAL_SUCCESS;
 }
 
 TTYR_TERMINAL_RESULT tk_terminal_freeGraphics(
     tk_terminal_Graphics *Graphics_p)
 {
-    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->Data1))
-    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->Data2))
-    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->BorderData))
+    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->MainData))
+    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->ElevatedData))
+    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->BackdropData))
 
+    nh_core_freeArray(&Graphics_p->Dim.Vertices);
+    nh_core_freeArray(&Graphics_p->Dim.Colors);
+ 
     nh_core_freeList(&Graphics_p->State.Fonts, false);
     nh_core_freeList(&Graphics_p->State.Glyphs, true);
     nh_core_freeList(&Graphics_p->State.Codepoints, true);
@@ -464,7 +463,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBoxesData(
 }
 
 static TTYR_TERMINAL_RESULT tk_terminal_updateDimData(
-    tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_terminal_GraphicsDim *Dim_p)
+    tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_terminal_Dim *Dim_p)
 {
     nh_core_freeArray(&Dim_p->Vertices);
     nh_core_freeArray(&Dim_p->Colors);
@@ -508,14 +507,13 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateDimData(
     return TTYR_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateGraphicsData(
+static TTYR_TERMINAL_RESULT tk_terminal_updateGraphicsData(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p,
     tk_terminal_Grid *Grid_p, int offset)
 {
     TTYR_TERMINAL_CHECK(tk_terminal_updateForegroundData(Config_p, State_p, Grid_p, &Data_p->Foreground, offset))
     TTYR_TERMINAL_CHECK(tk_terminal_updateBackgroundData(Config_p, State_p, Grid_p, &Data_p->Background, offset))
     TTYR_TERMINAL_CHECK(tk_terminal_updateBoxesData(Config_p, State_p, Grid_p, &Data_p->Boxes))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateDimData(State_p, Grid_p, &Data_p->Dim))
 
     TTYR_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, true))
     TTYR_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, false))
@@ -524,6 +522,25 @@ TTYR_TERMINAL_RESULT tk_terminal_updateGraphicsData(
     return TTYR_TERMINAL_SUCCESS;
 }
 
+
+TTYR_TERMINAL_RESULT tk_terminal_updateGraphics(
+    tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
+    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn)
+{
+    int shift = titlebarOn ? 1 : 3;
+
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData( 
+        Config_p, &Graphics_p->State, &Graphics_p->MainData, Grid_p, shift))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData( 
+        Config_p, &Graphics_p->State, &Graphics_p->ElevatedData, ElevatedGrid_p, shift))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData( 
+        Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
+
+    TTYR_TERMINAL_CHECK(tk_terminal_updateDimData(&Graphics_p->State, Grid_p, &Graphics_p->Dim))
+
+    return TTYR_TERMINAL_SUCCESS;
+}
+ 
 bool tk_terminal_updateBlinkOrGradient(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p)
 {
@@ -598,7 +615,7 @@ TTYR_TERMINAL_RESULT tk_terminal_handleViewportChange(
 
 TTYR_TERMINAL_RESULT tk_terminal_renderGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Grid *Grid2_p, tk_terminal_Grid *BorderGrid_p)
+    tk_terminal_Grid *ElevatedGrid_p, tk_terminal_Grid *BackdropGrid_p)
 {
     switch (Graphics_p->State.Viewport_p->Surface_p->api)
     {
@@ -606,7 +623,7 @@ TTYR_TERMINAL_RESULT tk_terminal_renderGraphics(
 //            TTYR_TERMINAL_CHECK(tk_terminal_renderUsingVulkan(Graphics_p))
             break;
        case NH_API_GRAPHICS_BACKEND_OPENGL :
-            TTYR_TERMINAL_CHECK(tk_terminal_renderUsingOpenGL(Config_p, Graphics_p, Grid_p, Grid2_p, BorderGrid_p))
+            TTYR_TERMINAL_CHECK(tk_terminal_renderUsingOpenGL(Config_p, Graphics_p, Grid_p, BackdropGrid_p))
             break;
         default :
             return TTYR_TERMINAL_ERROR_BAD_STATE;

@@ -30,8 +30,8 @@
         char namespace_p[255];
         tk_terminal_Config Config;
         tk_terminal_Grid Grid;
-        tk_terminal_Grid Grid2;
-        tk_terminal_Grid BorderGrid;
+        tk_terminal_Grid ElevatedGrid;
+        tk_terminal_Grid BackdropGrid;
         tk_terminal_Graphics Graphics;
         tk_terminal_Graphics Graphics2;
         tk_core_View *View_p;

@@ -6,7 +6,7 @@
 
 TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Grid *Grid2_p, tk_terminal_Grid *BorderGrid_p
+    tk_terminal_Grid *BackdropGrid_p
 );
 
 #endif

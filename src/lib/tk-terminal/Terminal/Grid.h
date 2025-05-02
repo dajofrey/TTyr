@@ -62,8 +62,8 @@ TTYR_TERMINAL_RESULT tk_terminal_freeGrid(
     tk_terminal_Grid *Grid_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_updateBorderGrid(
-    tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BorderGrid_p, void *state_p, nh_gfx_Text *Text_p
+TTYR_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
+    tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p
 );
 
 TTYR_TERMINAL_RESULT tk_terminal_updateGrid(

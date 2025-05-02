@@ -35,12 +35,12 @@
         bool init;
     } tk_terminal_GraphicsAction;
 
-    typedef struct tk_terminal_GraphicsDim {
+    typedef struct tk_terminal_Dim {
         tk_terminal_GraphicsAction Action;
         tk_terminal_OpenGLDim OpenGL;
         nh_core_Array Vertices;
         nh_core_Array Colors;
-    } tk_terminal_GraphicsDim;
+    } tk_terminal_Dim;
 
     /**
      * Text that is drawn on top of the background. Can be either normal or elevated,
@@ -90,7 +90,6 @@
     typedef struct tk_terminal_GraphicsData {
         tk_terminal_GraphicsForeground Foreground;
         tk_terminal_GraphicsBackground Background;
-        tk_terminal_GraphicsDim Dim;
         tk_terminal_GraphicsBoxes Boxes;
     } tk_terminal_GraphicsData;
 
@@ -117,9 +116,10 @@
 
     typedef struct tk_terminal_Graphics {
         tk_terminal_GraphicsState State;
-        tk_terminal_GraphicsData Data1;
-        tk_terminal_GraphicsData Data2;
-        tk_terminal_GraphicsData BorderData;
+        tk_terminal_GraphicsData MainData;
+        tk_terminal_GraphicsData ElevatedData;
+        tk_terminal_GraphicsData BackdropData;
+        tk_terminal_Dim Dim;
     } tk_terminal_Graphics;
 
 /** @} */
@@ -140,14 +140,14 @@
         tk_terminal_Graphics *Graphics_p, nh_gfx_Viewport *Viewport_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_updateGraphicsData(
-        tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p,
-        tk_terminal_Grid *Grid_p, int offset
-    );
+    TTYR_TERMINAL_RESULT tk_terminal_updateGraphics( 
+        tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
+        tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn
+    ); 
 
     TTYR_TERMINAL_RESULT tk_terminal_renderGraphics(
         tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-        tk_terminal_Grid *Grid2_p, tk_terminal_Grid *BorderGrid_p
+        tk_terminal_Grid *ElevatedGrid_p, tk_terminal_Grid *BackdropGrid_p
     );
 
     bool tk_terminal_updateBlinkOrGradient(

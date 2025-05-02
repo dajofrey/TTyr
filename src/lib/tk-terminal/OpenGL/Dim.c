@@ -139,18 +139,18 @@ TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLDim(
     void *state_p, void *data_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
-    tk_terminal_GraphicsData *Data_p = data_p;
+    tk_terminal_Dim *Dim_p = data_p;
 
-    if (Data_p->Dim.Action.init) {
-        tk_terminal_initOpenGLDimProgram(&Data_p->Dim.OpenGL, 
+    if (Dim_p->Action.init) {
+        tk_terminal_initOpenGLDimProgram(&Dim_p->OpenGL, 
             State_p->Viewport_p->OpenGL.CommandBuffer_p);
-        tk_terminal_initOpenGLDimVertices(&Data_p->Dim.OpenGL, 
+        tk_terminal_initOpenGLDimVertices(&Dim_p->OpenGL, 
             State_p->Viewport_p->OpenGL.CommandBuffer_p);
-        Data_p->Dim.Action.init = false;
+        Dim_p->Action.init = false;
     }
 
-    tk_terminal_updateOpenGLDimVertices(&Data_p->Dim.OpenGL,
-        State_p->Viewport_p->OpenGL.CommandBuffer_p, &Data_p->Dim.Vertices, &Data_p->Dim.Colors);
+    tk_terminal_updateOpenGLDimVertices(&Dim_p->OpenGL,
+        State_p->Viewport_p->OpenGL.CommandBuffer_p, &Dim_p->Vertices, &Dim_p->Colors);
 
     return TTYR_TERMINAL_SUCCESS;
 }
