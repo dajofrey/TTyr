@@ -72,12 +72,12 @@
         nh_core_Array Colors;
     } tk_terminal_GraphicsBackground;
 
-    typedef struct tk_terminal_GraphicsBoxes {
+    typedef struct tk_terminal_Boxes {
         tk_terminal_GraphicsAction Action;
         tk_terminal_OpenGLBoxes OpenGL;
         nh_core_Array Vertices;
         nh_core_Array Colors;
-    } tk_terminal_GraphicsBoxes;
+    } tk_terminal_Boxes;
  
     typedef struct tk_terminal_GraphicsGradient {
         tk_core_Color Color;
@@ -90,7 +90,6 @@
     typedef struct tk_terminal_GraphicsData {
         tk_terminal_GraphicsForeground Foreground;
         tk_terminal_GraphicsBackground Background;
-        tk_terminal_GraphicsBoxes Boxes;
     } tk_terminal_GraphicsData;
 
     /**
@@ -120,6 +119,7 @@
         tk_terminal_GraphicsData ElevatedData;
         tk_terminal_GraphicsData BackdropData;
         tk_terminal_Dim Dim;
+        tk_terminal_Boxes Boxes;
     } tk_terminal_Graphics;
 
 /** @} */

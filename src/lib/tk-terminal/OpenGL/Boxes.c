@@ -49,7 +49,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBoxesVertices(
 }
 
 static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxesVertices(
-    tk_terminal_GraphicsBoxes *Boxes_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
+    tk_terminal_Boxes *Boxes_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Boxes_p->OpenGL.VertexArray_p);
 
@@ -88,17 +88,16 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxesVertices(
 TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxes(
     void *state_p, void *data_p)
 {
-    tk_terminal_GraphicsData *Data_p = data_p;
+    tk_terminal_Boxes *Boxes_p = data_p;
     tk_terminal_GraphicsState *State_p = state_p;
 
-    if (Data_p->Boxes.Action.init) {
+    if (Boxes_p->Action.init) {
         tk_terminal_initOpenGLBoxesVertices(
-            &Data_p->Boxes.OpenGL, State_p->Viewport_p->OpenGL.CommandBuffer_p);
-        Data_p->Boxes.Action.init = false;
+            &Boxes_p->OpenGL, State_p->Viewport_p->OpenGL.CommandBuffer_p);
+        Boxes_p->Action.init = false;
     }
 
-    tk_terminal_updateOpenGLBoxesVertices(
-        &Data_p->Boxes, State_p->Viewport_p->OpenGL.CommandBuffer_p);
+    tk_terminal_updateOpenGLBoxesVertices(Boxes_p, State_p->Viewport_p->OpenGL.CommandBuffer_p);
 
     return TTYR_TERMINAL_SUCCESS;
 }

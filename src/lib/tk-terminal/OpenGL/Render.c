@@ -120,7 +120,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLInactiveCursor(
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p;
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glUseProgram", &Graphics_p->MainData.Background.OpenGL.Program_p->Result);
-    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Graphics_p->MainData.Boxes.OpenGL.VertexArray_p);
+    nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Graphics_p->Boxes.OpenGL.VertexArray_p);
 
     int offset = 0;
     for (int i = 0; i < Grid_p->Boxes.length; ++i) {
@@ -246,7 +246,7 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
         "glDisable", 
         nh_gfx_glenum(NULL, GL_DEPTH_TEST));
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLBoxes(&Graphics_p->State, &Graphics_p->MainData))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLBoxes(&Graphics_p->State, &Graphics_p->Boxes))
     TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLInactiveCursor(Graphics_p, Grid_p))
 
     nh_gfx_addOpenGLCommand(

@@ -82,9 +82,6 @@ static TTYR_TERMINAL_RESULT tk_terminal_initGraphicsData(
 
     tk_terminal_initOpenGLBackground(&Data_p->Background.OpenGL);
 
-    Data_p->Boxes.Action = tk_terminal_initGraphicsAction();
-    tk_terminal_initOpenGLBoxes(&Data_p->Boxes.OpenGL);
- 
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -126,6 +123,9 @@ TTYR_TERMINAL_RESULT tk_terminal_initGraphics(
     Graphics_p->Dim.Colors = nh_core_initArray(sizeof(float), 255);
     tk_terminal_initOpenGLDim(&Graphics_p->Dim.OpenGL);
 
+    Graphics_p->Boxes.Action = tk_terminal_initGraphicsAction();
+    tk_terminal_initOpenGLBoxes(&Graphics_p->Boxes.OpenGL);
+ 
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -149,7 +149,6 @@ static TTYR_TERMINAL_RESULT tk_terminal_freeGraphicsData(
     nh_core_freeArray(&Data_p->Background.Ranges);
  
     tk_terminal_freeOpenGLBackground(&Data_p->Background.OpenGL);
-    tk_terminal_freeOpenGLBoxes(&Data_p->Boxes.OpenGL);
 
     return TTYR_TERMINAL_SUCCESS;
 }
@@ -164,6 +163,8 @@ TTYR_TERMINAL_RESULT tk_terminal_freeGraphics(
     nh_core_freeArray(&Graphics_p->Dim.Vertices);
     nh_core_freeArray(&Graphics_p->Dim.Colors);
  
+    tk_terminal_freeOpenGLBoxes(&Graphics_p->Boxes.OpenGL);
+
     nh_core_freeList(&Graphics_p->State.Fonts, false);
     nh_core_freeList(&Graphics_p->State.Glyphs, true);
     nh_core_freeList(&Graphics_p->State.Codepoints, true);
@@ -432,7 +433,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBackgroundData(
 
 static TTYR_TERMINAL_RESULT tk_terminal_updateBoxesData(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_GraphicsBoxes *Boxes_p)
+    tk_terminal_Boxes *Boxes_p)
 {
     nh_core_freeArray(&Boxes_p->Vertices);
     nh_core_freeArray(&Boxes_p->Colors);
@@ -507,13 +508,12 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateDimData(
     return TTYR_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateGraphicsData(
+static TTYR_TERMINAL_RESULT tk_terminal_updateGridGraphics(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p,
     tk_terminal_Grid *Grid_p, int offset)
 {
     TTYR_TERMINAL_CHECK(tk_terminal_updateForegroundData(Config_p, State_p, Grid_p, &Data_p->Foreground, offset))
     TTYR_TERMINAL_CHECK(tk_terminal_updateBackgroundData(Config_p, State_p, Grid_p, &Data_p->Background, offset))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateBoxesData(Config_p, State_p, Grid_p, &Data_p->Boxes))
 
     TTYR_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, true))
     TTYR_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, false))
@@ -522,21 +522,21 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateGraphicsData(
     return TTYR_TERMINAL_SUCCESS;
 }
 
-
 TTYR_TERMINAL_RESULT tk_terminal_updateGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
     tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn)
 {
     int shift = titlebarOn ? 1 : 3;
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData( 
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->MainData, Grid_p, shift))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData( 
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->ElevatedData, ElevatedGrid_p, shift))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData( 
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
 
     TTYR_TERMINAL_CHECK(tk_terminal_updateDimData(&Graphics_p->State, Grid_p, &Graphics_p->Dim))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateBoxesData(Config_p, &Graphics_p->State, Grid_p, &Graphics_p->Boxes))
 
     return TTYR_TERMINAL_SUCCESS;
 }
