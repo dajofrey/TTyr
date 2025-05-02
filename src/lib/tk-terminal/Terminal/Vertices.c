@@ -293,9 +293,9 @@ static TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesDefault(
     return TTYR_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
+TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col,
-    int row, float depth, float vertices_p[24], int fontSize)
+    int row, float depth, float vertices_p[24], int fontSize, int colPixelOffset, int rowPixelOffset)
 {
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
         State_p->Fonts.pp[State_p->font], fontSize
@@ -306,7 +306,11 @@ static TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
     int tmp = row * Grid_p->TileSize.height;
 
     float x = (float)((float)(col * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
+    x -= (float)((float)colPixelOffset/(float)Grid_p->Size.width)*2.0f;
+
     float y = (float)((float)(tmp) / (float)Grid_p->Size.height) * 2.0f - 1.0f;
+    y -= (float)((float)rowPixelOffset/(float)Grid_p->Size.height)*2.0f;
+
     float width  = (float)((float)(Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f;
     float height = (float)((float)(Grid_p->TileSize.height) / (float)Grid_p->Size.height) * 2.0f;
 
@@ -620,7 +624,7 @@ TTYR_TERMINAL_RESULT tk_terminal_getForegroundVertices(
 
     if (Glyph_p->mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
         TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
-            State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p, fontSize
+            State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p, fontSize, 0, 0
         ))
     } else {
         TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVerticesDefault(

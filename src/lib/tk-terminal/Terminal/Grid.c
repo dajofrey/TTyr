@@ -1,9 +1,9 @@
 // LICENSE NOTICE ==================================================================================
 
 /**
- * TTýr - Terminal Emulator
+ * Termoskanne - Terminal Emulator
  * Copyright (C) 2022  Dajo Frey
- * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
+ * Published under GNU LGPL. See LICENSE.LGPL file.
  */
 
 // INCLUDES ========================================================================================
@@ -333,45 +333,53 @@ TTYR_TERMINAL_RESULT tk_terminal_updateTile(
 }
 
 TTYR_TERMINAL_RESULT tk_terminal_updateBorderGrid(
-    tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p)
+    tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BorderGrid_p, void *state_p, nh_gfx_Text *Text_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
 
     // Free data.
-    tk_terminal_freeGrid(Grid_p);
+    tk_terminal_freeGrid(BorderGrid_p);
 
     // Update data.
-    Grid_p->TileSize.width = nh_gfx_getTextWidth(Text_p);
-    Grid_p->TileSize.height = Config_p->fontSize+abs(State_p->FontInstance_p->descender);
+    BorderGrid_p->TileSize.width = nh_gfx_getTextWidth(Text_p);
+    BorderGrid_p->TileSize.height = Config_p->fontSize+abs(State_p->FontInstance_p->descender);
 
-    Grid_p->borderPixel = Grid_p->TileSize.width/3;
+    BorderGrid_p->borderPixel = BorderGrid_p->TileSize.width/3;
 
-    int borderCols = (Grid_p->borderPixel+Grid_p->TileSize.width-1)/Grid_p->TileSize.width;
-    int borderColsPixels = borderCols*Grid_p->TileSize.width;
-    int borderColsPixelsOffset = borderColsPixels-Grid_p->borderPixel;
+    int borderCols = (BorderGrid_p->borderPixel+BorderGrid_p->TileSize.width-1)/BorderGrid_p->TileSize.width;
+    int borderColsPixel = borderCols*BorderGrid_p->TileSize.width;
+    int borderColsPixelOffset = borderColsPixel-BorderGrid_p->borderPixel;
 
-    int borderRows = (Grid_p->borderPixel+Grid_p->TileSize.height-1)/Grid_p->TileSize.height;
-    int borderRowsPixels = borderRows*Grid_p->TileSize.height;
-    int borderRowsPixelsOffset = borderRowsPixels-Grid_p->borderPixel;
+    int borderRows = (BorderGrid_p->borderPixel+BorderGrid_p->TileSize.height-1)/BorderGrid_p->TileSize.height;
+    int borderRowsPixel = borderRows*BorderGrid_p->TileSize.height;
+    int borderRowsPixelOffset = borderRowsPixel-BorderGrid_p->borderPixel;
 
-    Grid_p->xOffset = borderColsPixelsOffset;
-    Grid_p->yOffset = borderRowsPixelsOffset;
+    BorderGrid_p->xOffset = borderColsPixelOffset;
+    BorderGrid_p->yOffset = borderRowsPixelOffset;
 
-    Grid_p->Size.width = State_p->Viewport_p->Settings.Size.width+(borderColsPixels*2);
-    Grid_p->Size.height = State_p->Viewport_p->Settings.Size.height+(borderRowsPixels*2);
+    BorderGrid_p->Size.width = State_p->Viewport_p->Settings.Size.width+(borderColsPixel*2);
+    BorderGrid_p->Size.height = State_p->Viewport_p->Settings.Size.height+(borderRowsPixel*2);
 
-    Grid_p->cols = Grid_p->Size.width / nh_gfx_getTextWidth(Text_p) + 2;
-    Grid_p->rows = Grid_p->Size.height / Grid_p->TileSize.height + 2;
+    BorderGrid_p->cols = BorderGrid_p->Size.width / nh_gfx_getTextWidth(Text_p) + 2;
+    BorderGrid_p->rows = BorderGrid_p->Size.height / BorderGrid_p->TileSize.height + 2;
 
-    for (int row = 0; row < Grid_p->rows; ++row) {
-        for (int col = 0; col < Grid_p->cols; ++col) {
-            tk_terminal_Tile *Tile_p = tk_terminal_getTile(Grid_p, row, col);
+    for (int row = 0; row < BorderGrid_p->rows; ++row) {
+        for (int col = 0; col < BorderGrid_p->cols; ++col) {
+            tk_terminal_Tile *Tile_p = tk_terminal_getTile(BorderGrid_p, row, col);
             TTYR_TERMINAL_CHECK_NULL(Tile_p)
-            Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
+            Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT | TTYR_CORE_MARK_LINE_GRAPHICS;
             Tile_p->Glyph.Attributes.reverse = true;
             TTYR_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
-                State_p, Grid_p, &Tile_p->Glyph, col, row, Tile_p->Background.vertices_p, borderColsPixelsOffset, borderRowsPixelsOffset, Config_p->fontSize
+                State_p, BorderGrid_p, &Tile_p->Glyph, col, row, Tile_p->Background.vertices_p, borderColsPixelOffset, borderRowsPixelOffset, Config_p->fontSize
             ))
+            if (row == 2 && Grid_p) {
+                tk_terminal_Tile *GridTile_p = tk_terminal_getTile(Grid_p, 0, col);
+                if (!GridTile_p || GridTile_p->Glyph.codepoint != 'x') {continue;}
+                Tile_p->Glyph.codepoint = 'x';
+                TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
+                    State_p, BorderGrid_p, Tile_p->Glyph.codepoint, col+1, row, 0.9, Tile_p->Foreground.vertices_p, 20, borderColsPixelOffset, borderRowsPixelOffset
+                ))
+            }
         }
     }
 

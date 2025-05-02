@@ -87,6 +87,8 @@ static void tk_terminal_freeTerminal(
     tk_terminal_freeGrid(&Terminal_p->Grid2);
     tk_terminal_freeGrid(&Terminal_p->BorderGrid);
 
+    nh_gfx_freeText(&Terminal_p->Text);
+
     nh_core_free(Terminal_p);
 }
 
@@ -101,12 +103,12 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
         Terminal_p->Config.fontSize
     );
 
-    nh_gfx_Text Text;
-    NH_API_UTF32 c = 'e';
+    nh_gfx_freeText(&Terminal_p->Text);
 
+    NH_API_UTF32 c = 'e';
     NH_API_RESULT failure = 1;
     for (int i = 0; i < Terminal_p->Graphics.State.Fonts.size; ++i) {
-        failure = nh_gfx_createTextFromFont(&Text, &c, 1, Terminal_p->Config.fontSize,
+        failure = nh_gfx_createTextFromFont(&Terminal_p->Text, &c, 1, Terminal_p->Config.fontSize,
             Terminal_p->Graphics.State.Fonts.pp[i]);
         if (!failure) {
             Terminal_p->Graphics.State.font = i;
@@ -116,9 +118,9 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
 
     if (failure) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
     
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->Graphics.State, &Text))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid2, &Terminal_p->Graphics.State, &Text))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateBorderGrid(&Terminal_p->Config, &Terminal_p->BorderGrid, &Terminal_p->Graphics.State, &Text))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid2, &Terminal_p->Graphics.State, &Terminal_p->Text))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateBorderGrid(&Terminal_p->Config, NULL, &Terminal_p->BorderGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
 
     int shift = Terminal_p->TTY_p->Config.Titlebar.on ? 1 : 3;
     TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData(
@@ -140,8 +142,6 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
         &Terminal_p->Config, &Terminal_p->Graphics.State, &Terminal_p->Graphics.Data2, &Terminal_p->Grid2, shift))
     TTYR_TERMINAL_CHECK(tk_terminal_updateGraphicsData(
         &Terminal_p->Config, &Terminal_p->Graphics.State, &Terminal_p->Graphics.BorderData, &Terminal_p->BorderGrid, 0))
-
-    nh_gfx_freeText(&Text);
 
     return TTYR_TERMINAL_SUCCESS;
 }
@@ -271,6 +271,11 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
             TTYR_TERMINAL_CHECK(tk_terminal_updateTile(
                 &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Grid.Updates_pp[row][col],
                 update_p, Terminal_p->Config.fontSize))
+            // update background grid tile if necessarry
+            if (row == 0 && Terminal_p->Grid.Updates_pp[row][col].Glyph.codepoint == 'x') {
+                if (!Terminal_p->TTY_p->Config.Topbar.on) {continue;}
+                TTYR_TERMINAL_CHECK(tk_terminal_updateBorderGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->BorderGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+            }
         }
     }
     for (int row = 0; row < Terminal_p->Grid2.rows; ++row) {

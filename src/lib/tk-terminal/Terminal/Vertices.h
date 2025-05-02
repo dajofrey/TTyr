@@ -24,4 +24,9 @@ TTYR_TERMINAL_RESULT tk_terminal_getForegroundVertices(
     int row, float *vertices_p, int fontSize
 );
 
+TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
+    tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col,
+    int row, float depth, float vertices_p[24], int fontSize, int colOffset, int rowOffset
+);
+
 #endif // TTYR_TERMINAL_TERMINAL_VERTICES_H 
