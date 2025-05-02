@@ -91,8 +91,8 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLElevatedBackground(
     tk_terminal_Graphics *Graphics_p, tk_terminal_GraphicsData *BackdropData_p, tk_terminal_GraphicsData *MainData_p,
     tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *Grid_p)
 {
-    for (int i = 0; i < Grid_p->Boxes.length; ++i) {
-        tk_terminal_Box *Box_p = ((tk_terminal_Box*)Grid_p->Boxes.p)+i;
+    for (int i = 0; i < Graphics_p->Boxes.Data.length; ++i) {
+        tk_terminal_Box *Box_p = ((tk_terminal_Box*)Graphics_p->Boxes.Data.p)+i;
         if (Box_p->UpperLeft.x == Box_p->LowerRight.x) {continue;}
         nh_gfx_addOpenGLCommand(
             Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
@@ -123,8 +123,8 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLInactiveCursor(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Graphics_p->Boxes.OpenGL.VertexArray_p);
 
     int offset = 0;
-    for (int i = 0; i < Grid_p->Boxes.length; ++i) {
-        tk_terminal_Box *Box_p = ((tk_terminal_Box*)Grid_p->Boxes.p)+i;
+    for (int i = 0; i < Graphics_p->Boxes.Data.length; ++i) {
+        tk_terminal_Box *Box_p = ((tk_terminal_Box*)Graphics_p->Boxes.Data.p)+i;
         if (Box_p->UpperLeft.x < 0 || Box_p->UpperLeft.y < 0 || Box_p->LowerRight.x < 0 || Box_p->LowerRight.y < 0) {continue;}
         if (Box_p->UpperLeft.x != Box_p->LowerRight.x) {continue;}
         // Render inner box.

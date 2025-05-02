@@ -6,6 +6,8 @@
 #include "nh-core/Util/Time.h"
 #include "nh-gfx/Fonts/Text.h"
 
+// STRUCTS =========================================================================================
+
 typedef struct tk_terminal_Box {
     bool accent;
     nh_api_PixelPosition UpperLeft;
@@ -38,7 +40,6 @@ typedef struct tk_terminal_Tile {
 
 typedef struct tk_terminal_Grid {
     nh_core_List Rows;
-    nh_core_Array Boxes;
     nh_api_PixelSize TileSize;
     nh_api_PixelSize Size;
     int cols;
@@ -49,6 +50,8 @@ typedef struct tk_terminal_Grid {
     bool **updates_pp;
     int borderPixel;
 } tk_terminal_Grid;
+
+// FUNCTIONS =======================================================================================
 
 tk_terminal_Tile *tk_terminal_getTile(
     tk_terminal_Grid *Grid_p, int row, int col
@@ -80,10 +83,6 @@ bool tk_terminal_compareForegroundAttributes(
 
 TTYR_TERMINAL_RESULT tk_terminal_updateTile(
     tk_terminal_Grid *Grid_p, void *state_p, tk_terminal_TileUpdate *Update_p, bool *update_p, int fontSize
-);
-
-TTYR_TERMINAL_RESULT tk_terminal_updateBoxes(
-    tk_terminal_Grid *Grid_p, void *state_p, nh_core_Array *Boxes_p, int fontSize
 );
 
 #endif 

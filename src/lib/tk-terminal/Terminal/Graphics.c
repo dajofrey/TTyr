@@ -124,6 +124,8 @@ TTYR_TERMINAL_RESULT tk_terminal_initGraphics(
     tk_terminal_initOpenGLDim(&Graphics_p->Dim.OpenGL);
 
     Graphics_p->Boxes.Action = tk_terminal_initGraphicsAction();
+    Graphics_p->Boxes.Data = nh_core_initArray(sizeof(tk_terminal_Box), 16);
+
     tk_terminal_initOpenGLBoxes(&Graphics_p->Boxes.OpenGL);
  
     return TTYR_TERMINAL_SUCCESS;
@@ -162,7 +164,8 @@ TTYR_TERMINAL_RESULT tk_terminal_freeGraphics(
 
     nh_core_freeArray(&Graphics_p->Dim.Vertices);
     nh_core_freeArray(&Graphics_p->Dim.Colors);
- 
+    nh_core_freeArray(&Graphics_p->Boxes.Data);
+
     tk_terminal_freeOpenGLBoxes(&Graphics_p->Boxes.OpenGL);
 
     nh_core_freeList(&Graphics_p->State.Fonts, false);
@@ -432,31 +435,30 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBackgroundData(
 }
 
 static TTYR_TERMINAL_RESULT tk_terminal_updateBoxesData(
-    tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Boxes *Boxes_p)
+    tk_terminal_Graphics *Graphics_p, tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p)
 {
-    nh_core_freeArray(&Boxes_p->Vertices);
-    nh_core_freeArray(&Boxes_p->Colors);
+    nh_core_freeArray(&Graphics_p->Boxes.Vertices);
+    nh_core_freeArray(&Graphics_p->Boxes.Colors);
 
-    Boxes_p->Vertices = nh_core_initArray(sizeof(float), 64);
-    Boxes_p->Colors = nh_core_initArray(sizeof(float), 64);
+    Graphics_p->Boxes.Vertices = nh_core_initArray(sizeof(float), 64);
+    Graphics_p->Boxes.Colors = nh_core_initArray(sizeof(float), 64);
  
-    for (int i = 0; i < Grid_p->Boxes.length; ++i) {
-        tk_terminal_Box *Box_p = ((tk_terminal_Box*)Grid_p->Boxes.p)+i;
+    for (int i = 0; i < Graphics_p->Boxes.Data.length; ++i) {
+        tk_terminal_Box *Box_p = ((tk_terminal_Box*)Graphics_p->Boxes.Data.p)+i;
         if (Box_p->UpperLeft.x < 0 || Box_p->UpperLeft.y < 0 || Box_p->LowerRight.x < 0 || Box_p->LowerRight.y < 0) {continue;}
-        nh_core_appendToArray(&Boxes_p->Vertices, Box_p->innerVertices_p, 18);
-        nh_core_appendToArray(&Boxes_p->Vertices, Box_p->outerVertices_p, 18);
+        nh_core_appendToArray(&Graphics_p->Boxes.Vertices, Box_p->innerVertices_p, 18);
+        nh_core_appendToArray(&Graphics_p->Boxes.Vertices, Box_p->outerVertices_p, 18);
         // add color data
         tk_terminal_Tile *Tile_p = tk_terminal_getTile(Grid_p, Box_p->UpperLeft.y, Box_p->UpperLeft.x);
         Tile_p->Glyph.Attributes.reverse = true;
         Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
-        tk_core_Color Color = tk_terminal_getGlyphColor(Config_p, State_p, &Tile_p->Glyph, false, Box_p->UpperLeft.x+2, Box_p->UpperLeft.y+1, Grid_p);
+        tk_core_Color Color = tk_terminal_getGlyphColor(Config_p, &Graphics_p->State, &Tile_p->Glyph, false, Box_p->UpperLeft.x+2, Box_p->UpperLeft.y+1, Grid_p);
         Tile_p->Glyph.Attributes.reverse = false;
         Tile_p->Glyph.mark &= TTYR_CORE_MARK_ACCENT;
         for (int v = 0; v < 12; ++v) {
-            nh_core_appendToArray(&Boxes_p->Colors, &Color.r, 1);
-            nh_core_appendToArray(&Boxes_p->Colors, &Color.g, 1);
-            nh_core_appendToArray(&Boxes_p->Colors, &Color.b, 1);
+            nh_core_appendToArray(&Graphics_p->Boxes.Colors, &Color.r, 1);
+            nh_core_appendToArray(&Graphics_p->Boxes.Colors, &Color.g, 1);
+            nh_core_appendToArray(&Graphics_p->Boxes.Colors, &Color.b, 1);
         }
     }
 
@@ -536,7 +538,7 @@ TTYR_TERMINAL_RESULT tk_terminal_updateGraphics(
         Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
 
     TTYR_TERMINAL_CHECK(tk_terminal_updateDimData(&Graphics_p->State, Grid_p, &Graphics_p->Dim))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateBoxesData(Config_p, &Graphics_p->State, Grid_p, &Graphics_p->Boxes))
+    TTYR_TERMINAL_CHECK(tk_terminal_updateBoxesData(Graphics_p, Config_p, Grid_p))
 
     return TTYR_TERMINAL_SUCCESS;
 }

@@ -9,6 +9,7 @@
 // INCLUDES ========================================================================================
 
 #include "Terminal.h"
+#include "Vertices.h"
 
 #include "../Common/Macros.h"
 
@@ -61,6 +62,7 @@ static void *tk_terminal_initTerminal(
     Terminal_p->leftMouse = false;
     Terminal_p->TTY_p = ((tk_terminal_Args*)Workload_p->args_p)->TTY_p;
     Terminal_p->View_p = tk_core_createView(Terminal_p->TTY_p, Terminal_p, false);
+
     TTYR_TERMINAL_CHECK_MEM_2(NULL, Terminal_p->View_p)
 
     if (((tk_terminal_Args*)Workload_p->args_p)->namespace_p) {
@@ -94,6 +96,31 @@ static void tk_terminal_freeTerminal(
 
 // RUN LOOP ========================================================================================
 // The next functions comprise the top-level of the nhterminal run loop.
+
+static TTYR_TERMINAL_RESULT tk_terminal_updateBoxes( 
+    tk_terminal_Terminal *Terminal_p, nh_core_Array *NewBoxes_p, int fontSize)
+{ 
+    if (Terminal_p->Graphics.Boxes.Data.length > 0) { 
+        nh_core_freeArray(&Terminal_p->Graphics.Boxes.Data); 
+    } 
+
+    for (int i = 0; i < NewBoxes_p->length; ++i) 
+    { 
+        tk_terminal_Box *Box_p = (tk_terminal_Box*)nh_core_incrementArray(&Terminal_p->Graphics.Boxes.Data);
+        TTYR_TERMINAL_CHECK_MEM(Box_p) 
+        *Box_p = ((tk_terminal_Box*)NewBoxes_p->p)[i]; 
+
+        if (Box_p->UpperLeft.x == Box_p->LowerRight.x && Box_p->UpperLeft.y == Box_p->UpperLeft.y) {
+            TTYR_TERMINAL_CHECK(tk_terminal_getOutlineVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, true, fontSize))
+            TTYR_TERMINAL_CHECK(tk_terminal_getOutlineVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, false, fontSize))
+        } else { 
+            TTYR_TERMINAL_CHECK(tk_terminal_getBoxVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, true, fontSize))
+            TTYR_TERMINAL_CHECK(tk_terminal_getBoxVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, false, fontSize))
+        } 
+    } 
+
+    return TTYR_TERMINAL_SUCCESS; 
+} 
 
 static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
     tk_terminal_Terminal *Terminal_p)
@@ -286,7 +313,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
 
         if (!Array_p) {break;}
 
-        TTYR_TERMINAL_CHECK(tk_terminal_updateBoxes(&Terminal_p->Grid, &Terminal_p->Graphics.State, Array_p, Terminal_p->Config.fontSize))
+        TTYR_TERMINAL_CHECK(tk_terminal_updateBoxes(Terminal_p, Array_p, Terminal_p->Config.fontSize))
 
     } while (Array_p);
 
@@ -357,7 +384,6 @@ static NH_SIGNAL tk_terminal_runTerminalCommand(
                 return NH_SIGNAL_ERROR;
             }
             tk_terminal_handleViewportChange(&Terminal_p->Graphics, Command_p->p);
-            tk_terminal_handleViewportChange(&Terminal_p->Graphics2, Command_p->p);
             break;
     }
 

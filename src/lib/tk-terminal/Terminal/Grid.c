@@ -33,10 +33,7 @@ TTYR_TERMINAL_RESULT tk_terminal_initGrid(
     tk_terminal_Grid *Grid_p)
 {
     memset(Grid_p, 0, sizeof(tk_terminal_Grid));
-
     Grid_p->Rows = nh_core_initList(128);
-    Grid_p->Boxes = nh_core_initArray(sizeof(tk_terminal_Box), 16);
-
     return TTYR_TERMINAL_SUCCESS;
 }
 
@@ -62,8 +59,6 @@ TTYR_TERMINAL_RESULT tk_terminal_freeGrid(
     }
 
     nh_core_freeList(&Grid_p->Rows, true);
-    nh_core_freeArray(&Grid_p->Boxes);
-
     tk_terminal_initGrid(Grid_p);
 
     return TTYR_TERMINAL_SUCCESS;
@@ -443,31 +438,6 @@ TTYR_TERMINAL_RESULT tk_terminal_updateGrid(
                 &Tile_p->Glyph, state_p, Grid_p, col, row, Tile_p, true, Config_p->fontSize))
             TTYR_TERMINAL_CHECK(tk_terminal_updateTileVertices(
                 &Tile_p->Glyph, state_p, Grid_p, col, row, Tile_p, false, Config_p->fontSize))
-        }
-    }
-
-    return TTYR_TERMINAL_SUCCESS;
-}
-
-TTYR_TERMINAL_RESULT tk_terminal_updateBoxes(
-    tk_terminal_Grid *Grid_p, void *state_p, nh_core_Array *Boxes_p, int fontSize)
-{   
-    if (Grid_p->Boxes.length > 0) {
-        nh_core_freeArray(&Grid_p->Boxes);
-    }
-
-    for (int i = 0; i < Boxes_p->length; ++i) 
-    {
-        tk_terminal_Box *Box_p = (tk_terminal_Box*)nh_core_incrementArray(&Grid_p->Boxes);
-        TTYR_TERMINAL_CHECK_MEM(Box_p)
-        *Box_p = ((tk_terminal_Box*)Boxes_p->p)[i];
-
-        if (Box_p->UpperLeft.x == Box_p->LowerRight.x && Box_p->UpperLeft.y == Box_p->UpperLeft.y) {
-            TTYR_TERMINAL_CHECK(tk_terminal_getOutlineVertices(state_p, Grid_p, Box_p, true, fontSize))
-            TTYR_TERMINAL_CHECK(tk_terminal_getOutlineVertices(state_p, Grid_p, Box_p, false, fontSize))
-        } else {
-            TTYR_TERMINAL_CHECK(tk_terminal_getBoxVertices(state_p, Grid_p, Box_p, true, fontSize))
-            TTYR_TERMINAL_CHECK(tk_terminal_getBoxVertices(state_p, Grid_p, Box_p, false, fontSize))
         }
     }
 
