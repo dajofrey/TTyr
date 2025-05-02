@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_CONTEXT_MENU_H
-#define TTYR_CORE_CONTEXT_MENU_H
+#ifndef TK_CORE_CONTEXT_MENU_H
+#define TK_CORE_CONTEXT_MENU_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -54,11 +54,11 @@
         int x, int y 
     );
 
-    TTYR_CORE_RESULT tk_core_handleMouseMenuPress(
+    TK_CORE_RESULT tk_core_handleMouseMenuPress(
         tk_core_ContextMenu *Root_p, tk_core_ContextMenu *Menu_p
     );
 
-    TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
+    TK_CORE_RESULT tk_core_drawContextMenuRecursively(
         tk_core_ContextMenu *Menu_p, tk_core_Row *Grid_p
     );
 

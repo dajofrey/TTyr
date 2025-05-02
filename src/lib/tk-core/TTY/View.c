@@ -34,20 +34,20 @@
 
 // SIZE ============================================================================================
 
-TTYR_CORE_RESULT tk_core_getViewSize(
+TK_CORE_RESULT tk_core_getViewSize(
     tk_core_View *View_p) 
 {
     if (View_p->standardIO) {
-        TTYR_CHECK(tk_core_getStandardOutputWindowSize(&View_p->cols, &View_p->rows))
+        TK_CHECK(tk_core_getStandardOutputWindowSize(&View_p->cols, &View_p->rows))
     }
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_translateMousePosition(
+TK_CORE_RESULT tk_core_translateMousePosition(
     tk_core_View *View_p, nh_api_MouseEvent Mouse, int *col_p, int *row_p)
 {
     if (View_p->standardIO) {
-        TTYR_CHECK(TTYR_CORE_ERROR_BAD_STATE)
+        TK_CHECK(TK_CORE_ERROR_BAD_STATE)
     }
 
     int index = 0;
@@ -62,16 +62,16 @@ TTYR_CORE_RESULT tk_core_translateMousePosition(
     }
     *row_p = index-1;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_updateView(
+TK_CORE_RESULT tk_core_updateView(
     tk_core_Config *Config_p, tk_core_View *View_p, bool *updated_p, bool macro)
 {
     if (View_p->cols == View_p->previousCols && View_p->rows == View_p->previousRows &&
         View_p->Size.width == View_p->PreviousSize.width && View_p->Size.height == View_p->PreviousSize.height) {
         if (updated_p) {*updated_p = false;}
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
 
     if (View_p->Row.Glyphs_p) {
@@ -116,7 +116,7 @@ TTYR_CORE_RESULT tk_core_updateView(
 
     if (updated_p) {*updated_p = true;}
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // CREATE/DESTROY ==================================================================================
@@ -159,7 +159,7 @@ tk_core_View *tk_core_createView(
     ))
 
     tk_core_View *View_p = (tk_core_View*)nh_core_allocate(sizeof(tk_core_View));
-    TTYR_CHECK_MEM_2(NULL, View_p)
+    TK_CHECK_MEM_2(NULL, View_p)
 
     *View_p = View;
 
@@ -170,7 +170,7 @@ tk_core_View *tk_core_createView(
     return View_p;
 }
 
-TTYR_CORE_RESULT tk_core_destroyView(
+TK_CORE_RESULT tk_core_destroyView(
     tk_core_TTY *TTY_p, tk_core_View *View_p)
 {
     for (int i = 0; i < 64; ++i) {
@@ -203,13 +203,13 @@ TTYR_CORE_RESULT tk_core_destroyView(
         nh_core_free(View_p); 
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // FORWARD FUNCTIONS ===============================================================================
 // These functions forward specific TTY internal data to the view for rendering.
 
-TTYR_CORE_RESULT tk_core_forwardCursor(
+TK_CORE_RESULT tk_core_forwardCursor(
     tk_core_Config *Config_p, tk_core_View *View_p, int x, int y)
 {
     if (View_p->standardIO) {
@@ -232,13 +232,13 @@ TTYR_CORE_RESULT tk_core_forwardCursor(
 
     nh_core_appendToArray(Array_p, &Update, 1);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_setContextMenuBoxes(
+static TK_CORE_RESULT tk_core_setContextMenuBoxes(
     tk_core_ContextMenu *Menu_p, nh_core_Array *Boxes_p)
 {
-    if (!Menu_p->active || Menu_p->Items.size == 0) {return TTYR_CORE_SUCCESS;}
+    if (!Menu_p->active || Menu_p->Items.size == 0) {return TK_CORE_SUCCESS;}
 
     tk_terminal_Box *Box_p = (tk_terminal_Box*)nh_core_incrementArray(Boxes_p);
 
@@ -258,10 +258,10 @@ static TTYR_CORE_RESULT tk_core_setContextMenuBoxes(
         tk_core_setContextMenuBoxes(Menu_p->Items.pp[i], Boxes_p);
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_setBox(
+static TK_CORE_RESULT tk_core_setBox(
     tk_core_Menu Menu, nh_core_Array *Boxes_p)
 {
     tk_terminal_Box *Box_p = (tk_terminal_Box*)nh_core_incrementArray(Boxes_p);
@@ -272,10 +272,10 @@ static TTYR_CORE_RESULT tk_core_setBox(
     Box_p->LowerRight.x = Menu.Position.x+Menu.width+1;
     Box_p->LowerRight.y = Menu.Position.y+Menu.height;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_forwardGrid1(
+TK_CORE_RESULT tk_core_forwardGrid1(
     tk_core_Config *Config_p, tk_core_View *View_p)
 {
     if (View_p->standardIO) {
@@ -333,21 +333,21 @@ TTYR_CORE_RESULT tk_core_forwardGrid1(
 
         // Skip macro tile without payload.
         if (((tk_core_Tile*)MacroTiles.pp[i])->p == NULL 
-        || TTYR_CORE_MACRO_TILE(MacroTiles.pp[i])->MacroTabs.size <= 0 
-        || TTYR_CORE_MACRO_TAB(MacroTiles.pp[i])->MicroWindow.Tabs_p == NULL) {continue;}
+        || TK_CORE_MACRO_TILE(MacroTiles.pp[i])->MacroTabs.size <= 0 
+        || TK_CORE_MACRO_TAB(MacroTiles.pp[i])->MicroWindow.Tabs_p == NULL) {continue;}
 
-        nh_core_List MicroTiles = tk_core_getTiles(TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(MacroTiles.pp[i]))->RootTile_p);
+        nh_core_List MicroTiles = tk_core_getTiles(TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(MacroTiles.pp[i]))->RootTile_p);
         for (int j = 0; j < MicroTiles.size; ++j) {
 
             // Skip micro tile without payload.
             if (((tk_core_Tile*)MicroTiles.pp[j])->p == NULL) {continue;}
 
-            tk_core_Program *Program_p = TTYR_CORE_MICRO_TILE(MicroTiles.pp[j])->Program_p;
-            tk_core_Program *CurrentProgram_p = tk_core_getCurrentProgram(&TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
+            tk_core_Program *Program_p = TK_CORE_MICRO_TILE(MicroTiles.pp[j])->Program_p;
+            tk_core_Program *CurrentProgram_p = tk_core_getCurrentProgram(&TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
             if (CurrentProgram_p == Program_p && TTY_p->hasFocus) {continue;}
 
             int x = 0, y = 0;
-            TTYR_CHECK(tk_core_getCursorPosition(Config_p, MacroTiles.pp[i], MicroTiles.pp[j], View_p->standardIO, &x, &y))
+            TK_CHECK(tk_core_getCursorPosition(Config_p, MacroTiles.pp[i], MicroTiles.pp[j], View_p->standardIO, &x, &y))
 
             tk_terminal_Box *Box_p = (tk_terminal_Box*)nh_core_incrementArray(Boxes_p);
             memset(Box_p, 0, sizeof(tk_terminal_Box));
@@ -361,10 +361,10 @@ TTYR_CORE_RESULT tk_core_forwardGrid1(
     }
     nh_core_freeList(&MacroTiles, false);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_forwardGrid2(
+TK_CORE_RESULT tk_core_forwardGrid2(
     tk_core_View *View_p)
 {
     // Write to nhterminal.
@@ -377,26 +377,26 @@ TTYR_CORE_RESULT tk_core_forwardGrid2(
             Update.row = row;
             Update.col = col;
             Update.Glyph = View_p->Grid2_p[row].Glyphs_p[col];
-            Update.Glyph.mark |= TTYR_CORE_MARK_ELEVATED | TTYR_CORE_MARK_ACCENT;
+            Update.Glyph.mark |= TK_CORE_MARK_ELEVATED | TK_CORE_MARK_ACCENT;
             Update.cursor = false;
             nh_core_appendToArray(Array_p, &Update, 1);
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_forwardEvent(
+TK_CORE_RESULT tk_core_forwardEvent(
     tk_core_View *View_p, nh_api_WSIEvent Event)
 {
     if (View_p->standardIO) {
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
 
     // Write to nhterminal.
     nh_api_WSIEvent *Event_p = (nh_api_WSIEvent*)nh_core_advanceRingBuffer(&View_p->Forward.Events);
-    TTYR_CHECK_MEM(Event_p)
+    TK_CHECK_MEM(Event_p)
     *Event_p = Event;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

@@ -19,7 +19,7 @@
 
 // FUNCTIONS =======================================================================================
 
-char TTYR_API_PATH_P[255] = {0};
+char TK_API_PATH_P[255] = {0};
 
 void tk_api_initialize() 
 {
@@ -42,8 +42,8 @@ void tk_api_initialize()
     assert(strtab != NULL);
 
     if (rpath != NULL) {
-        sprintf(TTYR_API_PATH_P, strtab + rpath->d_un.d_val);
+        sprintf(TK_API_PATH_P, strtab + rpath->d_un.d_val);
     } else if (runpath != NULL) {
-        sprintf(TTYR_API_PATH_P, strtab + runpath->d_un.d_val);
+        sprintf(TK_API_PATH_P, strtab + runpath->d_un.d_val);
     }
 }

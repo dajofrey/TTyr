@@ -39,7 +39,7 @@
 
 // CLIPBOARD =======================================================================================
 
-TTYR_CORE_RESULT tk_core_resetClipboard()
+TK_CORE_RESULT tk_core_resetClipboard()
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
 
@@ -52,7 +52,7 @@ TTYR_CORE_RESULT tk_core_resetClipboard()
     nh_core_freeArray(&TTY_p->Clipboard.Lines);
     TTY_p->Clipboard.Lines = nh_core_initArray(sizeof(nh_encoding_UTF32String), 32);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 nh_encoding_UTF32String *tk_core_newClipboardLine()
@@ -61,7 +61,7 @@ nh_encoding_UTF32String *tk_core_newClipboardLine()
 
     nh_encoding_UTF32String *Line_p = (nh_encoding_UTF32String*)nh_core_incrementArray(&TTY_p->Clipboard.Lines);
 
-    TTYR_CHECK_NULL_2(NULL, Line_p)
+    TK_CHECK_NULL_2(NULL, Line_p)
     *Line_p = nh_encoding_initUTF32(32);
 
     return Line_p;
@@ -92,7 +92,7 @@ static void *tk_core_initTTY(
     Workload_p->module = -1;
 
     tk_core_TTY *TTY_p = (tk_core_TTY*)nh_core_allocate(sizeof(tk_core_TTY));
-    TTYR_CHECK_MEM_2(NULL, TTY_p)
+    TK_CHECK_MEM_2(NULL, TTY_p)
 
     memset(TTY_p, 0, sizeof(tk_core_TTY));
 
@@ -116,11 +116,11 @@ static void *tk_core_initTTY(
     TTY_p->Preview.blink = true;
     TTY_p->Preview.LastBlink = nh_core_getSystemTime();
 
-    TTYR_CHECK_2(NULL, nh_core_initRingBuffer(
+    TK_CHECK_2(NULL, nh_core_initRingBuffer(
         &TTY_p->Events, 128, sizeof(nh_api_WSIEvent), NULL 
     ))
 
-    TTYR_CHECK_NULL_2(NULL, tk_core_insertAndFocusWindow(TTY_p, 0))
+    TK_CHECK_NULL_2(NULL, tk_core_insertAndFocusWindow(TTY_p, 0))
 
     if (Args_p->Interface_p == NULL) {
         Args_p->Interface_p = tk_core_createShellInterface();
@@ -162,11 +162,11 @@ static void tk_core_freeTTY(
 // RUN LOOP ========================================================================================
 // The next functions comprise the top-level of the nhtty run loop.
 
-static TTYR_CORE_RESULT tk_core_handleInput(
+static TK_CORE_RESULT tk_core_handleInput(
     tk_core_TTY *TTY_p)
 {
     if (tk_core_claimsStandardIO(TTY_p)) {
-        TTYR_CHECK(tk_core_readStandardInput(TTY_p))
+        TK_CHECK(tk_core_readStandardInput(TTY_p))
     }
 
     while (1)
@@ -176,23 +176,23 @@ static TTYR_CORE_RESULT tk_core_handleInput(
 
         if (Event_p == NULL) {break;}
 
-        TTYR_CHECK(tk_core_handleMacroWindowInput(&TTY_p->Config, TTY_p->Window_p, *Event_p))
+        TK_CHECK(tk_core_handleMacroWindowInput(&TTY_p->Config, TTY_p->Window_p, *Event_p))
 
         for (int i = 0; i < TTY_p->Views.size; ++i) {
-            TTYR_CHECK(tk_core_forwardEvent(TTY_p->Views.pp[i], *Event_p))
+            TK_CHECK(tk_core_forwardEvent(TTY_p->Views.pp[i], *Event_p))
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_handleWindowResize(
+static TK_CORE_RESULT tk_core_handleWindowResize(
     tk_core_TTY *TTY_p, tk_core_View *View_p)
 {
     bool updated = false;
 
-    TTYR_CHECK(tk_core_getViewSize(View_p))
-    TTYR_CHECK(tk_core_updateView(&TTY_p->Config, View_p, &updated, true))
+    TK_CHECK(tk_core_getViewSize(View_p))
+    TK_CHECK(tk_core_updateView(&TTY_p->Config, View_p, &updated, true))
 
     if (updated) {
         if (TTY_p->Window_p->MouseMenu_p) {
@@ -204,7 +204,7 @@ static TTYR_CORE_RESULT tk_core_handleWindowResize(
 	TTY_p->Window_p->refreshTitlebar = true;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 static NH_SIGNAL tk_core_runTTY(
@@ -214,26 +214,26 @@ static NH_SIGNAL tk_core_runTTY(
     bool idle = true;
 
     for (int i = 0; i < TTY_p->Views.size; ++i) {
-        TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_handleWindowResize(TTY_p, TTY_p->Views.pp[i]))
+        TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_handleWindowResize(TTY_p, TTY_p->Views.pp[i]))
     }
     if (TTY_p->Views.size <= 0 || ((tk_core_View*)TTY_p->Views.pp[0])->cols <= 0) {return NH_SIGNAL_IDLE;}
 
     tk_core_updateConfig(TTY_p);
 
-    TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_handleInput(TTY_p))
-    TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_updateMacroWindow(TTY_p->Window_p))
+    TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_handleInput(TTY_p))
+    TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_updateMacroWindow(TTY_p->Window_p))
     tk_core_checkTitlebar(&TTY_p->Config, &TTY_p->Titlebar, &TTY_p->Window_p->refreshGrid1);
 
     if (TTY_p->Window_p->refreshGrid1) {
-        TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_drawTitlebar(TTY_p))
-        TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_refreshGrid1(TTY_p))
+        TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_drawTitlebar(TTY_p))
+        TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_refreshGrid1(TTY_p))
     }
     if (TTY_p->Window_p->refreshGrid2) {
-        TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_refreshGrid2(TTY_p))
+        TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_refreshGrid2(TTY_p))
     }
 
     if (TTY_p->Window_p->refreshCursor || TTY_p->Window_p->refreshGrid1) {
-        TTYR_CHECK_2(NH_SIGNAL_ERROR, tk_core_refreshCursor(TTY_p))
+        TK_CHECK_2(NH_SIGNAL_ERROR, tk_core_refreshCursor(TTY_p))
         idle = false;
     }
 
@@ -259,11 +259,11 @@ static NH_SIGNAL tk_core_runTTY(
 // COMMANDS ========================================================================================
 // The next functions are executed by tk_core_cmd_* functions.
 
-typedef enum TTYR_CORE_COMMAND_E {
-    TTYR_CORE_COMMAND_CLAIM_STANDARD_IO,
-    TTYR_CORE_COMMAND_UNCLAIM_STANDARD_IO,
-    TTYR_CORE_COMMAND_SEND_EVENT,
-} TTYR_CORE_COMMAND_E;
+typedef enum TK_CORE_COMMAND_E {
+    TK_CORE_COMMAND_CLAIM_STANDARD_IO,
+    TK_CORE_COMMAND_UNCLAIM_STANDARD_IO,
+    TK_CORE_COMMAND_SEND_EVENT,
+} TK_CORE_COMMAND_E;
 
 typedef struct tk_core_AddProgramData {
     char name_p[255];
@@ -279,15 +279,15 @@ static NH_SIGNAL tk_core_runTTYCommand(
 
     switch (Command_p->type)
     {
-        case TTYR_CORE_COMMAND_CLAIM_STANDARD_IO :
-            TTYR_CHECK(tk_core_claimStandardIO(TTY_p))
+        case TK_CORE_COMMAND_CLAIM_STANDARD_IO :
+            TK_CHECK(tk_core_claimStandardIO(TTY_p))
             break;
-        case TTYR_CORE_COMMAND_UNCLAIM_STANDARD_IO :
-            TTYR_CHECK(tk_core_unclaimStandardIO(TTY_p))
+        case TK_CORE_COMMAND_UNCLAIM_STANDARD_IO :
+            TK_CHECK(tk_core_unclaimStandardIO(TTY_p))
             break;
-        case TTYR_CORE_COMMAND_SEND_EVENT :
+        case TK_CORE_COMMAND_SEND_EVENT :
             nh_api_WSIEvent *Event2_p = (nh_api_WSIEvent*)nh_core_advanceRingBuffer(&TTY_p->Events);
-            TTYR_CHECK_NULL(Event2_p)
+            TK_CHECK_NULL(Event2_p)
             *Event2_p = *((nh_api_WSIEvent*)Command_p->p);
             break;
     }
@@ -312,38 +312,38 @@ tk_core_TTY *tk_core_openTTY(
     return TTY_p;
 }
 
-TTYR_CORE_RESULT tk_core_closeTTY(
+TK_CORE_RESULT tk_core_closeTTY(
     tk_core_TTY *TTY_p)
 {
     nh_core_deactivateWorkload(nh_core_getWorkload(TTY_p));
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_cmd_claimStandardIO(
+TK_CORE_RESULT tk_core_cmd_claimStandardIO(
     tk_core_TTY *TTY_p)
 {
-    nh_core_executeWorkloadCommand(TTY_p, TTYR_CORE_COMMAND_CLAIM_STANDARD_IO, NULL, 0);
-    return TTYR_CORE_SUCCESS;
+    nh_core_executeWorkloadCommand(TTY_p, TK_CORE_COMMAND_CLAIM_STANDARD_IO, NULL, 0);
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_cmd_unclaimStandardIO(
+TK_CORE_RESULT tk_core_cmd_unclaimStandardIO(
     tk_core_TTY *TTY_p)
 {
-    nh_core_executeWorkloadCommand(TTY_p, TTYR_CORE_COMMAND_UNCLAIM_STANDARD_IO, NULL, 0);
-    return TTYR_CORE_SUCCESS;
+    nh_core_executeWorkloadCommand(TTY_p, TK_CORE_COMMAND_UNCLAIM_STANDARD_IO, NULL, 0);
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_cmd_sendEvent(
+TK_CORE_RESULT tk_core_cmd_sendEvent(
     tk_core_TTY *TTY_p, nh_api_WSIEvent Event)
 {
     switch (Event.type) {
         case NH_API_WSI_EVENT_KEYBOARD :
         case NH_API_WSI_EVENT_MOUSE :
         case NH_API_WSI_EVENT_WINDOW :
-            nh_core_executeWorkloadCommand(TTY_p, TTYR_CORE_COMMAND_SEND_EVENT, &Event, sizeof(nh_api_WSIEvent));
+            nh_core_executeWorkloadCommand(TTY_p, TK_CORE_COMMAND_SEND_EVENT, &Event, sizeof(nh_api_WSIEvent));
         default :
             // Ignore other events.
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

@@ -16,7 +16,7 @@
 
 // SDF TEXT ========================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_createVulkanSDFPipeline(
+static TK_TERMINAL_RESULT tk_terminal_createVulkanSDFPipeline(
     nh_gfx_VulkanDriver *Driver_p, nh_gfx_VulkanPipeline *Pipeline_p, nh_gfx_VulkanPipelineInfo *Info_p)
 {
 // layout
@@ -54,7 +54,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_createVulkanSDFPipeline(
     };
 
     VkDescriptorSetLayout Layout;
-    NH_GFX_CHECK_VULKAN_2(TTYR_TERMINAL_ERROR_BAD_STATE, Driver_p->Functions.vkCreateDescriptorSetLayout(Driver_p->Device, &LayoutInfo, VK_NULL_HANDLE, &Layout))
+    NH_GFX_CHECK_VULKAN_2(TK_TERMINAL_ERROR_BAD_STATE, Driver_p->Functions.vkCreateDescriptorSetLayout(Driver_p->Device, &LayoutInfo, VK_NULL_HANDLE, &Layout))
 
     VkPipelineLayoutCreateInfo PipelineLayoutInfo = 
     {
@@ -74,8 +74,8 @@ static TTYR_TERMINAL_RESULT tk_terminal_createVulkanSDFPipeline(
     {
         #include "../Common/Data/GLSL/TextSDF.frag.inc"
     };
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanShaderModule(Driver_p, vs_code, sizeof(vs_code), &vertShaderModule))
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanShaderModule(Driver_p, fs_code, sizeof(fs_code), &fragShaderModule))
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanShaderModule(Driver_p, vs_code, sizeof(vs_code), &vertShaderModule))
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanShaderModule(Driver_p, fs_code, sizeof(fs_code), &fragShaderModule))
 
     VkPipelineShaderStageCreateInfo vertShaderInfo = 
     {
@@ -154,24 +154,24 @@ static TTYR_TERMINAL_RESULT tk_terminal_createVulkanSDFPipeline(
         .subpass             = 0
     };
 
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanPipeline(Driver_p, NH_VK_PIPELINE_GRAPHICS, &PipelineLayoutInfo, &PipelineInfo, Pipeline_p))
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanPipeline(Driver_p, NH_VK_PIPELINE_GRAPHICS, &PipelineLayoutInfo, &PipelineInfo, Pipeline_p))
 
     Driver_p->Functions.vkDestroyShaderModule(Driver_p->Device, fragShaderModule, VK_NULL_HANDLE);
     Driver_p->Functions.vkDestroyShaderModule(Driver_p->Device, vertShaderModule, VK_NULL_HANDLE);
     Driver_p->Functions.vkDestroyDescriptorSetLayout(Driver_p->Device, Layout, VK_NULL_HANDLE);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 // IMPLEMENT ======================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_createVulkanPipelines(
+TK_TERMINAL_RESULT tk_terminal_createVulkanPipelines(
     nh_gfx_VulkanDriver *Driver_p, nh_gfx_VulkanPipeline *Pipelines_p)
 {
     nh_gfx_VulkanPipelineInfo Info;
     nh_gfx_prepareVulkanPipelineInfo(&Info);
 
-    TTYR_TERMINAL_CHECK(tk_terminal_createVulkanSDFPipeline(Driver_p, &Pipelines_p[TTYR_TERMINAL_VULKAN_PIPELINE_SDF], &Info))
+    TK_TERMINAL_CHECK(tk_terminal_createVulkanSDFPipeline(Driver_p, &Pipelines_p[TK_TERMINAL_VULKAN_PIPELINE_SDF], &Info))
 
     return NH_API_SUCCESS;
 }
@@ -179,7 +179,7 @@ TTYR_TERMINAL_RESULT tk_terminal_createVulkanPipelines(
 void tk_terminal_destroyVulkanPipelines(
     nh_gfx_VulkanDriver *Driver_p, nh_gfx_VulkanPipeline *Pipelines_p)
 {
-    for (int i = 0; i < _TTYR_TERMINAL_VULKAN_PIPELINE_COUNT; ++i) {
+    for (int i = 0; i < _TK_TERMINAL_VULKAN_PIPELINE_COUNT; ++i) {
         nh_gfx_destroyVulkanPipeline(Driver_p, &Pipelines_p[i]);
     }
 }

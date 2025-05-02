@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TTY_H
-#define TTYR_CORE_TTY_H
+#ifndef TK_CORE_TTY_H
+#define TK_CORE_TTY_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -79,7 +79,7 @@
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_resetClipboard(
+    TK_CORE_RESULT tk_core_resetClipboard(
     );
 
     nh_encoding_UTF32String *tk_core_newClipboardLine(

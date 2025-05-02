@@ -46,7 +46,7 @@ tk_core_FileEditor tk_core_initFileEditor()
     return Editor;
 }
 
-TTYR_CORE_RESULT tk_core_freeFileEditor(
+TK_CORE_RESULT tk_core_freeFileEditor(
      tk_core_FileEditor *FileEditor_p)
 {
     while (1) {
@@ -57,21 +57,21 @@ TTYR_CORE_RESULT tk_core_freeFileEditor(
 
     nh_core_destroyLinkedList(&FileEditor_p->Files, true);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // RENDER ==========================================================================================
 
-static TTYR_CORE_RESULT tk_core_renderFileEditor(
+static TK_CORE_RESULT tk_core_renderFileEditor(
     tk_core_FileEditor *FileEditor_p)
 {
     for (int i = 0; i < FileEditor_p->Files.count; ++i) {
         tk_core_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, i);
-        TTYR_CHECK_NULL(File_p)
-        TTYR_CHECK(tk_core_renderFile(File_p))
+        TK_CHECK_NULL(File_p)
+        TK_CHECK(tk_core_renderFile(File_p))
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // FILE ============================================================================================
@@ -100,7 +100,7 @@ tk_core_File *tk_core_openFile(
     tk_core_FileEditorView *FileEditorView_p = &((tk_core_Editor*)Program_p->handle_p)->View.FileEditor;
 
     tk_core_File *File_p = (tk_core_File*)nh_core_allocate(sizeof(tk_core_File));
-    TTYR_CHECK_MEM_2(NULL, File_p)
+    TK_CHECK_MEM_2(NULL, File_p)
 
     File_p->type      = tk_core_getFileType(&Node_p->Path);
     File_p->Node_p    = Node_p;
@@ -109,46 +109,46 @@ tk_core_File *tk_core_openFile(
 
     switch (File_p->type) 
     {
-        case TTYR_CORE_FILE_TEXT :
+        case TK_CORE_FILE_TEXT :
             File_p->handle_p = tk_core_openTextFile(&Node_p->Path); 
             break;
-        case TTYR_CORE_FILE_CHANGES :
+        case TK_CORE_FILE_CHANGES :
             break;
     }
 
-    TTYR_CHECK_NULL_2(NULL, File_p->handle_p)
-    TTYR_CHECK_2(NULL, tk_core_createFileViews(FileEditorView_p, File_p))
+    TK_CHECK_NULL_2(NULL, File_p->handle_p)
+    TK_CHECK_2(NULL, tk_core_createFileViews(FileEditorView_p, File_p))
 
     nh_core_prependToLinkedList(&FileEditor_p->Files, File_p);
     FileEditor_p->current = 0;
     Node_p->File_p = File_p;
 
-    TTYR_CHECK_2(NULL, tk_core_renderFileEditor(FileEditor_p))
+    TK_CHECK_2(NULL, tk_core_renderFileEditor(FileEditor_p))
 
-    TTYR_CHECK_2(NULL, tk_core_setCustomSuffixMessage(
-        NULL, TTYR_CORE_MESSAGE_EDITOR_FILE_OPENED, Node_p->Path.p, Node_p->Path.length
+    TK_CHECK_2(NULL, tk_core_setCustomSuffixMessage(
+        NULL, TK_CORE_MESSAGE_EDITOR_FILE_OPENED, Node_p->Path.p, Node_p->Path.length
     ))
 
     return File_p;
 }
 
-TTYR_CORE_RESULT tk_core_closeFile(
+TK_CORE_RESULT tk_core_closeFile(
     tk_core_FileEditor *Editor_p, tk_core_File *File_p)
 {
     if (File_p == NULL || !tk_core_hasFile(Editor_p, File_p)) {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
 
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
+        case TK_CORE_FILE_TEXT :
             tk_core_closeTextFile(File_p->handle_p);
             break;
     }
 
     nh_core_removeFromLinkedList2(&Editor_p->Files, File_p, true);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // HELP TEXT =======================================================================================
@@ -212,7 +212,7 @@ static const char *help_pp[] =
 
 // INPUT ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_cycleThroughFiles(
+TK_CORE_RESULT tk_core_cycleThroughFiles(
     tk_core_Program *Program_p, NH_API_UTF32 c)
 {
     tk_core_FileEditor *FileEditor_p = &((tk_core_Editor*)Program_p->handle_p)->FileEditor;
@@ -265,15 +265,15 @@ TTYR_CORE_RESULT tk_core_cycleThroughFiles(
 
     if (File_p != NULL) {
         // Move tree listing cursor to focused file.
-        TTYR_CHECK(tk_core_setTreeListingCursor(Program_p, File_p))
+        TK_CHECK(tk_core_setTreeListingCursor(Program_p, File_p))
         // Update message.
-        tk_core_setCustomSuffixMessage(NULL, TTYR_CORE_MESSAGE_EDITOR_FILE_EDIT, File_p->Node_p->Path.p, File_p->Node_p->Path.length);
+        tk_core_setCustomSuffixMessage(NULL, TK_CORE_MESSAGE_EDITOR_FILE_EDIT, File_p->Node_p->Path.p, File_p->Node_p->Path.length);
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_handleFileEditorInput(
+TK_CORE_RESULT tk_core_handleFileEditorInput(
     tk_core_Program *Program_p, NH_API_UTF32 c)
 {
     tk_core_Editor *Editor_p = Program_p->handle_p;
@@ -281,7 +281,7 @@ TTYR_CORE_RESULT tk_core_handleFileEditorInput(
     tk_core_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, FileEditor_p->current);
 
     if (File_p != NULL) {
-        TTYR_CHECK(tk_core_handleFileInput(Program_p, File_p, c, Editor_p->insertMode, &Program_p->refresh))
+        TK_CHECK(tk_core_handleFileInput(Program_p, File_p, c, Editor_p->insertMode, &Program_p->refresh))
 
         switch (c) {
             case 'l' :
@@ -289,12 +289,12 @@ TTYR_CORE_RESULT tk_core_handleFileEditorInput(
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // DRAW ============================================================================================
 
-static TTYR_CORE_RESULT tk_core_drawHelp(
+static TK_CORE_RESULT tk_core_drawHelp(
     tk_core_Glyph *Glyphs_p, int width, int line, int lines, int scroll)
 {
     line += scroll;
@@ -320,10 +320,10 @@ static TTYR_CORE_RESULT tk_core_drawHelp(
 //        }
 //    }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_updateFileEditorView(
+static TK_CORE_RESULT tk_core_updateFileEditorView(
     tk_core_FileEditor *FileEditor_p, tk_core_EditorView *View_p, int width)
 {
     View_p->FileEditor.width = width;
@@ -338,34 +338,34 @@ static TTYR_CORE_RESULT tk_core_updateFileEditorView(
         View_p->FileEditor.currentOffset = 0;
     }
 
-    TTYR_CHECK(tk_core_updateFileViews(View_p))
+    TK_CHECK(tk_core_updateFileViews(View_p))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_drawFileEditorRow(
+TK_CORE_RESULT tk_core_drawFileEditorRow(
     tk_core_Program *Program_p, tk_core_Glyph *Glyphs_p, int width, int height, int row)
 {
     tk_core_Editor *Editor_p = Program_p->handle_p;
     tk_core_FileEditor *FileEditor_p = &Editor_p->FileEditor;
     tk_core_FileEditorView *View_p = &Editor_p->View.FileEditor;
 
-    TTYR_CHECK(tk_core_updateFileEditorView(FileEditor_p, &Editor_p->View, width))
+    TK_CHECK(tk_core_updateFileEditorView(FileEditor_p, &Editor_p->View, width))
 
     if (FileEditor_p->Files.count == 0) {
-        TTYR_CHECK(tk_core_drawHelp(Glyphs_p, View_p->width, row, height, View_p->helpScroll))
+        TK_CHECK(tk_core_drawHelp(Glyphs_p, View_p->width, row, height, View_p->helpScroll))
     }
 
     for (int i = View_p->currentOffset, width2 = 0, count = 0; i < FileEditor_p->Files.count; ++i, ++count) {
         if (count == View_p->maxOnScreen) {break;}
         tk_core_File *File_p = nh_core_getFromLinkedList(&FileEditor_p->Files, i);
         tk_core_FileView *FileView_p = tk_core_getFileView(&Editor_p->View, File_p);
-        TTYR_CHECK_NULL(File_p)
-        TTYR_CHECK_NULL(FileView_p)
-        TTYR_CHECK(tk_core_drawFileRow(Program_p, File_p, FileView_p, Glyphs_p+width2, row))
+        TK_CHECK_NULL(File_p)
+        TK_CHECK_NULL(FileView_p)
+        TK_CHECK(tk_core_drawFileRow(Program_p, File_p, FileView_p, Glyphs_p+width2, row))
         width2 += FileView_p->width;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 

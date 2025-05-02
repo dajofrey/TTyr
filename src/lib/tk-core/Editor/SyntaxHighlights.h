@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_SYNTAX_HIGHLIGHT_H
-#define TTYR_CORE_SYNTAX_HIGHLIGHT_H
+#ifndef TK_CORE_SYNTAX_HIGHLIGHT_H
+#define TK_CORE_SYNTAX_HIGHLIGHT_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -18,11 +18,11 @@
  *  @{
  */
 
-    typedef enum TTYR_CORE_TEXT {
-        TTYR_CORE_TEXT_UNDEFINED,
-        TTYR_CORE_TEXT_C,
-        TTYR_CORE_TEXT_CPP,
-    } TTYR_CORE_TEXT;
+    typedef enum TK_CORE_TEXT {
+        TK_CORE_TEXT_UNDEFINED,
+        TK_CORE_TEXT_C,
+        TK_CORE_TEXT_CPP,
+    } TK_CORE_TEXT;
 
 /** @} */
 
@@ -38,7 +38,7 @@
         nh_encoding_UTF32String *String_p
     );
     
-    TTYR_CORE_TEXT tk_core_getTextType(
+    TK_CORE_TEXT tk_core_getTextType(
         nh_encoding_UTF32String *Path_p 
     );
 

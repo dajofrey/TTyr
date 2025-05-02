@@ -22,78 +22,78 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_CORE_RESULT tk_core_getSetting(
+static TK_CORE_RESULT tk_core_getSetting(
     tk_core_Config *Config_p, char *namespace_p, int index, char *setting_p)
 {
     nh_core_List *Values_p = nh_core_getGlobalConfigSetting(namespace_p, -1, setting_p);
-    TTYR_CHECK_NULL(Values_p)
+    TK_CHECK_NULL(Values_p)
 
     switch (index) {
         case 0 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Shell.maxScroll = atoi(Values_p->pp[0]);
             break;
         case 1 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->windows = atoi(Values_p->pp[0]);
             break;
         case 2 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->tabs = atoi(Values_p->pp[0]);
             break;
         case 3 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.program = atoi(Values_p->pp[0]);
             break;
         case 4 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.split = atoi(Values_p->pp[0]);
             break;
         case 5 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.append = atoi(Values_p->pp[0]);
             break;
         case 6 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.window = atoi(Values_p->pp[0]);
             break;
         case 7 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.tab = atoi(Values_p->pp[0]);
             break;
         case 8 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.close = atoi(Values_p->pp[0]);
             break;
         case 9 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Menu.debug = atoi(Values_p->pp[0]);
             break;
         case 10 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Titlebar.on = atoi(Values_p->pp[0]);
             break;
         case 11 :
-            if (Values_p->size != 4) {return TTYR_CORE_ERROR_BAD_STATE;} 
+            if (Values_p->size != 4) {return TK_CORE_ERROR_BAD_STATE;} 
             Config_p->Titlebar.Foreground.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
             Config_p->Titlebar.Foreground.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
             Config_p->Titlebar.Foreground.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
             Config_p->Titlebar.Foreground.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
             break;
         case 12 :
-            if (Values_p->size != 4) {return TTYR_CORE_ERROR_BAD_STATE;} 
+            if (Values_p->size != 4) {return TK_CORE_ERROR_BAD_STATE;} 
             Config_p->Titlebar.Background.r = ((float)atoi(Values_p->pp[0]))/255.0f; 
             Config_p->Titlebar.Background.g = ((float)atoi(Values_p->pp[1]))/255.0f; 
             Config_p->Titlebar.Background.b = ((float)atoi(Values_p->pp[2]))/255.0f; 
             Config_p->Titlebar.Background.a = ((float)atoi(Values_p->pp[3]))/255.0f; 
             break;
         case 13 :
-            if (Values_p->size != 1) {return TTYR_CORE_ERROR_BAD_STATE;}
+            if (Values_p->size != 1) {return TK_CORE_ERROR_BAD_STATE;}
             Config_p->Topbar.on = atoi(Values_p->pp[0]);
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 static tk_core_Config tk_core_getStaticConfig()
@@ -121,10 +121,10 @@ static tk_core_Config tk_core_getStaticConfig()
     int options = sizeof(options_pp)/sizeof(options_pp[0]);
 
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
-    TTYR_CHECK_NULL_2(Config, TTY_p)
+    TK_CHECK_NULL_2(Config, TTY_p)
 
     for (int i = 0; i < options; ++i) {
-        TTYR_CHECK_2(Config, tk_core_getSetting(&Config, TTY_p->namespace_p, i, options_pp[i]))
+        TK_CHECK_2(Config, tk_core_getSetting(&Config, TTY_p->namespace_p, i, options_pp[i]))
     }
 
     return Config;

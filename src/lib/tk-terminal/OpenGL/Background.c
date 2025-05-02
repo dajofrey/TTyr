@@ -27,7 +27,7 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBackgroundProgram(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLBackgroundProgram(
     tk_terminal_OpenGLBackground *Background_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     static const char* vsSource_p =
@@ -76,10 +76,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBackgroundProgram(
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glLinkProgram", &Background_p->Program_p->Result);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBackgroundVertices(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLBackgroundVertices(
     tk_terminal_OpenGLBackground *Background_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     Background_p->VertexArray_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
@@ -99,10 +99,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBackgroundVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1), 
         Background_p->ColorBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBackgroundVertices(
+static TK_TERMINAL_RESULT tk_terminal_updateOpenGLBackgroundVertices(
     tk_terminal_OpenGLBackground *Background_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p, nh_core_Array *Vertices_p,
     nh_core_Array *Indices_p, nh_core_Array *Colors_p)
 {
@@ -145,10 +145,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBackgroundVertices(
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float) * 3),
         nh_gfx_glpointer(NULL, NULL));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBackground(
+TK_TERMINAL_RESULT tk_terminal_updateOpenGLBackground(
     void *state_p, void *data_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
@@ -166,18 +166,18 @@ TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBackground(
         State_p->Viewport_p->OpenGL.CommandBuffer_p, &Data_p->Background.Vertices,
         &Data_p->Background.Indices, &Data_p->Background.Colors);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBackground(
+TK_TERMINAL_RESULT tk_terminal_initOpenGLBackground(
     tk_terminal_OpenGLBackground *Background_p)
 {
     memset(Background_p, 0, sizeof(tk_terminal_OpenGLBackground));
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLBackground(
+TK_TERMINAL_RESULT tk_terminal_freeOpenGLBackground(
     tk_terminal_OpenGLBackground *Background_p)
 {
     nh_gfx_freeOpenGLCommand(Background_p->VertexShader_p);
@@ -189,5 +189,5 @@ TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLBackground(
     nh_gfx_freeOpenGLData(Background_p->ColorBuffer_p);
     nh_gfx_freeOpenGLData(Background_p->VerticesBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

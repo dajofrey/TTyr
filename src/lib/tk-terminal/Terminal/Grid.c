@@ -29,15 +29,15 @@
 
 // INIT ============================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_initGrid(
+TK_TERMINAL_RESULT tk_terminal_initGrid(
     tk_terminal_Grid *Grid_p)
 {
     memset(Grid_p, 0, sizeof(tk_terminal_Grid));
     Grid_p->Rows = nh_core_initList(128);
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_freeGrid(
+TK_TERMINAL_RESULT tk_terminal_freeGrid(
     tk_terminal_Grid *Grid_p)
 {
     for (int row = 0; row < Grid_p->Rows.size; ++row) {
@@ -61,10 +61,10 @@ TTYR_TERMINAL_RESULT tk_terminal_freeGrid(
     nh_core_freeList(&Grid_p->Rows, true);
     tk_terminal_initGrid(Grid_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_initTile(
+static TK_TERMINAL_RESULT tk_terminal_initTile(
     tk_terminal_Grid *Grid_p, tk_terminal_Tile *Tile_p, int row, int col)
 {
     memset(Tile_p, 0, sizeof(tk_terminal_Tile));
@@ -72,7 +72,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_initTile(
     memset(Tile_p->Foreground.vertices_p, 0, sizeof(float) * 20);
     memset(Tile_p->Background.vertices_p, 0, sizeof(float) * 12);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 // UPDATE ==========================================================================================
@@ -108,7 +108,7 @@ tk_terminal_Tile *tk_terminal_getTile(
 
     if (!Grid_p->Rows.pp[row]) {
         Grid_p->Rows.pp[row] = nh_core_allocate(sizeof(nh_core_List));
-        TTYR_TERMINAL_CHECK_MEM_2(NULL, Grid_p->Rows.pp[row])
+        TK_TERMINAL_CHECK_MEM_2(NULL, Grid_p->Rows.pp[row])
         *((nh_core_List*)Grid_p->Rows.pp[row]) = nh_core_initList(128);
     }
 
@@ -120,8 +120,8 @@ tk_terminal_Tile *tk_terminal_getTile(
 
     if (!Cols_p->pp[col]) {
         Cols_p->pp[col] = nh_core_allocate(sizeof(tk_terminal_Tile));
-        TTYR_TERMINAL_CHECK_MEM_2(NULL, Cols_p->pp[col])
-        TTYR_TERMINAL_CHECK_2(NULL, tk_terminal_initTile(Grid_p, Cols_p->pp[col], row, col))
+        TK_TERMINAL_CHECK_MEM_2(NULL, Cols_p->pp[col])
+        TK_TERMINAL_CHECK_2(NULL, tk_terminal_initTile(Grid_p, Cols_p->pp[col], row, col))
     }
 
     return Cols_p->pp[col];
@@ -131,7 +131,7 @@ bool tk_terminal_compareBackgroundAttributes(
     tk_core_Glyph *Glyph1_p, tk_core_Glyph *Glyph2_p)
 {
     // Compare attributes.
-    if ((Glyph1_p->mark & TTYR_CORE_MARK_ACCENT) != (Glyph2_p->mark & TTYR_CORE_MARK_ACCENT)) {
+    if ((Glyph1_p->mark & TK_CORE_MARK_ACCENT) != (Glyph2_p->mark & TK_CORE_MARK_ACCENT)) {
         return true;
     }
 
@@ -162,7 +162,7 @@ bool tk_terminal_compareBackgroundAttributes(
 bool tk_terminal_compareForegroundAttributes(
     tk_core_Glyph *Glyph1_p, tk_core_Glyph *Glyph2_p)
 {
-    if ((Glyph1_p->mark & TTYR_CORE_MARK_ACCENT) != (Glyph2_p->mark & TTYR_CORE_MARK_ACCENT)) {
+    if ((Glyph1_p->mark & TK_CORE_MARK_ACCENT) != (Glyph2_p->mark & TK_CORE_MARK_ACCENT)) {
         return true;
     }
 
@@ -192,7 +192,7 @@ bool tk_terminal_compareForegroundAttributes(
     return false;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateCursorTile(
+static TK_TERMINAL_RESULT tk_terminal_updateCursorTile(
     tk_terminal_Grid *Grid_p, tk_terminal_GraphicsState *State_p, tk_terminal_TileUpdate *Update_p)
 {
     // Check if inside draw area, if not don't show cursor.
@@ -202,7 +202,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateCursorTile(
             Grid_p->Cursor_p->dirty = true;
             Grid_p->Cursor_p = NULL;
         }
-        return TTYR_TERMINAL_SUCCESS;
+        return TK_TERMINAL_SUCCESS;
     }
 
     tk_terminal_Tile *Tile_p = ((nh_core_List*)Grid_p->Rows.pp[Update_p->row])->pp[Update_p->col];
@@ -217,7 +217,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateCursorTile(
     // Set new cursor.
     Grid_p->Cursor_p = Tile_p;
     Grid_p->Cursor_p->Glyph.Attributes.blink = true;
-    Grid_p->Cursor_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
+    Grid_p->Cursor_p->Glyph.mark |= TK_CORE_MARK_ACCENT;
     Grid_p->Cursor_p->dirty = true;
 
     // Trigger blink at move.
@@ -229,27 +229,27 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateCursorTile(
         State_p->Blink.LastBlink = nh_core_getSystemTime();
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateTileVertices(
+static TK_TERMINAL_RESULT tk_terminal_updateTileVertices(
     tk_core_Glyph *Glyph_p, tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, int col,
     int row, tk_terminal_Tile *Tile_p, bool foreground, int fontSize)
 {
     if (foreground) {
-        TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVertices(
+        TK_TERMINAL_CHECK(tk_terminal_getForegroundVertices(
             State_p, Grid_p, Glyph_p, col, row, Tile_p->Foreground.vertices_p, fontSize
         ))
     } else {
-        TTYR_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
+        TK_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
             State_p, Grid_p, Glyph_p, col, row, Tile_p->Background.vertices_p, 0, 0, fontSize
         ))
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateTile(
+TK_TERMINAL_RESULT tk_terminal_updateTile(
     tk_terminal_Grid *Grid_p, void *state_p, tk_terminal_TileUpdate *Update_p, bool *update_p, int fontSize)
 {
     // Only update cursor tile in case of cursor flag.
@@ -263,9 +263,9 @@ TTYR_TERMINAL_RESULT tk_terminal_updateTile(
     // Compare codepoint.
     if (Tile_p->Glyph.codepoint != Update_p->Glyph.codepoint || Tile_p->Glyph.mark != Update_p->Glyph.mark)
     {
-        TTYR_TERMINAL_CHECK(tk_terminal_updateTileVertices(
+        TK_TERMINAL_CHECK(tk_terminal_updateTileVertices(
             &Update_p->Glyph, state_p, Grid_p, Update_p->col, Update_p->row, Tile_p, true, fontSize))
-        TTYR_TERMINAL_CHECK(tk_terminal_updateTileVertices(
+        TK_TERMINAL_CHECK(tk_terminal_updateTileVertices(
             &Update_p->Glyph, state_p, Grid_p, Update_p->col, Update_p->row, Tile_p, false, fontSize))
         Tile_p->dirty = true;
     }
@@ -292,42 +292,42 @@ TTYR_TERMINAL_RESULT tk_terminal_updateTile(
 
     // Update or reset right gap tile if necessary.
     if (Update_p->col == Grid_p->cols-2) {
-        if (Update_p->Glyph.mark & TTYR_CORE_MARK_LINE_HORIZONTAL) {
+        if (Update_p->Glyph.mark & TK_CORE_MARK_LINE_HORIZONTAL) {
             Update_p->col++;
-            if (!(Update_p->Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS)) {
+            if (!(Update_p->Glyph.mark & TK_CORE_MARK_LINE_GRAPHICS)) {
                 Update_p->Glyph.codepoint = ' ';
             }
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
         } else if (Update_p->Glyph.Attributes.reverse == true) {
             Update_p->Glyph.codepoint = 0;
             Update_p->col++;
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
         } else {
             Update_p->col++;
             Update_p->Glyph.codepoint = 0;
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
         } 
     }
 
     // Update or reset bottom gap tile if necessary.
     if (Update_p->row == Grid_p->rows-2) {
-        if (Update_p->Glyph.mark & TTYR_CORE_MARK_LINE_VERTICAL) {
+        if (Update_p->Glyph.mark & TK_CORE_MARK_LINE_VERTICAL) {
             Update_p->row++;
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
         } else if (Update_p->col == 0 && (Update_p->Glyph.codepoint == 0 || Update_p->Glyph.codepoint == ' ')) {
             Update_p->row++;
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
         } else {
             Update_p->row++;
             memset(&Update_p->Glyph, 0, sizeof(tk_core_Glyph));
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(Grid_p, state_p, Update_p, update_p, fontSize))
         }
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
+TK_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
     tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
@@ -361,27 +361,27 @@ TTYR_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
     for (int row = 0; row < BackdropGrid_p->rows; ++row) {
         for (int col = 0; col < BackdropGrid_p->cols; ++col) {
             tk_terminal_Tile *Tile_p = tk_terminal_getTile(BackdropGrid_p, row, col);
-            TTYR_TERMINAL_CHECK_NULL(Tile_p)
-            Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT | TTYR_CORE_MARK_LINE_GRAPHICS;
+            TK_TERMINAL_CHECK_NULL(Tile_p)
+            Tile_p->Glyph.mark |= TK_CORE_MARK_ACCENT | TK_CORE_MARK_LINE_GRAPHICS;
             Tile_p->Glyph.Attributes.reverse = true;
-            TTYR_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
+            TK_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
                 State_p, BackdropGrid_p, &Tile_p->Glyph, col, row, Tile_p->Background.vertices_p, borderColsPixelOffset, borderRowsPixelOffset, Config_p->fontSize
             ))
             if (row == 2 && Grid_p) {
                 tk_terminal_Tile *GridTile_p = tk_terminal_getTile(Grid_p, 0, col);
                 if (!GridTile_p || GridTile_p->Glyph.codepoint != 'x') {continue;}
                 Tile_p->Glyph.codepoint = 'x';
-                TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
+                TK_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
                     State_p, BackdropGrid_p, Tile_p->Glyph.codepoint, col+1, row, 0.9, Tile_p->Foreground.vertices_p, 20, borderColsPixelOffset, borderRowsPixelOffset
                 ))
             }
         }
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateGrid(
+TK_TERMINAL_RESULT tk_terminal_updateGrid(
     tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
@@ -416,16 +416,16 @@ TTYR_TERMINAL_RESULT tk_terminal_updateGrid(
     Grid_p->rows += 1;
 
     Grid_p->Updates_pp = (tk_terminal_TileUpdate**)nh_core_allocate(sizeof(tk_terminal_TileUpdate*) * Grid_p->rows);
-    TTYR_TERMINAL_CHECK_MEM(Grid_p->Updates_pp)
+    TK_TERMINAL_CHECK_MEM(Grid_p->Updates_pp)
 
     Grid_p->updates_pp = (bool**)nh_core_allocate(sizeof(bool*) * Grid_p->rows);
-    TTYR_TERMINAL_CHECK_MEM(Grid_p->updates_pp)
+    TK_TERMINAL_CHECK_MEM(Grid_p->updates_pp)
 
     for (int row = 0; row < Grid_p->rows; ++row) {
         Grid_p->Updates_pp[row] = (tk_terminal_TileUpdate*)nh_core_allocate(sizeof(tk_terminal_TileUpdate) * Grid_p->cols);
-        TTYR_TERMINAL_CHECK_MEM(Grid_p->Updates_pp[row])
+        TK_TERMINAL_CHECK_MEM(Grid_p->Updates_pp[row])
         Grid_p->updates_pp[row] = (bool*)nh_core_allocate(sizeof(bool) * Grid_p->cols);
-        TTYR_TERMINAL_CHECK_MEM(Grid_p->updates_pp[row])
+        TK_TERMINAL_CHECK_MEM(Grid_p->updates_pp[row])
         memset(Grid_p->updates_pp[row], 0, sizeof(bool)*Grid_p->cols);
     }
 
@@ -433,13 +433,13 @@ TTYR_TERMINAL_RESULT tk_terminal_updateGrid(
         for (int col = 0; col < Grid_p->cols; ++col) {
             tk_terminal_Tile *Tile_p =
                 tk_terminal_getTile(Grid_p, row, col);
-            TTYR_TERMINAL_CHECK_NULL(Tile_p)
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTileVertices(
+            TK_TERMINAL_CHECK_NULL(Tile_p)
+            TK_TERMINAL_CHECK(tk_terminal_updateTileVertices(
                 &Tile_p->Glyph, state_p, Grid_p, col, row, Tile_p, true, Config_p->fontSize))
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTileVertices(
+            TK_TERMINAL_CHECK(tk_terminal_updateTileVertices(
                 &Tile_p->Glyph, state_p, Grid_p, col, row, Tile_p, false, Config_p->fontSize))
         }
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

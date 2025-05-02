@@ -32,7 +32,7 @@
 
 // FUNCTIONS =======================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_getBackgroundVertices(
+TK_TERMINAL_RESULT tk_terminal_getBackgroundVertices(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_core_Glyph *Glyph_p, int col, 
     int row, float vertices_p[12], int colPixelOffset, int rowPixelOffset, int fontSize)
 {
@@ -41,7 +41,7 @@ TTYR_TERMINAL_RESULT tk_terminal_getBackgroundVertices(
         State_p->Fonts.pp[State_p->font], fontSize
     );
 
-    float depth = Glyph_p->mark & TTYR_CORE_MARK_ELEVATED ? 0.15f : 0.5f;
+    float depth = Glyph_p->mark & TK_CORE_MARK_ELEVATED ? 0.15f : 0.5f;
     int pixel = row * Grid_p->TileSize.height;
 
     float x = (float)((float)(col * Grid_p->TileSize.width) / (float)Grid_p->Size.width) * 2.0f - 1.0f;
@@ -79,10 +79,10 @@ TTYR_TERMINAL_RESULT tk_terminal_getBackgroundVertices(
 
     nh_verticesToArray(Vertices_p, vertices_p, 4, false, 0);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_getBoxVertices(
+TK_TERMINAL_RESULT tk_terminal_getBoxVertices(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_terminal_Box *Box_p, 
     bool inner, int fontSize)
 {
@@ -144,10 +144,10 @@ TTYR_TERMINAL_RESULT tk_terminal_getBoxVertices(
     nh_verticesToArray((nh_Vertex*)Vertices.p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, Vertices.length, false, 0);
     nh_core_freeArray(&Vertices);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_getOutlineVertices(
+TK_TERMINAL_RESULT tk_terminal_getOutlineVertices(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_terminal_Box *Box_p,
     bool inner, int fontSize)
 {
@@ -206,10 +206,10 @@ TTYR_TERMINAL_RESULT tk_terminal_getOutlineVertices(
 
     nh_verticesToArray(Vertices_p, inner ? Box_p->innerVertices_p : Box_p->outerVertices_p, 6, false, 0);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesDefault(
+static TK_TERMINAL_RESULT tk_terminal_getForegroundVerticesDefault(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col, 
     int row, float depth, float vertices_p[20])
 {
@@ -219,21 +219,21 @@ static TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesDefault(
 
     if (!Glyph_p) {
         if (nh_gfx_loadGlyphs(State_p->FontInstance_p, &codepoint, 1)) {
-            return TTYR_TERMINAL_ERROR_BAD_STATE;
+            return TK_TERMINAL_ERROR_BAD_STATE;
         }
     
         unsigned int glyphs = 0;
         nh_gfx_HarfBuzzBuffer Buffer = nh_gfx_createHarfBuzzBuffer(State_p->FontInstance_p, &codepoint, 1);
         nh_gfx_HarfBuzzGlyphInfo *Infos_p = nh_gfx_getHarfBuzzGlyphInfos(Buffer, &glyphs);
     
-        if (glyphs != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+        if (glyphs != 1) {return TK_TERMINAL_ERROR_BAD_STATE;}
 
         nh_gfx_Glyph Glyph = nh_gfx_getGlyph(State_p->FontInstance_p, Infos_p[0].id);
 
         Glyph_p = (nh_gfx_Glyph*)nh_core_allocate(sizeof(nh_gfx_Glyph));
-        TTYR_TERMINAL_CHECK_MEM(Glyph_p)
+        TK_TERMINAL_CHECK_MEM(Glyph_p)
         char *codepoint_p = nh_core_allocate(sizeof(char)*4);
-        TTYR_TERMINAL_CHECK_MEM(codepoint_p)
+        TK_TERMINAL_CHECK_MEM(codepoint_p)
         memcpy(codepoint_p, p, 4);
 
         *Glyph_p = Glyph;
@@ -290,10 +290,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesDefault(
 
     nh_verticesToArray(Vertices_p, vertices_p, 4, true, 0);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
+TK_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, NH_API_UTF32 codepoint, int col,
     int row, float depth, float vertices_p[24], int fontSize, int colPixelOffset, int rowPixelOffset)
 {
@@ -613,24 +613,24 @@ TTYR_TERMINAL_RESULT tk_terminal_getForegroundVerticesForLineGraphics(
 
     nh_verticesToArray(Vertices_p, vertices_p, 8, false, 0);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_getForegroundVertices(
+TK_TERMINAL_RESULT tk_terminal_getForegroundVertices(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_core_Glyph *Glyph_p, int col,
     int row, float *vertices_p, int fontSize)
 {
-    float depth = Glyph_p->mark & TTYR_CORE_MARK_ELEVATED ? 0.1f : 0.2f;
+    float depth = Glyph_p->mark & TK_CORE_MARK_ELEVATED ? 0.1f : 0.2f;
 
-    if (Glyph_p->mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
-        TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
+    if (Glyph_p->mark & TK_CORE_MARK_LINE_GRAPHICS) {
+        TK_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
             State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p, fontSize, 0, 0
         ))
     } else {
-        TTYR_TERMINAL_CHECK(tk_terminal_getForegroundVerticesDefault(
+        TK_TERMINAL_CHECK(tk_terminal_getForegroundVerticesDefault(
             State_p, Grid_p, Glyph_p->codepoint, col, row, depth, vertices_p
         ))
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

@@ -29,14 +29,14 @@
 // INIT/FREE =======================================================================================
 
 tk_core_Tile *tk_core_createTile(
-    void *p, TTYR_CORE_TILE_TYPE_E type, tk_core_Tile *Parent_p, int index)
+    void *p, TK_CORE_TILE_TYPE_E type, tk_core_Tile *Parent_p, int index)
 {
     tk_core_Tile *Tile_p = (tk_core_Tile*)nh_core_allocate(sizeof(tk_core_Tile));
-    TTYR_CHECK_MEM_2(NULL, Tile_p)
+    TK_CHECK_MEM_2(NULL, Tile_p)
 
     Tile_p->type = type;
     Tile_p->p = p;
-    Tile_p->orientation = TTYR_CORE_TILE_ORIENTATION_VERTICAL;
+    Tile_p->orientation = TK_CORE_TILE_ORIENTATION_VERTICAL;
     Tile_p->rightSeparator = false;
     Tile_p->refresh  = false;
     Tile_p->Children = nh_core_initLinkedList();
@@ -57,8 +57,8 @@ static void tk_core_destroyTile(
 {
     if (Tile_p->p) {
         switch (Tile_p->type) {
-            case TTYR_CORE_TILE_TYPE_MACRO : tk_core_destroyMacroTile(Tile_p->p); break;
-            case TTYR_CORE_TILE_TYPE_MICRO : tk_core_destroyMicroTile(Tile_p->p); break;
+            case TK_CORE_TILE_TYPE_MACRO : tk_core_destroyMacroTile(Tile_p->p); break;
+            case TK_CORE_TILE_TYPE_MICRO : tk_core_destroyMicroTile(Tile_p->p); break;
         }
     }
 
@@ -75,19 +75,19 @@ static tk_core_Tile *tk_core_getNextFocusTile(
     return Tile_p;
 }
 
-TTYR_CORE_RESULT tk_core_closeTile(
+TK_CORE_RESULT tk_core_closeTile(
     tk_core_Tile *Tile_p, void *p)
 {
-    if (!Tile_p) {return TTYR_CORE_SUCCESS;}
+    if (!Tile_p) {return TK_CORE_SUCCESS;}
 
     if (!Tile_p->Parent_p) {
 
         // Handle root tile.
-        if (Tile_p->type == TTYR_CORE_TILE_TYPE_MACRO) {
+        if (Tile_p->type == TK_CORE_TILE_TYPE_MACRO) {
             ((tk_core_MacroWindow*)p)->Tile_p = NULL;
             ((tk_core_MacroWindow*)p)->LastFocus_p = NULL;
             ((tk_core_MacroWindow*)p)->RootTile_p = NULL;
-        } else if (Tile_p->type == TTYR_CORE_TILE_TYPE_MICRO) {
+        } else if (Tile_p->type == TK_CORE_TILE_TYPE_MICRO) {
             ((tk_core_MicroTab*)p)->Tile_p = NULL;
             ((tk_core_MicroTab*)p)->LastFocus_p = NULL;
             ((tk_core_MicroTab*)p)->RootTile_p = NULL;
@@ -112,10 +112,10 @@ TTYR_CORE_RESULT tk_core_closeTile(
             tk_core_Tile *Focus_p = tk_core_getNextFocusTile(Other_p);
 
             // Set other tile as focused tile.
-            if (Tile_p->type == TTYR_CORE_TILE_TYPE_MACRO) {
+            if (Tile_p->type == TK_CORE_TILE_TYPE_MACRO) {
                 ((tk_core_MacroWindow*)p)->Tile_p = Focus_p;
                 ((tk_core_MacroWindow*)p)->LastFocus_p = Focus_p;
-            } else if (Tile_p->type == TTYR_CORE_TILE_TYPE_MICRO) {
+            } else if (Tile_p->type == TK_CORE_TILE_TYPE_MICRO) {
                 ((tk_core_MicroTab*)p)->Tile_p = Focus_p;
                 ((tk_core_MicroTab*)p)->LastFocus_p = Focus_p;
             }
@@ -127,11 +127,11 @@ TTYR_CORE_RESULT tk_core_closeTile(
             tk_core_Tile *Focus_p = tk_core_getNextFocusTile(Other_p);
 
             // Set other tile as new root tile and set focus.
-            if (Tile_p->type == TTYR_CORE_TILE_TYPE_MACRO) {
+            if (Tile_p->type == TK_CORE_TILE_TYPE_MACRO) {
 		((tk_core_MacroWindow*)p)->Tile_p = Focus_p;
                 ((tk_core_MacroWindow*)p)->LastFocus_p = Focus_p;
                 ((tk_core_MacroWindow*)p)->RootTile_p = Other_p;
-            } else if (Tile_p->type == TTYR_CORE_TILE_TYPE_MICRO) {
+            } else if (Tile_p->type == TK_CORE_TILE_TYPE_MICRO) {
                 ((tk_core_MicroTab*)p)->Tile_p = Focus_p;
                 ((tk_core_MicroTab*)p)->LastFocus_p = Focus_p;
                 ((tk_core_MicroTab*)p)->RootTile_p = Other_p;
@@ -153,10 +153,10 @@ TTYR_CORE_RESULT tk_core_closeTile(
         tk_core_Tile *Focus_p = tk_core_getNextFocusTile(Next_p);
 
         // Switch focus to neighbor tile.
-        if (Tile_p->type == TTYR_CORE_TILE_TYPE_MACRO) {
+        if (Tile_p->type == TK_CORE_TILE_TYPE_MACRO) {
             ((tk_core_MacroWindow*)p)->Tile_p = Focus_p;
             ((tk_core_MacroWindow*)p)->LastFocus_p = Focus_p;
-        } else if (Tile_p->type == TTYR_CORE_TILE_TYPE_MICRO) {
+        } else if (Tile_p->type == TK_CORE_TILE_TYPE_MICRO) {
             ((tk_core_MicroTab*)p)->Tile_p = Focus_p;
             ((tk_core_MicroTab*)p)->LastFocus_p = Focus_p;
         }
@@ -166,7 +166,7 @@ TTYR_CORE_RESULT tk_core_closeTile(
         tk_core_destroyTile(Tile_p);
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // GET =============================================================================================
@@ -231,22 +231,22 @@ static int tk_core_getTileIndex(
 
 // SWITCH ==========================================================================================
 
-static TTYR_CORE_RESULT tk_core_leaveTilingAndFocusTile(
+static TK_CORE_RESULT tk_core_leaveTilingAndFocusTile(
     tk_core_MacroWindow *Window_p, tk_core_Tile *Focus_p)
 {
-    if (Focus_p->type == TTYR_CORE_TILE_TYPE_MICRO) {
-        TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p = Focus_p;
+    if (Focus_p->type == TK_CORE_TILE_TYPE_MICRO) {
+        TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p = Focus_p;
     } else {
         Window_p->Tile_p = Focus_p;
     }
 
-    Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_DONE;
-    Window_p->Tiling.mode  = TTYR_CORE_TILING_MODE_MICRO;
+    Window_p->Tiling.stage = TK_CORE_TILING_STAGE_DONE;
+    Window_p->Tiling.mode  = TK_CORE_TILING_MODE_MICRO;
 
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
     TTY_p->InsertTile_p = NULL;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 static tk_core_Tile *tk_core_getNextDirectionalTile(
@@ -259,7 +259,7 @@ static tk_core_Tile *tk_core_getNextDirectionalTile(
     switch (direction) {
         case 1 : // right
         case 3 : // left
-            if (Tile_p->Parent_p->orientation != TTYR_CORE_TILE_ORIENTATION_VERTICAL) {
+            if (Tile_p->Parent_p->orientation != TK_CORE_TILE_ORIENTATION_VERTICAL) {
                 return NULL;
             }
             for (int i = 0; i < Tile_p->Parent_p->Children.count; ++i) {
@@ -276,7 +276,7 @@ static tk_core_Tile *tk_core_getNextDirectionalTile(
             break;
         case 0 : // top
         case 2 : // bottom
-            if (Tile_p->Parent_p->orientation != TTYR_CORE_TILE_ORIENTATION_HORIZONTAL) {
+            if (Tile_p->Parent_p->orientation != TK_CORE_TILE_ORIENTATION_HORIZONTAL) {
                 return NULL;
             }
             for (int i = 0; i < Tile_p->Parent_p->Children.count; ++i) {
@@ -299,7 +299,7 @@ static tk_core_Tile *tk_core_getNextDirectionalTile(
 tk_core_Tile *tk_core_switchTile(
     tk_core_MacroWindow *Window_p, tk_core_Tile *MacroTile_p, int direction)
 {
-    tk_core_Tile *MicroTile_p = TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(MacroTile_p))->Tile_p;
+    tk_core_Tile *MicroTile_p = TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(MacroTile_p))->Tile_p;
 
     tk_core_Tile *Result_p = NULL;
     while (!Result_p && MicroTile_p) {
@@ -322,7 +322,7 @@ tk_core_Tile *tk_core_switchTile(
 
 // UPDATE ==========================================================================================
 
-static TTYR_CORE_RESULT tk_core_computeTileSizeRecursively(
+static TK_CORE_RESULT tk_core_computeTileSizeRecursively(
     tk_core_Tile *Tile_p, int viewRows, int viewCols)
 {
     Tile_p->rightSeparator = false;
@@ -349,7 +349,7 @@ static TTYR_CORE_RESULT tk_core_computeTileSizeRecursively(
 
         switch (Tile_p->orientation)
         {
-            case TTYR_CORE_TILE_ORIENTATION_VERTICAL :
+            case TK_CORE_TILE_ORIENTATION_VERTICAL :
                 Child_p->colSize     = Tile_p->colSize / Tile_p->Children.count;
                 Child_p->colPosition = Tile_p->colPosition + Child_p->colSize * i;
                 Child_p->rowSize     = Tile_p->rowSize;
@@ -358,7 +358,7 @@ static TTYR_CORE_RESULT tk_core_computeTileSizeRecursively(
                     Child_p->colSize += Tile_p->colSize % Tile_p->Children.count;
                 }
                 break;
-            case TTYR_CORE_TILE_ORIENTATION_HORIZONTAL :
+            case TK_CORE_TILE_ORIENTATION_HORIZONTAL :
                 Child_p->colSize     = Tile_p->colSize;
                 Child_p->colPosition = Tile_p->colPosition;
                 Child_p->rowSize     = Tile_p->rowSize / Tile_p->Children.count;
@@ -369,13 +369,13 @@ static TTYR_CORE_RESULT tk_core_computeTileSizeRecursively(
                 break;
         }
 
-        TTYR_CHECK(tk_core_computeTileSizeRecursively(Child_p, viewRows, viewCols))
+        TK_CHECK(tk_core_computeTileSizeRecursively(Child_p, viewRows, viewCols))
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_updateTiling(
+TK_CORE_RESULT tk_core_updateTiling(
     tk_core_Tile *RootTile_p, int viewRows, int viewCols)
 {
     return tk_core_computeTileSizeRecursively(RootTile_p, viewRows, viewCols);
@@ -391,32 +391,32 @@ static void tk_core_moveInsertTile(
 
     switch (c) 
     {
-        case TTYR_CORE_INSERT_TILE_TOP_KEY :
-            Tile_p->Parent_p->orientation = TTYR_CORE_TILE_ORIENTATION_HORIZONTAL;
+        case TK_CORE_INSERT_TILE_TOP_KEY :
+            Tile_p->Parent_p->orientation = TK_CORE_TILE_ORIENTATION_HORIZONTAL;
             if (index > 0) {
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index, nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, index - 1));
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index - 1, Tile_p);
             }
             break;
 
-        case TTYR_CORE_INSERT_TILE_BOTTOM_KEY :
-            Tile_p->Parent_p->orientation = TTYR_CORE_TILE_ORIENTATION_HORIZONTAL;
+        case TK_CORE_INSERT_TILE_BOTTOM_KEY :
+            Tile_p->Parent_p->orientation = TK_CORE_TILE_ORIENTATION_HORIZONTAL;
             if (index < Tile_p->Parent_p->Children.count - 1) {
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index, nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, index + 1));
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index + 1, Tile_p);
             }
             break;
 
-        case TTYR_CORE_INSERT_TILE_LEFT_KEY :
-            Tile_p->Parent_p->orientation = TTYR_CORE_TILE_ORIENTATION_VERTICAL;
+        case TK_CORE_INSERT_TILE_LEFT_KEY :
+            Tile_p->Parent_p->orientation = TK_CORE_TILE_ORIENTATION_VERTICAL;
             if (index > 0) {
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index, nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, index - 1));
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index - 1, Tile_p);
             }
             break;
 
-        case TTYR_CORE_INSERT_TILE_RIGHT_KEY :
-            Tile_p->Parent_p->orientation = TTYR_CORE_TILE_ORIENTATION_VERTICAL;
+        case TK_CORE_INSERT_TILE_RIGHT_KEY :
+            Tile_p->Parent_p->orientation = TK_CORE_TILE_ORIENTATION_VERTICAL;
             if (index < Tile_p->Parent_p->Children.count - 1) {
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index, nh_core_getFromLinkedList(&Tile_p->Parent_p->Children, index + 1));
                 nh_core_setInLinkedList(&Tile_p->Parent_p->Children, index + 1, Tile_p);
@@ -425,7 +425,7 @@ static void tk_core_moveInsertTile(
     }
 }
 
-static TTYR_CORE_RESULT tk_core_insertEmptyTile(
+static TK_CORE_RESULT tk_core_insertEmptyTile(
     tk_core_Tile *Parent_p, NH_API_UTF32 c)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -434,19 +434,19 @@ static TTYR_CORE_RESULT tk_core_insertEmptyTile(
 
     switch (c) 
     {
-        case TTYR_CORE_INSERT_TILE_TOP_KEY    :
-        case TTYR_CORE_INSERT_TILE_BOTTOM_KEY :
-            orientation = TTYR_CORE_TILE_ORIENTATION_HORIZONTAL;
+        case TK_CORE_INSERT_TILE_TOP_KEY    :
+        case TK_CORE_INSERT_TILE_BOTTOM_KEY :
+            orientation = TK_CORE_TILE_ORIENTATION_HORIZONTAL;
             break;
-        case TTYR_CORE_INSERT_TILE_LEFT_KEY  :
-        case TTYR_CORE_INSERT_TILE_RIGHT_KEY :
-            orientation = TTYR_CORE_TILE_ORIENTATION_VERTICAL;
+        case TK_CORE_INSERT_TILE_LEFT_KEY  :
+        case TK_CORE_INSERT_TILE_RIGHT_KEY :
+            orientation = TK_CORE_TILE_ORIENTATION_VERTICAL;
             break;
     }
 
     if (Parent_p->Children.count > 0 && Parent_p->orientation != orientation) {
         // Changing orientation is not allowed because it's confusing.
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
 
     // Configure orientation.
@@ -455,55 +455,55 @@ static TTYR_CORE_RESULT tk_core_insertEmptyTile(
     // Insert tile. The inserted tile is created without data.
     switch (c)
     {
-        case TTYR_CORE_INSERT_TILE_TOP_KEY  :
-        case TTYR_CORE_INSERT_TILE_LEFT_KEY :
-            if (Parent_p->type == TTYR_CORE_TILE_TYPE_MACRO) {
+        case TK_CORE_INSERT_TILE_TOP_KEY  :
+        case TK_CORE_INSERT_TILE_LEFT_KEY :
+            if (Parent_p->type == TK_CORE_TILE_TYPE_MACRO) {
                 if (Parent_p->Children.count == 0) {
                     nh_core_List *List_pp[9] = {};
                     for (int i = 0; i < 9; ++i) {
-                        List_pp[i] = TTYR_CORE_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
+                        List_pp[i] = TK_CORE_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
                     }
                     TTY_p->InsertTile_p     = tk_core_createMacroTile(Parent_p, NULL, 0);
                     TTY_p->Window_p->Tile_p = tk_core_createMacroTile(Parent_p, List_pp, 1);
                     // Remove data references from parent tile.
-                    nh_core_freeList(&TTYR_CORE_MACRO_TILE(Parent_p)->MacroTabs, true);
-                    TTYR_CORE_MACRO_TILE(Parent_p)->current = -1;
+                    nh_core_freeList(&TK_CORE_MACRO_TILE(Parent_p)->MacroTabs, true);
+                    TK_CORE_MACRO_TILE(Parent_p)->current = -1;
                 } else {
                     TTY_p->InsertTile_p = tk_core_createMacroTile(Parent_p, NULL, 0);
                 }
             } else {
                 if (Parent_p->Children.count == 0) {
                     TTY_p->InsertTile_p = tk_core_createMicroTile(Parent_p, NULL, 0);
-                    tk_core_createMicroTile(Parent_p, TTYR_CORE_MICRO_TILE(Parent_p)->Program_p, 1);
+                    tk_core_createMicroTile(Parent_p, TK_CORE_MICRO_TILE(Parent_p)->Program_p, 1);
                     // Remove data references from parent tile.
-                    TTYR_CORE_MICRO_TILE(Parent_p)->Program_p = NULL;
+                    TK_CORE_MICRO_TILE(Parent_p)->Program_p = NULL;
                 } else {
                     TTY_p->InsertTile_p = tk_core_createMicroTile(Parent_p, NULL, 0);
                 }
             }
             break;
-        case TTYR_CORE_INSERT_TILE_BOTTOM_KEY :
-        case TTYR_CORE_INSERT_TILE_RIGHT_KEY  :
-            if (Parent_p->type == TTYR_CORE_TILE_TYPE_MACRO) {
+        case TK_CORE_INSERT_TILE_BOTTOM_KEY :
+        case TK_CORE_INSERT_TILE_RIGHT_KEY  :
+            if (Parent_p->type == TK_CORE_TILE_TYPE_MACRO) {
                 if (Parent_p->Children.count == 0) {
                     nh_core_List *List_pp[9] = {};
                     for (int i = 0; i < 9; ++i) {
-                        List_pp[i] = TTYR_CORE_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
+                        List_pp[i] = TK_CORE_MACRO_TAB_2(Parent_p, i)->MicroWindow.Tabs_p;
                     }
                     TTY_p->Window_p->Tile_p = tk_core_createMacroTile(Parent_p, List_pp, 0);
                     TTY_p->InsertTile_p     = tk_core_createMacroTile(Parent_p, NULL, 1);
                     // Remove data references from parent tile.
-                    nh_core_freeList(&TTYR_CORE_MACRO_TILE(Parent_p)->MacroTabs, true);
-                    TTYR_CORE_MACRO_TILE(Parent_p)->current = -1;
+                    nh_core_freeList(&TK_CORE_MACRO_TILE(Parent_p)->MacroTabs, true);
+                    TK_CORE_MACRO_TILE(Parent_p)->current = -1;
                 } else {
                     TTY_p->InsertTile_p = tk_core_createMacroTile(Parent_p, NULL, Parent_p->Children.count);
                 }
             } else {
                 if (Parent_p->Children.count == 0) {
-                    tk_core_createMicroTile(Parent_p, TTYR_CORE_MICRO_TILE(Parent_p)->Program_p, 0);
+                    tk_core_createMicroTile(Parent_p, TK_CORE_MICRO_TILE(Parent_p)->Program_p, 0);
                     TTY_p->InsertTile_p = tk_core_createMicroTile(Parent_p, NULL, 1);
                     // Remove data references from parent tile.
-                    TTYR_CORE_MICRO_TILE(Parent_p)->Program_p = NULL;
+                    TK_CORE_MICRO_TILE(Parent_p)->Program_p = NULL;
                 } else {
                     TTY_p->InsertTile_p = tk_core_createMicroTile(Parent_p, NULL, Parent_p->Children.count);
                 }
@@ -511,84 +511,84 @@ static TTYR_CORE_RESULT tk_core_insertEmptyTile(
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_addTile(
+static TK_CORE_RESULT tk_core_addTile(
     tk_core_Tile *Tile_p, NH_API_UTF32 c)
 {
-    if (Tile_p->Parent_p == NULL || Tile_p->Parent_p->Children.count == 0) {return TTYR_CORE_ERROR_BAD_STATE;}
+    if (Tile_p->Parent_p == NULL || Tile_p->Parent_p->Children.count == 0) {return TK_CORE_ERROR_BAD_STATE;}
     return tk_core_insertEmptyTile(Tile_p->Parent_p, c);
 }
 
-static TTYR_CORE_RESULT tk_core_splitTile(
+static TK_CORE_RESULT tk_core_splitTile(
     tk_core_Tile *Tile_p, NH_API_UTF32 c)
 {
-    if (Tile_p->Children.count != 0) {return TTYR_CORE_ERROR_BAD_STATE;}
+    if (Tile_p->Children.count != 0) {return TK_CORE_ERROR_BAD_STATE;}
     return tk_core_insertEmptyTile(Tile_p, c);
 }
 
 // RESET ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_resetTiling(
+TK_CORE_RESULT tk_core_resetTiling(
     tk_core_MacroWindow *Window_p)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
 
-    if (Window_p->Tiling.mode == TTYR_CORE_TILING_MODE_MICRO) {
+    if (Window_p->Tiling.mode == TK_CORE_TILING_MODE_MICRO) {
         switch (Window_p->Tiling.stage)
         {
-            case TTYR_CORE_TILING_STAGE_OVERVIEW :
-                TTYR_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
+            case TK_CORE_TILING_STAGE_OVERVIEW :
+                TK_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
                 break;
 
-            case TTYR_CORE_TILING_STAGE_INSERT :
-                tk_core_closeTile(TTY_p->InsertTile_p, TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p)));
-                TTYR_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
+            case TK_CORE_TILING_STAGE_INSERT :
+                tk_core_closeTile(TTY_p->InsertTile_p, TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p)));
+                TK_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->LastFocus_p))
                 break;
         }
     } else {
         switch (Window_p->Tiling.stage)
         {
-            case TTYR_CORE_TILING_STAGE_OVERVIEW :
-                TTYR_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
+            case TK_CORE_TILING_STAGE_OVERVIEW :
+                TK_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
                 break;
 
-            case TTYR_CORE_TILING_STAGE_INSERT :
+            case TK_CORE_TILING_STAGE_INSERT :
                 tk_core_closeTile(TTY_p->InsertTile_p, Window_p);
-                TTYR_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
+                TK_CHECK(tk_core_leaveTilingAndFocusTile(Window_p, Window_p->LastFocus_p))
                 break;
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // MESSAGES ========================================================================================
 
-static TTYR_CORE_RESULT tk_core_updateTilingMessages(
+static TK_CORE_RESULT tk_core_updateTilingMessages(
     tk_core_MacroWindow *Window_p)
 {
-    if (Window_p->Tiling.mode == TTYR_CORE_TILING_MODE_MACRO) {
+    if (Window_p->Tiling.mode == TK_CORE_TILING_MODE_MACRO) {
         if (Window_p->Tile_p->Parent_p == NULL) {
-            TTYR_CHECK(tk_core_setDefaultMessage(&TTYR_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_CORE_MESSAGE_MACRO_TILING_WASD))
+            TK_CHECK(tk_core_setDefaultMessage(&TK_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TK_CORE_MESSAGE_MACRO_TILING_WASD))
         } else {
-            TTYR_CHECK(tk_core_setDefaultMessage(&TTYR_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_CORE_MESSAGE_MACRO_TILING_WASDF))
+            TK_CHECK(tk_core_setDefaultMessage(&TK_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TK_CORE_MESSAGE_MACRO_TILING_WASDF))
         }
-    } else if (Window_p->Tiling.mode == TTYR_CORE_TILING_MODE_MICRO) {
-        if (TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
-            TTYR_CHECK(tk_core_setDefaultMessage(&TTYR_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_CORE_MESSAGE_MICRO_TILING_WASD))
+    } else if (Window_p->Tiling.mode == TK_CORE_TILING_MODE_MICRO) {
+        if (TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
+            TK_CHECK(tk_core_setDefaultMessage(&TK_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TK_CORE_MESSAGE_MICRO_TILING_WASD))
         } else {
-            TTYR_CHECK(tk_core_setDefaultMessage(&TTYR_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TTYR_CORE_MESSAGE_MICRO_TILING_WASDF))
+            TK_CHECK(tk_core_setDefaultMessage(&TK_CORE_MACRO_TAB(Window_p->Tile_p)->Topbar, TK_CORE_MESSAGE_MICRO_TILING_WASDF))
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // INPUT ===========================================================================================
 
-static TTYR_CORE_RESULT tk_core_handlePotentialMacroTileInsertion(
+static TK_CORE_RESULT tk_core_handlePotentialMacroTileInsertion(
     tk_core_MacroWindow *Window_p, NH_API_UTF32 c)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -597,8 +597,8 @@ static TTYR_CORE_RESULT tk_core_handlePotentialMacroTileInsertion(
     {
         // Insert data into new macro tile.
         for (int i = 0; i < 9; ++i) {
-            TTYR_CORE_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.Tabs_p = tk_core_createMicroTabs(TTY_p);
-            TTYR_CORE_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.current = 0; 
+            TK_CORE_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.Tabs_p = tk_core_createMicroTabs(TTY_p);
+            TK_CORE_MACRO_TAB_2(TTY_p->InsertTile_p, i)->MicroWindow.current = 0; 
         }
 
         return tk_core_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p);
@@ -606,10 +606,10 @@ static TTYR_CORE_RESULT tk_core_handlePotentialMacroTileInsertion(
 
     switch (c) 
     {
-        case TTYR_CORE_INSERT_TILE_TOP_KEY    :
-        case TTYR_CORE_INSERT_TILE_BOTTOM_KEY :
-        case TTYR_CORE_INSERT_TILE_LEFT_KEY   :
-        case TTYR_CORE_INSERT_TILE_RIGHT_KEY  :
+        case TK_CORE_INSERT_TILE_TOP_KEY    :
+        case TK_CORE_INSERT_TILE_BOTTOM_KEY :
+        case TK_CORE_INSERT_TILE_LEFT_KEY   :
+        case TK_CORE_INSERT_TILE_RIGHT_KEY  :
 
             if (TTY_p->InsertTile_p) { 
                 tk_core_moveInsertTile(TTY_p->InsertTile_p, c);
@@ -618,13 +618,13 @@ static TTYR_CORE_RESULT tk_core_handlePotentialMacroTileInsertion(
             // Fall through.
 
         default :
-            TTYR_CHECK(tk_core_resetTiling(Window_p))
+            TK_CHECK(tk_core_resetTiling(Window_p))
     }
 
     return tk_core_updateTilingMessages(Window_p);
 }
 
-static TTYR_CORE_RESULT tk_core_handlePotentialMicroTileInsertion(
+static TK_CORE_RESULT tk_core_handlePotentialMicroTileInsertion(
     tk_core_MacroWindow *Window_p, NH_API_UTF32 c)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -632,135 +632,135 @@ static TTYR_CORE_RESULT tk_core_handlePotentialMicroTileInsertion(
     if (c == 13)
     {
         // Insert data into new micro tile.
-        TTYR_CORE_MICRO_TILE(TTY_p->InsertTile_p)->Program_p = tk_core_createProgramInstance(
-            TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Prototype_p, false);
+        TK_CORE_MICRO_TILE(TTY_p->InsertTile_p)->Program_p = tk_core_createProgramInstance(
+            TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Prototype_p, false);
 
         return tk_core_leaveTilingAndFocusTile(Window_p, TTY_p->InsertTile_p);
     }
 
     switch (c)
     {
-        case TTYR_CORE_INSERT_TILE_TOP_KEY    :
-        case TTYR_CORE_INSERT_TILE_BOTTOM_KEY :
-        case TTYR_CORE_INSERT_TILE_LEFT_KEY   :
-        case TTYR_CORE_INSERT_TILE_RIGHT_KEY  :
+        case TK_CORE_INSERT_TILE_TOP_KEY    :
+        case TK_CORE_INSERT_TILE_BOTTOM_KEY :
+        case TK_CORE_INSERT_TILE_LEFT_KEY   :
+        case TK_CORE_INSERT_TILE_RIGHT_KEY  :
 
             tk_core_moveInsertTile(TTY_p->InsertTile_p, c);
             break;
 
         default :
-            TTYR_CHECK(tk_core_resetTiling(Window_p))
+            TK_CHECK(tk_core_resetTiling(Window_p))
     }
 
     return tk_core_updateTilingMessages(Window_p);
 }
 
-static TTYR_CORE_RESULT tk_core_handleMacroTilingInput(
+static TK_CORE_RESULT tk_core_handleMacroTilingInput(
     tk_core_MacroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
     NH_API_UTF32 c = Event.codepoint;
 
     switch (Window_p->Tiling.stage)
     {
-        case TTYR_CORE_TILING_STAGE_OVERVIEW :
+        case TK_CORE_TILING_STAGE_OVERVIEW :
 
-            if (c == TTYR_CORE_SPLIT_KEY) {
+            if (c == TK_CORE_SPLIT_KEY) {
                 // Split tile.
-                TTYR_CHECK(tk_core_splitTile(Window_p->Tile_p, TTYR_CORE_INSERT_TILE_RIGHT_KEY))
-                Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_INSERT;
-                TTYR_CHECK(tk_core_updateTilingMessages(Window_p))
+                TK_CHECK(tk_core_splitTile(Window_p->Tile_p, TK_CORE_INSERT_TILE_RIGHT_KEY))
+                Window_p->Tiling.stage = TK_CORE_TILING_STAGE_INSERT;
+                TK_CHECK(tk_core_updateTilingMessages(Window_p))
             }
-            else if (c == TTYR_CORE_INSERT_TILE_LEFT_KEY || c == TTYR_CORE_INSERT_TILE_RIGHT_KEY || c == TTYR_CORE_INSERT_TILE_TOP_KEY || c == TTYR_CORE_INSERT_TILE_BOTTOM_KEY) {
+            else if (c == TK_CORE_INSERT_TILE_LEFT_KEY || c == TK_CORE_INSERT_TILE_RIGHT_KEY || c == TK_CORE_INSERT_TILE_TOP_KEY || c == TK_CORE_INSERT_TILE_BOTTOM_KEY) {
                 // Append or split tile.
                 if (Window_p->Tile_p->Parent_p == NULL) {
-                    TTYR_CHECK(tk_core_splitTile(Window_p->Tile_p, c))
+                    TK_CHECK(tk_core_splitTile(Window_p->Tile_p, c))
                 } else {
                     if (tk_core_addTile(Window_p->Tile_p, c)) {
                         return tk_core_resetTiling(Window_p);
                     }
                 }
-                Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_INSERT;
-                TTYR_CHECK(tk_core_updateTilingMessages(Window_p))
+                Window_p->Tiling.stage = TK_CORE_TILING_STAGE_INSERT;
+                TK_CHECK(tk_core_updateTilingMessages(Window_p))
             } else {
-                TTYR_CHECK(tk_core_resetTiling(Window_p))
+                TK_CHECK(tk_core_resetTiling(Window_p))
             }
             break;
 
-        case TTYR_CORE_TILING_STAGE_INSERT :
+        case TK_CORE_TILING_STAGE_INSERT :
 
-            TTYR_CHECK(tk_core_handlePotentialMacroTileInsertion(Window_p, c))
+            TK_CHECK(tk_core_handlePotentialMacroTileInsertion(Window_p, c))
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_handleMicroTilingInput(
+static TK_CORE_RESULT tk_core_handleMicroTilingInput(
     tk_core_MacroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
     NH_API_UTF32 c = Event.codepoint;
 
     switch (Window_p->Tiling.stage)
     {
-        case TTYR_CORE_TILING_STAGE_DONE :
+        case TK_CORE_TILING_STAGE_DONE :
 
-            if (c == TTYR_CORE_TILING_KEY) {
-                Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_OVERVIEW; 
+            if (c == TK_CORE_TILING_KEY) {
+                Window_p->Tiling.stage = TK_CORE_TILING_STAGE_OVERVIEW; 
                 Window_p->LastFocus_p = Window_p->Tile_p;
-                TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->LastFocus_p = 
-                    TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p;
-                TTYR_CHECK(tk_core_updateTilingMessages(Window_p))
+                TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->LastFocus_p = 
+                    TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p;
+                TK_CHECK(tk_core_updateTilingMessages(Window_p))
             }
             break;
 
-        case TTYR_CORE_TILING_STAGE_OVERVIEW :
+        case TK_CORE_TILING_STAGE_OVERVIEW :
 
-            if (c == TTYR_CORE_TILING_KEY) {
-                Window_p->Tiling.mode = TTYR_CORE_TILING_MODE_MACRO;
-                TTYR_CHECK(tk_core_updateTilingMessages(Window_p))
+            if (c == TK_CORE_TILING_KEY) {
+                Window_p->Tiling.mode = TK_CORE_TILING_MODE_MACRO;
+                TK_CHECK(tk_core_updateTilingMessages(Window_p))
             } 
-            else if (c == TTYR_CORE_SPLIT_KEY) {
+            else if (c == TK_CORE_SPLIT_KEY) {
                 // Split tile.
-                TTYR_CHECK(tk_core_splitTile(TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p, TTYR_CORE_INSERT_TILE_RIGHT_KEY))
-                Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_INSERT;
-                TTYR_CHECK(tk_core_updateTilingMessages(Window_p))
+                TK_CHECK(tk_core_splitTile(TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p, TK_CORE_INSERT_TILE_RIGHT_KEY))
+                Window_p->Tiling.stage = TK_CORE_TILING_STAGE_INSERT;
+                TK_CHECK(tk_core_updateTilingMessages(Window_p))
             }
-            else if (c == TTYR_CORE_INSERT_TILE_LEFT_KEY || c == TTYR_CORE_INSERT_TILE_RIGHT_KEY || c == TTYR_CORE_INSERT_TILE_TOP_KEY || c == TTYR_CORE_INSERT_TILE_BOTTOM_KEY) {
+            else if (c == TK_CORE_INSERT_TILE_LEFT_KEY || c == TK_CORE_INSERT_TILE_RIGHT_KEY || c == TK_CORE_INSERT_TILE_TOP_KEY || c == TK_CORE_INSERT_TILE_BOTTOM_KEY) {
                 // Append or split tile.
-                if (TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
-                    TTYR_CHECK(tk_core_splitTile(TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p, c))
+                if (TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p->Parent_p == NULL) {
+                    TK_CHECK(tk_core_splitTile(TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p, c))
                 } else {
-                    if (tk_core_addTile(TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p, c)) {
+                    if (tk_core_addTile(TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Window_p->Tile_p))->Tile_p, c)) {
                         return tk_core_resetTiling(Window_p);
                     }
                 }
-                Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_INSERT;
-                TTYR_CHECK(tk_core_updateTilingMessages(Window_p))
+                Window_p->Tiling.stage = TK_CORE_TILING_STAGE_INSERT;
+                TK_CHECK(tk_core_updateTilingMessages(Window_p))
             }
             else {
-                TTYR_CHECK(tk_core_resetTiling(Window_p))
+                TK_CHECK(tk_core_resetTiling(Window_p))
             }
             break;
 
-        case TTYR_CORE_TILING_STAGE_INSERT :
+        case TK_CORE_TILING_STAGE_INSERT :
 
-            TTYR_CHECK(tk_core_handlePotentialMicroTileInsertion(Window_p, c))
+            TK_CHECK(tk_core_handlePotentialMicroTileInsertion(Window_p, c))
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_handleTilingInput(
+TK_CORE_RESULT tk_core_handleTilingInput(
     tk_core_MacroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
-    if (Event.trigger != NH_API_TRIGGER_PRESS) {return TTYR_CORE_SUCCESS;}
+    if (Event.trigger != NH_API_TRIGGER_PRESS) {return TK_CORE_SUCCESS;}
 
-    if (Window_p->Tiling.mode == TTYR_CORE_TILING_MODE_MICRO) {
-        TTYR_CHECK(tk_core_handleMicroTilingInput(Window_p, Event))
-    } else if (Window_p->Tiling.mode == TTYR_CORE_TILING_MODE_MACRO) {
-        TTYR_CHECK(tk_core_handleMacroTilingInput(Window_p, Event))
+    if (Window_p->Tiling.mode == TK_CORE_TILING_MODE_MICRO) {
+        TK_CHECK(tk_core_handleMicroTilingInput(Window_p, Event))
+    } else if (Window_p->Tiling.mode == TK_CORE_TILING_MODE_MACRO) {
+        TK_CHECK(tk_core_handleMacroTilingInput(Window_p, Event))
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

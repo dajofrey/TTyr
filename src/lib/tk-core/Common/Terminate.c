@@ -17,8 +17,8 @@
 
 // DEBUG ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_terminate()
+TK_CORE_RESULT tk_core_terminate()
 {
-     return TTYR_CORE_SUCCESS;
+     return TK_CORE_SUCCESS;
 }
 

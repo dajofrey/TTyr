@@ -22,23 +22,23 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_getSetting(
+static TK_TERMINAL_RESULT tk_terminal_getSetting(
     tk_terminal_Config *Config_p, char namespace_p[255], int setting, char *setting_p)
 {
     nh_core_List *Setting_p = nh_core_getGlobalConfigSetting(namespace_p, -1, setting_p);
-    TTYR_TERMINAL_CHECK_NULL(Setting_p)
+    TK_TERMINAL_CHECK_NULL(Setting_p)
 
     switch (setting) {
         case 0 :
-            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size != 1) {return TK_TERMINAL_ERROR_BAD_STATE;}
             Config_p->fontSize = atoi(Setting_p->pp[0]);
             break;
         case 1 :
-            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size != 1) {return TK_TERMINAL_ERROR_BAD_STATE;}
             Config_p->blinkFrequency = atof(Setting_p->pp[0]);
             break;
         case 2 :
-            if (Setting_p->size != 4) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size != 4) {return TK_TERMINAL_ERROR_BAD_STATE;}
             Config_p->Foreground.r = ((float)atoi(Setting_p->pp[0]))/255.0f;
             Config_p->Foreground.g = ((float)atoi(Setting_p->pp[1]))/255.0f;
             Config_p->Foreground.b = ((float)atoi(Setting_p->pp[2]))/255.0f;
@@ -46,7 +46,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_getSetting(
             break;
         case 3 :
             Config_p->backgrounds = 0;
-            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {return TK_TERMINAL_ERROR_BAD_STATE;}
             for (int i = 0, j = 0; j < Setting_p->size; i++, j += 4) {
                 Config_p->Backgrounds_p[i].r = ((float)atof(Setting_p->pp[j+0]))/255.0f;
                 Config_p->Backgrounds_p[i].g = ((float)atof(Setting_p->pp[j+1]))/255.0f;
@@ -57,7 +57,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_getSetting(
             break;
         case 4 :
             Config_p->accents = 0;
-            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size < 4 || (Setting_p->size % 4) != 0) {return TK_TERMINAL_ERROR_BAD_STATE;}
             for (int i = 0, j = 0; j < Setting_p->size; i++, j += 4) {
                 Config_p->Accents_p[i].r = ((float)atof(Setting_p->pp[j+0]))/255.0f;
                 Config_p->Accents_p[i].g = ((float)atof(Setting_p->pp[j+1]))/255.0f;
@@ -67,16 +67,16 @@ static TTYR_TERMINAL_RESULT tk_terminal_getSetting(
             }
             break;
         case 5 :
-            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size != 1) {return TK_TERMINAL_ERROR_BAD_STATE;}
             Config_p->style = atoi(Setting_p->pp[0]);
             break;
         case 6 :
-            if (Setting_p->size != 1) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+            if (Setting_p->size != 1) {return TK_TERMINAL_ERROR_BAD_STATE;}
             Config_p->animationFreq = atof(Setting_p->pp[0]);
             break;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 static tk_terminal_Config tk_terminal_getStaticConfig()
@@ -97,10 +97,10 @@ static tk_terminal_Config tk_terminal_getStaticConfig()
     int options = sizeof(options_pp)/sizeof(options_pp[0]);
  
     tk_terminal_Terminal *Terminal_p = nh_core_getWorkloadArg();
-    TTYR_TERMINAL_CHECK_NULL_2(Config, Terminal_p)
+    TK_TERMINAL_CHECK_NULL_2(Config, Terminal_p)
 
     for (int i = 0; i < options; ++i) {
-        TTYR_TERMINAL_CHECK_2(Config, tk_terminal_getSetting(&Config, Terminal_p->namespace_p, i, options_pp[i]))
+        TK_TERMINAL_CHECK_2(Config, tk_terminal_getSetting(&Config, Terminal_p->namespace_p, i, options_pp[i]))
     }
 
     return Config;

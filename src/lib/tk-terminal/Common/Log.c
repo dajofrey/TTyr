@@ -17,22 +17,22 @@
 
 // FLOW LOGGING ====================================================================================
 
-TTYR_TERMINAL_RESULT _tk_terminal_logBegin(
+TK_TERMINAL_RESULT _tk_terminal_logBegin(
     const char *file_p, const char *function_p)
 {
 //    if (!NH_CONFIG.Flags.Log.Flow.core) {return NH_SUCCESS;}
 //    return _nh_begin(file_p, function_p);
 }
 
-TTYR_TERMINAL_RESULT _tk_terminal_logEnd(
+TK_TERMINAL_RESULT _tk_terminal_logEnd(
     const char *file_p, const char *function_p)
 {
 //    if (!NH_CONFIG.Flags.Log.Flow.core) {return NH_SUCCESS;}
 //    return _nh_end(file_p, function_p);
 }
 
-TTYR_TERMINAL_RESULT _tk_terminal_logDiagnosticEnd(
-    const char *file_p, const char *function_p, TTYR_TERMINAL_RESULT result, int line)
+TK_TERMINAL_RESULT _tk_terminal_logDiagnosticEnd(
+    const char *file_p, const char *function_p, TK_TERMINAL_RESULT result, int line)
 {
 //    if (!NH_CONFIG.Flags.Log.Flow.core) {return result;}
 //    _nh_diagnosticEnd(file_p, function_p, NH_CORE_RESULTS_PP[result], line, result == NH_SUCCESS);

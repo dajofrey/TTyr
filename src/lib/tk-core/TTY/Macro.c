@@ -39,23 +39,23 @@ tk_core_Tile *tk_core_createMacroTile(
     tk_core_Tile *Parent_p, nh_core_List **MicroTabs_pp, int index)
 {
     tk_core_MacroTile *Tile_p = (tk_core_MacroTile*)nh_core_allocate(sizeof(tk_core_MacroTile));
-    TTYR_CHECK_MEM_2(NULL, Tile_p)
+    TK_CHECK_MEM_2(NULL, Tile_p)
 
     nh_core_List MacroTabs = nh_core_initList(9);
  
     for (int i = 0; i < 9; ++i) {
         tk_core_MacroTab *MacroTab_p = (tk_core_MacroTab*)nh_core_allocate(sizeof(tk_core_MacroTab));
-        TTYR_CHECK_MEM_2(NULL, MacroTab_p)
+        TK_CHECK_MEM_2(NULL, MacroTab_p)
         MacroTab_p->Topbar = tk_core_initTopbar();
         MacroTab_p->MicroWindow = MicroTabs_pp == NULL || Parent_p == NULL ?
-            tk_core_initMicroWindow(MicroTabs_pp != NULL ? MicroTabs_pp[i] : NULL) : TTYR_CORE_MACRO_TAB_2(Parent_p, i)->MicroWindow;
+            tk_core_initMicroWindow(MicroTabs_pp != NULL ? MicroTabs_pp[i] : NULL) : TK_CORE_MACRO_TAB_2(Parent_p, i)->MicroWindow;
         nh_core_appendToList(&MacroTabs, MacroTab_p);
     }
 
     Tile_p->MacroTabs = MacroTabs;
     Tile_p->current = 0;
 
-    return tk_core_createTile(Tile_p, TTYR_CORE_TILE_TYPE_MACRO, Parent_p, index);
+    return tk_core_createTile(Tile_p, TK_CORE_TILE_TYPE_MACRO, Parent_p, index);
 }
 
 // Helper function for destroying a tile without side effects.
@@ -81,12 +81,12 @@ static tk_core_MacroWindow *tk_core_createMacroWindow(
     void *TTY_p)
 {
     tk_core_MacroWindow *Window_p = (tk_core_MacroWindow*)nh_core_allocate(sizeof(tk_core_MacroWindow));
-    TTYR_CHECK_MEM_2(NULL, Window_p)
+    TK_CHECK_MEM_2(NULL, Window_p)
 
     nh_core_List *MicroTabs_pp[9] = {};
     for (int i = 0; i < 9; ++i) {
         MicroTabs_pp[i] = tk_core_createMicroTabs(TTY_p);
-        TTYR_CHECK_NULL_2(NULL, MicroTabs_pp[i])
+        TK_CHECK_NULL_2(NULL, MicroTabs_pp[i])
     }
 
     struct winsize w;
@@ -100,25 +100,25 @@ static tk_core_MacroWindow *tk_core_createMacroWindow(
     Window_p->refreshTitlebar = false;
     Window_p->close           = false;
 
-    Window_p->Tiling.mode  = TTYR_CORE_TILING_MODE_MICRO;
-    Window_p->Tiling.stage = TTYR_CORE_TILING_STAGE_DONE;
+    Window_p->Tiling.mode  = TK_CORE_TILING_MODE_MICRO;
+    Window_p->Tiling.stage = TK_CORE_TILING_STAGE_DONE;
 
     Window_p->MouseMenu_p = NULL;
 
     return Window_p;
 }
 
-static TTYR_CORE_RESULT tk_core_destroyMacroWindow(
+static TK_CORE_RESULT tk_core_destroyMacroWindow(
     tk_core_MacroWindow *Window_p)
 {
     if (Window_p->RootTile_p != NULL) {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
 
     tk_core_closeTile(Window_p->RootTile_p, Window_p);
     nh_core_free(Window_p);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // ADD/REMOVE ======================================================================================
@@ -141,7 +141,7 @@ tk_core_MacroWindow *tk_core_insertAndFocusWindow(
 
     for (int i = ((tk_core_TTY*)TTY_p)->Windows.size; i <= index; ++i) {
         Window_p = tk_core_createMacroWindow(TTY_p);
-        TTYR_CHECK_NULL_2(NULL, Window_p)
+        TK_CHECK_NULL_2(NULL, Window_p)
         nh_core_appendToList(&((tk_core_TTY*)TTY_p)->Windows, Window_p);
         // Automatically switch to new window. 
         ((tk_core_TTY*)TTY_p)->Window_p = Window_p;
@@ -150,7 +150,7 @@ tk_core_MacroWindow *tk_core_insertAndFocusWindow(
     return Window_p;
 }
 
-TTYR_CORE_RESULT tk_core_destroyWindows(
+TK_CORE_RESULT tk_core_destroyWindows(
     void *TTY_p)
 {
     for (int i = 0; i < ((tk_core_TTY*)TTY_p)->Windows.size; ++i) {
@@ -161,29 +161,29 @@ TTYR_CORE_RESULT tk_core_destroyWindows(
 
     nh_core_freeList(&((tk_core_TTY*)TTY_p)->Windows, false);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // UPDATE ==========================================================================================
 
-static TTYR_CORE_RESULT tk_core_updateMacroTab(
+static TK_CORE_RESULT tk_core_updateMacroTab(
     tk_core_MacroTab *Tab_p, bool *refresh_p)
 {
     if (Tab_p->Topbar.hasFocus) {
-        TTYR_CHECK(tk_core_updateTopbar(&Tab_p->Topbar))
+        TK_CHECK(tk_core_updateTopbar(&Tab_p->Topbar))
     }
 
     if (Tab_p->MicroWindow.Tabs_p == NULL || Tab_p->MicroWindow.Tabs_p->size == 0) {
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
 
-    nh_core_List Tiles = tk_core_getTiles(TTYR_CORE_MICRO_TAB(Tab_p)->RootTile_p);
+    nh_core_List Tiles = tk_core_getTiles(TK_CORE_MICRO_TAB(Tab_p)->RootTile_p);
     for (int i = 0; i < Tiles.size; ++i) {
-        tk_core_Program *Program_p = TTYR_CORE_MICRO_TILE(Tiles.pp[i])->Program_p;
+        tk_core_Program *Program_p = TK_CORE_MICRO_TILE(Tiles.pp[i])->Program_p;
         if (!Program_p) {continue;}
     
         if (Program_p->Prototype_p->Callbacks.update_f) {
-            TTYR_CHECK(Program_p->Prototype_p->Callbacks.update_f(Program_p))
+            TK_CHECK(Program_p->Prototype_p->Callbacks.update_f(Program_p))
         }
     
         if (Program_p->close) {
@@ -201,10 +201,10 @@ static TTYR_CORE_RESULT tk_core_updateMacroTab(
     }
     nh_core_freeList(&Tiles, false);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_updateMacroTile(
+static TK_CORE_RESULT tk_core_updateMacroTile(
     tk_core_MacroTile *Tile_p, bool *refresh_p)
 {
     for (int i = 0; i < Tile_p->MacroTabs.size; ++i) {
@@ -214,10 +214,10 @@ static TTYR_CORE_RESULT tk_core_updateMacroTile(
             *refresh_p = true;
         }
     }
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_updateMacroWindow(
+TK_CORE_RESULT tk_core_updateMacroWindow(
     tk_core_MacroWindow *Window_p)
 {
     // Get macro tiles.
@@ -232,7 +232,7 @@ TTYR_CORE_RESULT tk_core_updateMacroWindow(
             continue;
         }
 
-        TTYR_CHECK(tk_core_updateMacroTile(Tile_p->p, &Tile_p->refresh))
+        TK_CHECK(tk_core_updateMacroTile(Tile_p->p, &Tile_p->refresh))
 
         if (Tile_p->refresh) {
             Tile_p->refresh = false;
@@ -240,22 +240,22 @@ TTYR_CORE_RESULT tk_core_updateMacroWindow(
             Window_p->refreshCursor = true;
         }
 
-        if (TTYR_CORE_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p == NULL || TTYR_CORE_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p->size == 0) {
+        if (TK_CORE_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p == NULL || TK_CORE_MACRO_TAB(Tile_p)->MicroWindow.Tabs_p->size == 0) {
             // Micro window has no micro tabs so we don't need to check for closure.
             // This case might happen for example with preview tiles during tiling configuration.
             continue;
         }
 
         // Close tiles and window if requested.
-        if (TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Tile_p))->Tile_p->close) {
+        if (TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Tile_p))->Tile_p->close) {
 
             // Close micro tile.
-            TTYR_CHECK(tk_core_closeTile(TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Tile_p))->Tile_p,
-                TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Tile_p))))
+            TK_CHECK(tk_core_closeTile(TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Tile_p))->Tile_p,
+                TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Tile_p))))
 
             // If micro tab does not contain any tiles anymore, close macro tile.
-            if (!TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Tile_p))->RootTile_p) {
-                TTYR_CHECK(tk_core_closeTile(Tile_p, Window_p))
+            if (!TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Tile_p))->RootTile_p) {
+                TK_CHECK(tk_core_closeTile(Tile_p, Window_p))
             } 
 
             // If macro window RootTile_p does not contain any macro tiles anymore, close macro window.
@@ -272,7 +272,7 @@ TTYR_CORE_RESULT tk_core_updateMacroWindow(
 
     nh_core_freeList(&Tiles, false);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // INPUT ===========================================================================================
@@ -285,7 +285,7 @@ static bool tk_core_isTilingInput(
     if (TTY_p->Window_p->Tiling.stage > 0) {
         tiling = true;
     } else if (Event.trigger == NH_API_TRIGGER_PRESS) {
-        tiling = TTYR_CORE_TILING_KEY == Event.codepoint;
+        tiling = TK_CORE_TILING_KEY == Event.codepoint;
     }
 
     // If there are no programs to create, tiling is useless.
@@ -304,7 +304,7 @@ static int tk_core_getCurrentWindowIndex(
     return i;
 }
 
-static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
+static TK_CORE_RESULT tk_core_handleKeyboardInput(
     tk_core_MacroWindow *Window_p, nh_api_WSIEvent Event)
 {
     tk_core_MacroTile *MacroTile_p = Window_p->Tile_p->p;
@@ -312,9 +312,9 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
 
     if (MacroTab_p->Topbar.Message.block) {
         bool _continue = false;
-        TTYR_CHECK(MacroTab_p->Topbar.Message.callback_f(Event.Keyboard, &_continue))
+        TK_CHECK(MacroTab_p->Topbar.Message.callback_f(Event.Keyboard, &_continue))
         Window_p->Tile_p->refresh = true;
-        if (!_continue) {return TTYR_CORE_SUCCESS;}
+        if (!_continue) {return TK_CORE_SUCCESS;}
     }
 
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -327,10 +327,10 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
 //            Window_p->refreshGrid1 = true;
 //            Window_p->refreshTitlebar = true;
 //            Window_p->Tile_p->refresh = true;
-//            return TTYR_CORE_SUCCESS;
+//            return TK_CORE_SUCCESS;
 //        }
 //        TTY_p->ignoreNext = true;
-//        return TTYR_CORE_SUCCESS;
+//        return TK_CORE_SUCCESS;
 //    }
     if (nh_encoding_isASCIIDigit(Event.Keyboard.codepoint) && Event.Keyboard.trigger == NH_API_TRIGGER_PRESS && (TTY_p->alt || TTY_p->ctrl)) {
         if (9 > Event.Keyboard.codepoint - '1') {
@@ -339,7 +339,7 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
             Window_p->Tile_p->refresh = true;
             MacroTile_p->current = Event.Keyboard.codepoint - '1';
         }
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
  
     // Toggle special keys.
@@ -365,8 +365,8 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
     }
 
     if (tk_core_isTilingInput(TTY_p, Event.Keyboard)) {
-        TTYR_CHECK(tk_core_handleTilingInput(Window_p, Event.Keyboard))
-        return TTYR_CORE_SUCCESS;
+        TK_CHECK(tk_core_handleTilingInput(Window_p, Event.Keyboard))
+        return TK_CORE_SUCCESS;
     }
 
     // Switch tile.
@@ -385,7 +385,7 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
         if (New_p) {
             Window_p->refreshGrid1 = true;
             Window_p->refreshGrid2 = true;
-            return TTYR_CORE_SUCCESS;
+            return TK_CORE_SUCCESS;
         } else {
             // switch window if possible
             if (Event.Keyboard.codepoint == 'd' || (Event.Keyboard.codepoint == CTRL_KEY('d') && TTY_p->ctrl && TTY_p->alt)) {
@@ -399,21 +399,21 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
         }
     }
 
-    if (TTYR_CORE_TOPBAR_KEY == Event.Keyboard.codepoint && Event.Keyboard.trigger == NH_API_TRIGGER_PRESS) {
+    if (TK_CORE_TOPBAR_KEY == Event.Keyboard.codepoint && Event.Keyboard.trigger == NH_API_TRIGGER_PRESS) {
         tk_core_toggleTopbar(&MacroTab_p->Topbar);
         Window_p->Tile_p->refresh = true;
     }
     else if (MacroTab_p->Topbar.hasFocus) {
-        TTYR_CHECK(tk_core_handleTopbarInput(Window_p->Tile_p, Event))
+        TK_CHECK(tk_core_handleTopbarInput(Window_p->Tile_p, Event))
         Window_p->Tile_p->refresh = true;
     }
     else if (tk_core_getCurrentProgram(&MacroTab_p->MicroWindow) != NULL) {
-        TTYR_CHECK(tk_core_getCurrentProgram(&MacroTab_p->MicroWindow)->Prototype_p->Callbacks.handleInput_f(
+        TK_CHECK(tk_core_getCurrentProgram(&MacroTab_p->MicroWindow)->Prototype_p->Callbacks.handleInput_f(
             tk_core_getCurrentProgram(&MacroTab_p->MicroWindow), Event
         ))
     }
     else {
-        TTYR_CHECK(tk_core_setDefaultMessage(&MacroTab_p->Topbar, TTYR_CORE_MESSAGE_MISC_NO_CURRENT_PROGRAM))
+        TK_CHECK(tk_core_setDefaultMessage(&MacroTab_p->Topbar, TK_CORE_MESSAGE_MISC_NO_CURRENT_PROGRAM))
     }
 
     if (tk_core_getCurrentProgram(&MacroTab_p->MicroWindow)->refresh) {
@@ -425,10 +425,10 @@ static TTYR_CORE_RESULT tk_core_handleKeyboardInput(
         Window_p->Tile_p->close = true;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_handleMouseInput(
+static TK_CORE_RESULT tk_core_handleMouseInput(
     tk_core_Config *Config_p, tk_core_MacroWindow *Window_p, nh_api_WSIEvent Event, int col, int row)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -454,10 +454,10 @@ static TTYR_CORE_RESULT tk_core_handleMouseInput(
             &&  MacroTile_p->rowPosition  + MacroTile_p->rowSize > cRow
             &&  MacroTile_p->colPosition <= cCol
             &&  MacroTile_p->colPosition  + MacroTile_p->colSize > cCol) {
-                if (!MacroTile_p->p || !TTYR_CORE_MACRO_TAB(MacroTile_p)->MicroWindow.Tabs_p) {break;}
+                if (!MacroTile_p->p || !TK_CORE_MACRO_TAB(MacroTile_p)->MicroWindow.Tabs_p) {break;}
             }
-            if (!MacroTile_p->p || !TTYR_CORE_MACRO_TAB(MacroTile_p)->MicroWindow.Tabs_p) {continue;}
-            nh_core_List MicroTiles = tk_core_getTiles(TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(MacroTile_p))->RootTile_p);
+            if (!MacroTile_p->p || !TK_CORE_MACRO_TAB(MacroTile_p)->MicroWindow.Tabs_p) {continue;}
+            nh_core_List MicroTiles = tk_core_getTiles(TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(MacroTile_p))->RootTile_p);
             for (int j = 0; j < MicroTiles.size; ++j) {
                 MicroTile_p = MicroTiles.pp[j];
                 if (MicroTile_p->Children.count > 0) {continue;}
@@ -486,7 +486,7 @@ static TTYR_CORE_RESULT tk_core_handleMouseInput(
         }
     }
  
-    if (MacroTile_p == NULL || MicroTile_p == NULL) {return TTYR_CORE_SUCCESS;}
+    if (MacroTile_p == NULL || MicroTile_p == NULL) {return TK_CORE_SUCCESS;}
 
     // Handle mouse-menu input.
     if (Window_p->MouseMenu_p) {
@@ -511,7 +511,7 @@ static TTYR_CORE_RESULT tk_core_handleMouseInput(
 
     // Close mouse-menu on left-click and switch tile.
     if (Event.Mouse.type == NH_API_MOUSE_LEFT && Event.Mouse.trigger == NH_API_TRIGGER_PRESS && MicroTile_p) {
-        TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(MacroTile_p))->Tile_p = MicroTile_p;
+        TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(MacroTile_p))->Tile_p = MicroTile_p;
         Window_p->Tile_p = MacroTile_p;
 
         if (Window_p->MouseMenu_p) {
@@ -524,12 +524,12 @@ static TTYR_CORE_RESULT tk_core_handleMouseInput(
 
     // Create mouse-menu on right-click and switch tiles.
     if (Event.Mouse.type == NH_API_MOUSE_RIGHT && Event.Mouse.trigger == NH_API_TRIGGER_PRESS && MicroTile_p) {
-        TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(MacroTile_p))->Tile_p = MicroTile_p;
+        TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(MacroTile_p))->Tile_p = MicroTile_p;
         Window_p->Tile_p = MacroTile_p;
 
         if (Window_p->MouseMenu_p) {tk_core_freeContextMenu(Window_p->MouseMenu_p);}
         Window_p->MouseMenu_p = tk_core_createMouseMenu(col, Config_p->Titlebar.on ? row+1 : row);
-        TTYR_CHECK_NULL(Window_p->MouseMenu_p)
+        TK_CHECK_NULL(Window_p->MouseMenu_p)
         Window_p->MouseMenu_p->active = true;
         Window_p->MouseMenu_p->cCol = cCol;
         Window_p->MouseMenu_p->cRow = cRow;
@@ -547,22 +547,22 @@ static TTYR_CORE_RESULT tk_core_handleMouseInput(
     if (cRow == 0) {
         // Forward topbar hit.
         Event.Mouse.Position.x = cCol2;
-        TTYR_CHECK(tk_core_handleTopbarInput(MacroTile_p, Event))
-    } else if (MicroTile_p && TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p) {
+        TK_CHECK(tk_core_handleTopbarInput(MacroTile_p, Event))
+    } else if (MicroTile_p && TK_CORE_MICRO_TILE(MicroTile_p)->Program_p) {
         // Forward program hit.
         Event.Window.Position.x = Event.Mouse.Position.x;
         Event.Window.Position.y = Event.Mouse.Position.y;
         Event.Mouse.Position.x = cCol;
         Event.Mouse.Position.y = cRow - 1; // Subtract topbar. 
-        TTYR_CHECK(TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.handleInput_f(
-            TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p, Event
+        TK_CHECK(TK_CORE_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.handleInput_f(
+            TK_CORE_MICRO_TILE(MicroTile_p)->Program_p, Event
         ))
     }
 
     if (cRow != 0) {
         for (int i = 0; i < MacroTiles.size; ++i) {
             if (((tk_core_Tile*)MacroTiles.pp[i])->Children.count > 0) {continue;}
-            TTYR_CORE_MACRO_TAB(MacroTiles.pp[i])->Topbar.quitHover = false;
+            TK_CORE_MACRO_TAB(MacroTiles.pp[i])->Topbar.quitHover = false;
         }
     }
 
@@ -570,17 +570,17 @@ SKIP:
 
     nh_core_freeList(&MacroTiles, false);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_handleMacroWindowInput(
+TK_CORE_RESULT tk_core_handleMacroWindowInput(
     tk_core_Config *Config_p, tk_core_MacroWindow *Window_p, nh_api_WSIEvent Event)
 {
     switch (Event.type)
     {
         case NH_API_WSI_EVENT_KEYBOARD :
         {
-            TTYR_CHECK(tk_core_handleKeyboardInput(Window_p, Event))
+            TK_CHECK(tk_core_handleKeyboardInput(Window_p, Event))
             break;
         }
         case NH_API_WSI_EVENT_MOUSE :
@@ -590,7 +590,7 @@ TTYR_CORE_RESULT tk_core_handleMacroWindowInput(
             tk_core_translateMousePosition(((tk_core_TTY*)nh_core_getWorkloadArg())->Views.pp[0], Event.Mouse, &col, &row);
             if (Config_p->Titlebar.on) {row--;}
             if (col < 0) {break;}
-            TTYR_CHECK(tk_core_handleMouseInput(Config_p, Window_p, Event, col, row))
+            TK_CHECK(tk_core_handleMouseInput(Config_p, Window_p, Event, col, row))
             break;
         }
         case NH_API_WSI_EVENT_WINDOW :
@@ -612,5 +612,5 @@ TTYR_CORE_RESULT tk_core_handleMacroWindowInput(
     Window_p->refreshGrid2 = true;
     Window_p->refreshCursor = true;
  
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

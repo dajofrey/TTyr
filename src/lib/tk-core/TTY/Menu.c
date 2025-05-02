@@ -33,11 +33,11 @@ static tk_core_Glyph tk_core_getGlyphHelper(
     tk_core_Glyph Glyph; 
     memset(&Glyph, 0, sizeof(tk_core_Glyph)); 
     Glyph.codepoint = codepoint; 
-    Glyph.mark |= TTYR_CORE_MARK_LINE_HORIZONTAL | TTYR_CORE_MARK_ACCENT; 
+    Glyph.mark |= TK_CORE_MARK_LINE_HORIZONTAL | TK_CORE_MARK_ACCENT; 
     return Glyph; 
 } 
 
-TTYR_CORE_RESULT tk_core_drawMicroWindowMenu(
+TK_CORE_RESULT tk_core_drawMicroWindowMenu(
     tk_core_Row *Grid_p)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -52,12 +52,12 @@ TTYR_CORE_RESULT tk_core_drawMicroWindowMenu(
     }
 
     // Get menu height.
-    int height = TTYR_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->MacroTabs.size;
-    if (height <= 0) {return TTYR_CORE_SUCCESS;}
+    int height = TK_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->MacroTabs.size;
+    if (height <= 0) {return TK_CORE_SUCCESS;}
 
     // Get menu width.
     int width = 0;
-    for (int i = 0; i <  TTYR_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->MacroTabs.size; ++i) {
+    for (int i = 0; i <  TK_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->MacroTabs.size; ++i) {
         tk_core_Program *Program_p = tk_core_getCurrentProgram(&((tk_core_MacroTab*)((tk_core_MacroTile*)TTY_p->Window_p->Tile_p->p)->MacroTabs.pp[i])->MicroWindow);
         if (!Program_p || !Program_p->Prototype_p) {continue;}
         NH_API_UTF32 title_p[255] = {0};
@@ -68,7 +68,7 @@ TTYR_CORE_RESULT tk_core_drawMicroWindowMenu(
             width = length;
         }
     }
-    if (width <= 0) {return TTYR_CORE_SUCCESS;}
+    if (width <= 0) {return TK_CORE_SUCCESS;}
 
     width += 4;
 
@@ -113,41 +113,41 @@ TTYR_CORE_RESULT tk_core_drawMicroWindowMenu(
     // Add basic outer lines.
     for (int row = Position.y, i = 0; row < Position.y+height; ++row, ++i) {
         Grid_p[row].Glyphs_p[Position.x-1].codepoint = 'x';
-        Grid_p[row].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[row].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         Grid_p[row].Glyphs_p[Position.x+width].codepoint = 'x';
-        Grid_p[row].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[row].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     }
 
     for (int col = Position.x-1, j = 0; col < Position.x+width+1; ++col, ++j) {
         Grid_p[Position.y-1].Glyphs_p[col].codepoint = 'q';
-        Grid_p[Position.y-1].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[Position.y-1].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         Grid_p[Position.y+height].Glyphs_p[col].codepoint = 'q';
-        Grid_p[Position.y+height].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[Position.y+height].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     }
 
     Grid_p[Position.y-1].Glyphs_p[Position.x-1].codepoint = 'l';
-    Grid_p[Position.y-1].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y-1].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Position.y-1].Glyphs_p[Position.x+width].codepoint = 'k';
-    Grid_p[Position.y-1].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y-1].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Position.y+height].Glyphs_p[Position.x-1].codepoint = 'm';
-    Grid_p[Position.y+height].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y+height].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Position.y+height].Glyphs_p[Position.x+width].codepoint = 'j';
-    Grid_p[Position.y+height].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y+height].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 
 //    for (int col = Position.x+1, j = 0; col < Position.x+width-1; ++col, ++j) {
 //        Grid_p[Position.y+1].Glyphs_p[col].codepoint = 'q';
-//        Grid_p[Position.y+1].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//        Grid_p[Position.y+1].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //    }
 
 //    Grid_p[Position.y+1].Glyphs_p[Position.x-1].codepoint = 't';
-//    Grid_p[Position.y+1].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//    Grid_p[Position.y+1].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //    Grid_p[Position.y+1].Glyphs_p[Position.x+width].codepoint = 'u';
-//    Grid_p[Position.y+1].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//    Grid_p[Position.y+1].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
  
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_drawPrompt(
+TK_CORE_RESULT tk_core_drawPrompt(
     tk_core_Row *Grid_p)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -159,12 +159,12 @@ TTYR_CORE_RESULT tk_core_drawPrompt(
 
     // Get menu height.
     int height = 1;
-    if (height <= 0) {return TTYR_CORE_SUCCESS;}
+    if (height <= 0) {return TK_CORE_SUCCESS;}
 
     // Get menu width.
     int width = 9;
 //    for (int i = 0; i < TTY_p->Windows.size; ++i) {
-//        tk_core_Program *Program_p = tk_core_getCurrentProgram(&TTYR_CORE_MACRO_TAB(((tk_core_MacroWindow*)TTY_p->Windows.pp[i])->Tile_p)->MicroWindow);
+//        tk_core_Program *Program_p = tk_core_getCurrentProgram(&TK_CORE_MACRO_TAB(((tk_core_MacroWindow*)TTY_p->Windows.pp[i])->Tile_p)->MicroWindow);
 //        if (!Program_p || !Program_p->Prototype_p) {continue;}
 //        NH_API_UTF32 title_p[255] = {0};
 //        Program_p->Prototype_p->Callbacks.getTitle_f(Program_p, title_p, 255);
@@ -174,7 +174,7 @@ TTYR_CORE_RESULT tk_core_drawPrompt(
 //            width = length;
 //        }
 //    }
-//    if (width <= 0) {return TTYR_CORE_SUCCESS;}
+//    if (width <= 0) {return TK_CORE_SUCCESS;}
 //
 //    width += 4;
 
@@ -193,7 +193,7 @@ TTYR_CORE_RESULT tk_core_drawPrompt(
 //    // Draw item names.
 //    NH_API_UTF32 defaultName_p[] = {'N', '/', 'A', 0};
 //    for (int row = Position.y+2, i = 0; row < Position.y+height; ++row, ++i) {
-//        tk_core_Program *Program_p = tk_core_getCurrentProgram(&TTYR_CORE_MACRO_TAB(((tk_core_MacroWindow*)TTY_p->Windows.pp[i])->Tile_p)->MicroWindow);
+//        tk_core_Program *Program_p = tk_core_getCurrentProgram(&TK_CORE_MACRO_TAB(((tk_core_MacroWindow*)TTY_p->Windows.pp[i])->Tile_p)->MicroWindow);
 //        if (!Program_p || !Program_p->Prototype_p) {
 //            for (int j = 0, k = 0; defaultName_p[j] != 0; ++j, k++) {
 //                Grid_p[row].Glyphs_p[Position.x+k+3] = tk_core_getGlyphHelper(defaultName_p[j]);
@@ -218,36 +218,36 @@ TTYR_CORE_RESULT tk_core_drawPrompt(
     // Add basic outer lines.
     for (int row = Position.y, i = 0; row < Position.y+height; ++row, ++i) {
         Grid_p[row].Glyphs_p[Position.x-1].codepoint = 'x';
-        Grid_p[row].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[row].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         Grid_p[row].Glyphs_p[Position.x+width].codepoint = 'x';
-        Grid_p[row].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[row].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     }
 
     for (int col = Position.x-1, j = 0; col < Position.x+width+1; ++col, ++j) {
         Grid_p[Position.y-1].Glyphs_p[col].codepoint = 'q';
-        Grid_p[Position.y-1].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[Position.y-1].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         Grid_p[Position.y+height].Glyphs_p[col].codepoint = 'q';
-        Grid_p[Position.y+height].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[Position.y+height].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     }
 
     Grid_p[Position.y-1].Glyphs_p[Position.x-1].codepoint = 'l';
-    Grid_p[Position.y-1].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y-1].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Position.y-1].Glyphs_p[Position.x+width].codepoint = 'k';
-    Grid_p[Position.y-1].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y-1].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Position.y+height].Glyphs_p[Position.x-1].codepoint = 'm';
-    Grid_p[Position.y+height].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y+height].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Position.y+height].Glyphs_p[Position.x+width].codepoint = 'j';
-    Grid_p[Position.y+height].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Position.y+height].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 
 //    for (int col = Position.x-1, j = 0; col < Position.x+width+1; ++col, ++j) {
 //        Grid_p[Position.y+1].Glyphs_p[col].codepoint = 'q';
-//        Grid_p[Position.y+1].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//        Grid_p[Position.y+1].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //    }
 //
 //    Grid_p[Position.y+1].Glyphs_p[Position.x-1].codepoint = 't';
-//    Grid_p[Position.y+1].Glyphs_p[Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//    Grid_p[Position.y+1].Glyphs_p[Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //    Grid_p[Position.y+1].Glyphs_p[Position.x+width].codepoint = 'u';
-//    Grid_p[Position.y+1].Glyphs_p[Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//    Grid_p[Position.y+1].Glyphs_p[Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
  
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

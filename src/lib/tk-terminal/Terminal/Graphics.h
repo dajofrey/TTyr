@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_TERMINAL_GRAPHICS_H
-#define TTYR_TERMINAL_TERMINAL_GRAPHICS_H
+#ifndef TK_TERMINAL_TERMINAL_GRAPHICS_H
+#define TK_TERMINAL_TERMINAL_GRAPHICS_H
 
 // INCLUDES ========================================================================================
 
@@ -115,24 +115,24 @@ typedef struct tk_terminal_Graphics {
 
 // FUNCTIONS =======================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_initGraphics(
+TK_TERMINAL_RESULT tk_terminal_initGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_freeGraphics(
+TK_TERMINAL_RESULT tk_terminal_freeGraphics(
     tk_terminal_Graphics *Graphics_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_handleViewportChange(
+TK_TERMINAL_RESULT tk_terminal_handleViewportChange(
     tk_terminal_Graphics *Graphics_p, nh_gfx_Viewport *Viewport_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_updateGraphics( 
+TK_TERMINAL_RESULT tk_terminal_updateGraphics( 
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
     tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn
 ); 
 
-TTYR_TERMINAL_RESULT tk_terminal_renderGraphics(
+TK_TERMINAL_RESULT tk_terminal_renderGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
     tk_terminal_Grid *ElevatedGrid_p, tk_terminal_Grid *BackdropGrid_p
 );

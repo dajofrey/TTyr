@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TREE_LISTING_H
-#define TTYR_CORE_TREE_LISTING_H
+#ifndef TK_CORE_TREE_LISTING_H
+#define TK_CORE_TREE_LISTING_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -65,19 +65,19 @@
     tk_core_TreeListing tk_core_initTreeListing(
     );
 
-    TTYR_CORE_RESULT tk_core_freeTreeListing(
+    TK_CORE_RESULT tk_core_freeTreeListing(
         tk_core_TreeListing *TreeListing_p
     );
 
-    TTYR_CORE_RESULT tk_core_handleTreeListingInput(
+    TK_CORE_RESULT tk_core_handleTreeListingInput(
         tk_core_Program *Program_p, NH_API_UTF32 c
     );
 
-    TTYR_CORE_RESULT tk_core_drawTreeListingRow(
+    TK_CORE_RESULT tk_core_drawTreeListingRow(
         tk_core_Program *Program_p, tk_core_Glyph *Glyph_p, int width, int height, int row
     );
 
-    TTYR_CORE_RESULT tk_core_setTreeListingCursor(
+    TK_CORE_RESULT tk_core_setTreeListingCursor(
         tk_core_Program *Program_p, tk_core_File *File_p 
     );
 

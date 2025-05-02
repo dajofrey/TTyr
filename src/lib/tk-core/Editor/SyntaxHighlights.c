@@ -84,10 +84,10 @@ static char *cControlKeywords_pp[] = {
 
 //// INIT ============================================================================================
 //
-//static TTYR_CORE_RESULT tk_core_insertHighlightWord(
+//static TK_CORE_RESULT tk_core_insertHighlightWord(
 //    nh_encoding_UTF32String *String_p, nh_encoding_UTF32String Word, char *prefix_p, char *suffix_p)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    nh_encoding_UTF32String Prefix = nh_decodeUTF8Text(prefix_p);
 //    nh_encoding_UTF32String Suffix = nh_decodeUTF8Text(suffix_p);
@@ -99,13 +99,13 @@ static char *cControlKeywords_pp[] = {
 //    nh_core_freeArray(&Prefix);
 //    nh_core_freeArray(&Suffix);
 //
-//TTYR_CORE_END(TTYR_CORE_SUCCESS)
+//TK_CORE_END(TK_CORE_SUCCESS)
 //}
 //
 //nh_encoding_UTF32String tk_core_highlightWord(
 //    nh_encoding_UTF32String Word, nh_encoding_UTF32String *String_p, char *prefix_p, char *suffix_p)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    nh_encoding_UTF32String NewString = nh_core_initArray(sizeof(NH_API_UTF32), 64);
 //
@@ -133,13 +133,13 @@ static char *cControlKeywords_pp[] = {
 //        nh_core_appendToArray(&NewString, codepoint_p, 1);
 //    }
 //
-//TTYR_CORE_END(NewString)
+//TK_CORE_END(NewString)
 //}
 //
 //nh_encoding_UTF32String tk_core_highlightWords(
 //    char *words_pp[], size_t words, nh_encoding_UTF32String *String_p, char *prefix_p, char *suffix_p)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    nh_encoding_UTF32String String = nh_core_initArray(sizeof(NH_API_UTF32), 64);
 //
@@ -154,7 +154,7 @@ static char *cControlKeywords_pp[] = {
 //        nh_core_freeArray(&Word);
 //    }
 //
-//TTYR_CORE_END(String)
+//TK_CORE_END(String)
 //}
 //
 //// C ===============================================================================================
@@ -162,7 +162,7 @@ static char *cControlKeywords_pp[] = {
 //nh_encoding_UTF32String tk_core_cSyntaxHighlights(
 //    nh_encoding_UTF32String *String_p)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    nh_encoding_UTF32String String1 = tk_core_highlightWords(
 //        cTypeKeywords_pp, sizeof(cTypeKeywords_pp) / sizeof(cTypeKeywords_pp[0]), String_p, "\e[0;32m", "\e[0m"
@@ -172,7 +172,7 @@ static char *cControlKeywords_pp[] = {
 //    ); 
 //    nh_core_freeArray(&String1);
 //
-//TTYR_CORE_END(String2)
+//TK_CORE_END(String2)
 //}
 //
 //// CPP =============================================================================================
@@ -180,26 +180,26 @@ static char *cControlKeywords_pp[] = {
 //nh_encoding_UTF32String tk_core_cppSyntaxHighlights(
 //    nh_encoding_UTF32String *String_p)
 //{
-//TTYR_CORE_BEGIN()
-//TTYR_CORE_END(nh_core_initArray(0, 0))
+//TK_CORE_BEGIN()
+//TK_CORE_END(nh_core_initArray(0, 0))
 //}
 //
 //// CODE TYPE =======================================================================================
 
-TTYR_CORE_TEXT tk_core_getTextType(
+TK_CORE_TEXT tk_core_getTextType(
     nh_encoding_UTF32String *Path_p)
 {
-    if (Path_p == NULL) {return TTYR_CORE_TEXT_UNDEFINED;}
+    if (Path_p == NULL) {return TK_CORE_TEXT_UNDEFINED;}
 
     if (Path_p->length > 1) {
         if (Path_p->p[Path_p->length - 2] == '.' && Path_p->p[Path_p->length - 1] == 'c') {
-            return TTYR_CORE_TEXT_C;
+            return TK_CORE_TEXT_C;
         }
         if (Path_p->p[Path_p->length - 2] == '.' && Path_p->p[Path_p->length - 1] == 'h') {
-            return TTYR_CORE_TEXT_C;
+            return TK_CORE_TEXT_C;
         }
     }
 
-    return TTYR_CORE_TEXT_UNDEFINED;
+    return TK_CORE_TEXT_UNDEFINED;
 }
 

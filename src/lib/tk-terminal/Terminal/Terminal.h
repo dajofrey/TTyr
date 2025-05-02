@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_TERMINAL_H
-#define TTYR_TERMINAL_TERMINAL_H
+#ifndef TK_TERMINAL_TERMINAL_H
+#define TK_TERMINAL_TERMINAL_H
 
 #include "Grid.h"
 #include "Graphics.h"

@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_LOG_H
-#define TTYR_CORE_LOG_H
+#ifndef TK_CORE_LOG_H
+#define TK_CORE_LOG_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -19,24 +19,24 @@
  *  @{
  */
 
-//    TTYR_CORE_RESULT tk_core_logTerminalMode(
+//    TK_CORE_RESULT tk_core_logTerminalMode(
 //        tk_core_Shell *Shell_p, int mode
 //    );
 //
-//    TTYR_CORE_RESULT tk_core_logCSI(
+//    TK_CORE_RESULT tk_core_logCSI(
 //        tk_core_Shell *Shell_p, char type
 //    );
 
-    TTYR_CORE_RESULT _tk_core_logBegin(
+    TK_CORE_RESULT _tk_core_logBegin(
         const char *file_p, const char *function_p
     );
 
-    TTYR_CORE_RESULT _tk_core_logEnd(
+    TK_CORE_RESULT _tk_core_logEnd(
         const char *file_p, const char *function_p
     );
 
-    TTYR_CORE_RESULT _tk_core_logDiagnosticEnd(
-        const char *file_p, const char *function_p, TTYR_CORE_RESULT result, int line
+    TK_CORE_RESULT _tk_core_logDiagnosticEnd(
+        const char *file_p, const char *function_p, TK_CORE_RESULT result, int line
     );
 
 /** @} */

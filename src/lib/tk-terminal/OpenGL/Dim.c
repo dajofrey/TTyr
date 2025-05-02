@@ -27,7 +27,7 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLDimProgram(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLDimProgram(
     tk_terminal_OpenGLDim *Dim_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     static const char* vsSource_p =
@@ -76,10 +76,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLDimProgram(
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glLinkProgram", &Dim_p->Program_p->Result);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLDimVertices(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLDimVertices(
     tk_terminal_OpenGLDim *Dim_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     Dim_p->VertexArray_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
@@ -95,10 +95,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLDimVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1), 
         Dim_p->ColorBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLDimVertices(
+static TK_TERMINAL_RESULT tk_terminal_updateOpenGLDimVertices(
     tk_terminal_OpenGLDim *Dim_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p, nh_core_Array *Vertices_p,
     nh_core_Array *Colors_p)
 {
@@ -132,10 +132,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLDimVertices(
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float) * 4),
         nh_gfx_glpointer(NULL, NULL));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLDim(
+TK_TERMINAL_RESULT tk_terminal_updateOpenGLDim(
     void *state_p, void *data_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
@@ -152,18 +152,18 @@ TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLDim(
     tk_terminal_updateOpenGLDimVertices(&Dim_p->OpenGL,
         State_p->Viewport_p->OpenGL.CommandBuffer_p, &Dim_p->Vertices, &Dim_p->Colors);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_initOpenGLDim(
+TK_TERMINAL_RESULT tk_terminal_initOpenGLDim(
     tk_terminal_OpenGLDim *Dim_p)
 {
     memset(Dim_p, 0, sizeof(tk_terminal_OpenGLDim));
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLDim(
+TK_TERMINAL_RESULT tk_terminal_freeOpenGLDim(
     tk_terminal_OpenGLDim *Dim_p)
 {
     nh_gfx_freeOpenGLCommand(Dim_p->VertexShader_p);
@@ -174,5 +174,5 @@ TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLDim(
     nh_gfx_freeOpenGLData(Dim_p->ColorBuffer_p);
     nh_gfx_freeOpenGLData(Dim_p->VerticesBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

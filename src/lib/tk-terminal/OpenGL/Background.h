@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_OPENGL_BACKGROUND_H
-#define TTYR_TERMINAL_OPENGL_BACKGROUND_H
+#ifndef TK_TERMINAL_OPENGL_BACKGROUND_H
+#define TK_TERMINAL_OPENGL_BACKGROUND_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -43,15 +43,15 @@ typedef struct tk_terminal_Graphics tk_terminal_Graphics;
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBackground(
+    TK_TERMINAL_RESULT tk_terminal_updateOpenGLBackground(
         void *state_p, void *data_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBackground(
+    TK_TERMINAL_RESULT tk_terminal_initOpenGLBackground(
         tk_terminal_OpenGLBackground *Background_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLBackground(
+    TK_TERMINAL_RESULT tk_terminal_freeOpenGLBackground(
         tk_terminal_OpenGLBackground *Background_p
     );
 

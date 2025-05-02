@@ -21,8 +21,8 @@
 
 // FUNCTIONS =======================================================================================
 
-TTYR_CORE_RESULT tk_core_initialize()
+TK_CORE_RESULT tk_core_initialize()
 {
     nh_core_appendConfig(termoskanne_default_conf_inc, termoskanne_default_conf_inc_len, true);
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

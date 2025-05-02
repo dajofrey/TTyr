@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_RESULT_H
-#define TTYR_CORE_RESULT_H
+#ifndef TK_CORE_RESULT_H
+#define TK_CORE_RESULT_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -13,8 +13,8 @@
 
 /** @{ */
 
-    extern const char *TTYR_CORE_RESULTS_PP[];
-    extern unsigned int TTYR_CORE_RESULTS_PP_COUNT;
+    extern const char *TK_CORE_RESULTS_PP[];
+    extern unsigned int TK_CORE_RESULTS_PP_COUNT;
 
 /** @} */
 

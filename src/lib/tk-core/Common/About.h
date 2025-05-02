@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_ABOUT_H
-#define TTYR_CORE_ABOUT_H
+#ifndef TK_CORE_ABOUT_H
+#define TK_CORE_ABOUT_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -47,27 +47,27 @@
     /**
      * The API version is used for backwards-incompatible API changes. 
      */
-    #define TTYR_CORE_API_VERSION 0
+    #define TK_CORE_API_VERSION 0
 
     /**
      * The major version is used for the completion of big functionalities. 
      */
-    #define TTYR_CORE_MAJOR_VERSION 2
+    #define TK_CORE_MAJOR_VERSION 2
 
     /**
      * The minor version is used for the addition of small functionalities or consequential changes. 
      */
-    #define TTYR_CORE_MINOR_VERSION 0
+    #define TK_CORE_MINOR_VERSION 0
 
     /**
      * The patch version is used for bugfixes or non-consequential changes. 
      */
-    #define TTYR_CORE_PATCH_VERSION 2
+    #define TK_CORE_PATCH_VERSION 2
 
     /**
      * Version array.
      */
-    extern int TTYR_CORE_VERSION_P[4];
+    extern int TK_CORE_VERSION_P[4];
 
 /** @} */
 

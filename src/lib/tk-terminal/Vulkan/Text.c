@@ -27,7 +27,7 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_createTextVertices(
+static TK_TERMINAL_RESULT tk_terminal_createTextVertices(
     nh_gfx_VulkanDriver *Driver_p, tk_terminal_VulkanText *Text_p, nh_core_Array *Vertices_p, nh_core_Array *Indices_p)
 {
     VkBufferCreateInfo BufferCreateInfo = 
@@ -45,7 +45,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_createTextVertices(
         .createInfo       = false,
     };
 
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
         Driver_p, &BufferInfo, &Text_p->VertexBuffer
     ))
 
@@ -54,14 +54,14 @@ static TTYR_TERMINAL_RESULT tk_terminal_createTextVertices(
     BufferInfo.data_p = Indices_p->p;
     BufferInfo.Info_p = &BufferCreateInfo;
    
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
         Driver_p, &BufferInfo, &Text_p->IndexBuffer 
     ))
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_createTextUniform(
+static TK_TERMINAL_RESULT tk_terminal_createTextUniform(
     nh_gfx_VulkanDriver *Driver_p, tk_terminal_VulkanText *Text_p)
 {
     // MVP
@@ -86,7 +86,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_createTextUniform(
         .createInfo       = false,
     };
 
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
         Driver_p, &BufferInfo, &Text_p->VertShaderBuffer
     ))
 
@@ -112,14 +112,14 @@ static TTYR_TERMINAL_RESULT tk_terminal_createTextUniform(
     BufferInfo.data_p = fsData_p;
     BufferInfo.Info_p = &FSInfo;
 
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanBuffer(
         Driver_p, &BufferInfo, &Text_p->FragShaderBuffer
     ))
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_createTextDescriptor(
+static TK_TERMINAL_RESULT tk_terminal_createTextDescriptor(
     nh_gfx_VulkanGPU *GPU_p, tk_terminal_VulkanText *Text_p)
 {
     nh_gfx_VulkanDriver *Driver_p = &GPU_p->Driver;
@@ -164,12 +164,12 @@ static TTYR_TERMINAL_RESULT tk_terminal_createTextDescriptor(
         .descriptorSetCount = 1,
     };
 
-    NH_CORE_CHECK_2(TTYR_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanDescriptorSet(Driver_p, &AllocateInfo, &LayoutInfo, &Text_p->DescriptorSet))
+    NH_CORE_CHECK_2(TK_TERMINAL_ERROR_BAD_STATE, nh_gfx_createVulkanDescriptorSet(Driver_p, &AllocateInfo, &LayoutInfo, &Text_p->DescriptorSet))
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateTextDescriptor(
+static TK_TERMINAL_RESULT tk_terminal_updateTextDescriptor(
     nh_gfx_VulkanGPU *GPU_p, tk_terminal_VulkanText *Text_p, nh_vk_Texture *Texture_p)
 {
     nh_gfx_VulkanDriver *Driver_p = &GPU_p->Driver;
@@ -224,19 +224,19 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateTextDescriptor(
     VkWriteDescriptorSet Sets_p[3] = {vsUniformBufferDescriptorSet, fsTextureSamplerDescriptorSet, fsUniformBufferDescriptorSet};
     Driver_p->Functions.vkUpdateDescriptorSets(Driver_p->Device, 3, Sets_p, 0, VK_NULL_HANDLE);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_initVulkanText(
+TK_TERMINAL_RESULT tk_terminal_initVulkanText(
     nh_gfx_VulkanGPU *GPU_p, tk_terminal_VulkanText *Text_p)
 {
     Text_p->destroy = false;
-    TTYR_TERMINAL_CHECK(tk_terminal_createTextDescriptor(GPU_p, Text_p))
+    TK_TERMINAL_CHECK(tk_terminal_createTextDescriptor(GPU_p, Text_p))
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateVulkanText(
+TK_TERMINAL_RESULT tk_terminal_updateVulkanText(
     nh_gfx_VulkanGPU *GPU_p, nh_gfx_FontInstance *FontInstance_p, tk_terminal_VulkanText *Text_p, nh_core_Array *Vertices_p, 
     nh_core_Array *Indices_p)
 {
@@ -249,16 +249,16 @@ TTYR_TERMINAL_RESULT tk_terminal_updateVulkanText(
         nh_gfx_destroyVulkanBuffer(&GPU_p->Driver, &Text_p->VertShaderBuffer);
     }
 
-    TTYR_TERMINAL_CHECK(tk_terminal_createTextVertices(&GPU_p->Driver, Text_p, Vertices_p, Indices_p))
-    TTYR_TERMINAL_CHECK(tk_terminal_createTextUniform(&GPU_p->Driver, Text_p))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateTextDescriptor(GPU_p, Text_p, Texture_p))
+    TK_TERMINAL_CHECK(tk_terminal_createTextVertices(&GPU_p->Driver, Text_p, Vertices_p, Indices_p))
+    TK_TERMINAL_CHECK(tk_terminal_createTextUniform(&GPU_p->Driver, Text_p))
+    TK_TERMINAL_CHECK(tk_terminal_updateTextDescriptor(GPU_p, Text_p, Texture_p))
 
     Text_p->destroy = true;
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-//TTYR_TERMINAL_RESULT tk_terminal_destroyVulkanText(
+//TK_TERMINAL_RESULT tk_terminal_destroyVulkanText(
 //    nh_gfx_VulkanGPU *GPU_p, tk_terminal_VulkanText *Text_p)
 //{
 //    nh_gfx_destroyVulkanBuffer(&GPU_p->Driver, &Text_p->VertexBuffer);

@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TITLEBAR_H
-#define TTYR_CORE_TITLEBAR_H
+#ifndef TK_CORE_TITLEBAR_H
+#define TK_CORE_TITLEBAR_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -26,7 +26,7 @@
         tk_core_Config *Config_p, tk_core_Titlebar *Titlebar_p, bool *refresh_p
     );
 
-    TTYR_CORE_RESULT tk_core_drawTitlebar(
+    TK_CORE_RESULT tk_core_drawTitlebar(
         tk_core_TTY *TTY_p
     );
 

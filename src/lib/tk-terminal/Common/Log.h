@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_LOG_H
-#define TTYR_TERMINAL_LOG_H
+#ifndef TK_TERMINAL_LOG_H
+#define TK_TERMINAL_LOG_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -17,16 +17,16 @@
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT _tk_terminal_logBegin(
+    TK_TERMINAL_RESULT _tk_terminal_logBegin(
         const char *file_p, const char *function_p
     );
 
-    TTYR_TERMINAL_RESULT _tk_terminal_logEnd(
+    TK_TERMINAL_RESULT _tk_terminal_logEnd(
         const char *file_p, const char *function_p
     );
 
-    TTYR_TERMINAL_RESULT _tk_terminal_logDiagnosticEnd(
-        const char *file_p, const char *function_p, TTYR_TERMINAL_RESULT result, int line
+    TK_TERMINAL_RESULT _tk_terminal_logDiagnosticEnd(
+        const char *file_p, const char *function_p, TK_TERMINAL_RESULT result, int line
     );
 
 /** @} */

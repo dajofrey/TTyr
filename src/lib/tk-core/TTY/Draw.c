@@ -34,20 +34,20 @@
 
 // FUNCTIONS: CURSOR ================================================================================
 
-TTYR_CORE_RESULT tk_core_getCursorPosition(
+TK_CORE_RESULT tk_core_getCursorPosition(
     tk_core_Config *Config_p, tk_core_Tile *MacroTile_p, tk_core_Tile *MicroTile_p, bool standardIO, int *x_p, int *y_p)
 {
     *x_p = -1;
     *y_p = -1;
 
-    if (TTYR_CORE_MACRO_TAB(MacroTile_p)->Topbar.hasFocus) {
-        TTYR_CHECK(tk_core_getTopbarCursor(&TTYR_CORE_MACRO_TAB(MacroTile_p)->Topbar, x_p, y_p, MacroTile_p->rowPosition == 0))
+    if (TK_CORE_MACRO_TAB(MacroTile_p)->Topbar.hasFocus) {
+        TK_CHECK(tk_core_getTopbarCursor(&TK_CORE_MACRO_TAB(MacroTile_p)->Topbar, x_p, y_p, MacroTile_p->rowPosition == 0))
     }
-    else if (TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p != NULL && TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f != NULL) {
-        TTYR_CHECK(TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f(TTYR_CORE_MICRO_TILE(MicroTile_p)->Program_p, x_p, y_p))
+    else if (TK_CORE_MICRO_TILE(MicroTile_p)->Program_p != NULL && TK_CORE_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f != NULL) {
+        TK_CHECK(TK_CORE_MICRO_TILE(MicroTile_p)->Program_p->Prototype_p->Callbacks.getCursorPosition_f(TK_CORE_MICRO_TILE(MicroTile_p)->Program_p, x_p, y_p))
         if (*x_p < 0 || *y_p < 0) {
              // Indicates that the program doesn't want the cursor to be shown.
-             return TTYR_CORE_SUCCESS;
+             return TK_CORE_SUCCESS;
         }
 
         *y_p += 1 + (Config_p->Topbar.on || Config_p->Titlebar.on);
@@ -65,23 +65,23 @@ TTYR_CORE_RESULT tk_core_getCursorPosition(
         *y_p += MacroTile_p->rowPosition;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_refreshCursor(
+TK_CORE_RESULT tk_core_refreshCursor(
     tk_core_TTY *TTY_p) 
 {
     tk_core_View *View_p = TTY_p->Views.pp[0];
     int x = -1, y = -1;
  
     if (TTY_p->hasFocus) {
-        tk_core_Tile *MicroTile_p = TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p;
-        TTYR_CHECK(tk_core_getCursorPosition(&TTY_p->Config, TTY_p->Window_p->Tile_p, MicroTile_p, View_p->standardIO, &x, &y))
+        tk_core_Tile *MicroTile_p = TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p;
+        TK_CHECK(tk_core_getCursorPosition(&TTY_p->Config, TTY_p->Window_p->Tile_p, MicroTile_p, View_p->standardIO, &x, &y))
     }
 
-    TTYR_CHECK(tk_core_forwardCursor(&TTY_p->Config, View_p, x, y))
+    TK_CHECK(tk_core_forwardCursor(&TTY_p->Config, View_p, x, y))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // FUNCTIONS: DRAW =================================================================================
@@ -100,12 +100,12 @@ static void tk_core_drawVerticalBorderGlyph(
     memset(Glyph_p, 0, sizeof(tk_core_Glyph));
 
     Glyph_p->codepoint = ' ';
-    Glyph_p->mark = TTYR_CORE_MARK_LINE_VERTICAL | TTYR_CORE_MARK_ACCENT;
+    Glyph_p->mark = TK_CORE_MARK_LINE_VERTICAL | TK_CORE_MARK_ACCENT;
     Glyph_p->Attributes.reverse = true;
     return;
 }
 
-static TTYR_CORE_RESULT tk_core_drawMicroTile(
+static TK_CORE_RESULT tk_core_drawMicroTile(
     tk_core_Config *Config_p, tk_core_Tile *Tile_p, tk_core_View *View_p, int row)
 {
     // Get relative row with 0 being the first row of the tile.
@@ -132,18 +132,18 @@ static TTYR_CORE_RESULT tk_core_drawMicroTile(
         }
     }
  
-    if (TTYR_CORE_MICRO_TILE(Tile_p)->Program_p) {
-        TTYR_CHECK(TTYR_CORE_MICRO_TILE(Tile_p)->Program_p->Prototype_p->Callbacks.draw_f(
-            TTYR_CORE_MICRO_TILE(Tile_p)->Program_p, View_p->Row.Glyphs_p, cols, 
+    if (TK_CORE_MICRO_TILE(Tile_p)->Program_p) {
+        TK_CHECK(TK_CORE_MICRO_TILE(Tile_p)->Program_p->Prototype_p->Callbacks.draw_f(
+            TK_CORE_MICRO_TILE(Tile_p)->Program_p, View_p->Row.Glyphs_p, cols, 
             Tile_p->rowSize-offset,
             row-offset
         ))
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_drawMacroTile(
+static TK_CORE_RESULT tk_core_drawMacroTile(
     tk_core_Config *Config_p, tk_core_Tile *Tile_p, tk_core_View *View_p, int row)
 {
 
@@ -165,18 +165,18 @@ static TTYR_CORE_RESULT tk_core_drawMacroTile(
         );
     }
  
-    TTYR_CHECK(tk_core_drawMicroWindow(
+    TK_CHECK(tk_core_drawMicroWindow(
         Config_p,
-        &TTYR_CORE_MACRO_TAB(Tile_p)->MicroWindow, View_p->Row.Glyphs_p, cols,
+        &TK_CORE_MACRO_TAB(Tile_p)->MicroWindow, View_p->Row.Glyphs_p, cols,
         topbar ? Tile_p->rowSize-1 : Tile_p->rowSize, 
         topbar ? row-1 : row, 
         View_p->standardIO
     ))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_draw(
+static TK_CORE_RESULT tk_core_draw(
     tk_core_Config *Config_p, tk_core_Tile *Tile_p, tk_core_View *View_p, int row)
 {
     // Normalize glyphs.
@@ -184,34 +184,34 @@ static TTYR_CORE_RESULT tk_core_draw(
         tk_core_normalizeGlyph(View_p->Row.Glyphs_p+i);
     }
  
-    return Tile_p->type == TTYR_CORE_TILE_TYPE_MACRO ? 
+    return Tile_p->type == TK_CORE_TILE_TYPE_MACRO ? 
         tk_core_drawMacroTile(Config_p, Tile_p, View_p, row) : tk_core_drawMicroTile(Config_p, Tile_p, View_p, row);
 }
 
 // FUNCTIONS: REFRESH ===============================================================================
 
-static TTYR_CORE_RESULT tk_core_postProcessRow(
+static TK_CORE_RESULT tk_core_postProcessRow(
     tk_core_View *View_p, int row)
 {
     tk_core_Row *Row_p = View_p->Grid1_p+row;
 
-    if (View_p->standardIO) {return TTYR_CORE_SUCCESS;}
+    if (View_p->standardIO) {return TK_CORE_SUCCESS;}
 
     // Post process line.
     for (int i = 0; i < View_p->cols; ++i) {
         tk_core_Glyph *Glyph_p = &Row_p->Glyphs_p[i];
-        if (Glyph_p->mark & TTYR_CORE_MARK_LINE_VERTICAL) {
+        if (Glyph_p->mark & TK_CORE_MARK_LINE_VERTICAL) {
             Glyph_p->codepoint = 'x';
             Glyph_p->Attributes.reverse = false;
-            Glyph_p->mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
-            if (((Glyph_p+1)->Attributes.reverse && (Glyph_p+1)->mark & TTYR_CORE_MARK_LINE_HORIZONTAL)
-            &&  ((Glyph_p-1)->Attributes.reverse && (Glyph_p-1)->mark & TTYR_CORE_MARK_LINE_HORIZONTAL)) {
+            Glyph_p->mark |= TK_CORE_MARK_LINE_GRAPHICS;
+            if (((Glyph_p+1)->Attributes.reverse && (Glyph_p+1)->mark & TK_CORE_MARK_LINE_HORIZONTAL)
+            &&  ((Glyph_p-1)->Attributes.reverse && (Glyph_p-1)->mark & TK_CORE_MARK_LINE_HORIZONTAL)) {
                 Glyph_p->Attributes.reverse = true;
                 continue;
             } 
-            if ((Glyph_p+1)->mark & TTYR_CORE_MARK_LINE_HORIZONTAL) {
-                if ((Glyph_p-1)->mark & TTYR_CORE_MARK_LINE_HORIZONTAL) {
-                    if (row > 0 && ((Row_p-1)->Glyphs_p[i].mark & TTYR_CORE_MARK_LINE_VERTICAL)) {
+            if ((Glyph_p+1)->mark & TK_CORE_MARK_LINE_HORIZONTAL) {
+                if ((Glyph_p-1)->mark & TK_CORE_MARK_LINE_HORIZONTAL) {
+                    if (row > 0 && ((Row_p-1)->Glyphs_p[i].mark & TK_CORE_MARK_LINE_VERTICAL)) {
                         if ((Glyph_p+1)->Attributes.reverse) {
                             Glyph_p->codepoint = 'b';
                         } else if ((Glyph_p-1)->Attributes.reverse) {
@@ -227,33 +227,33 @@ static TTYR_CORE_RESULT tk_core_postProcessRow(
                     Glyph_p->codepoint = (Glyph_p+1)->Attributes.reverse ? 'd' : 't';
                 }
             }
-            else if (i < View_p->cols-1 && ((Glyph_p-1)->mark & TTYR_CORE_MARK_LINE_HORIZONTAL)) {
+            else if (i < View_p->cols-1 && ((Glyph_p-1)->mark & TK_CORE_MARK_LINE_HORIZONTAL)) {
                 Glyph_p->codepoint = (Glyph_p-1)->Attributes.reverse ? 'e' : 'u';
             }
         }
-        if (Glyph_p->mark & TTYR_CORE_MARK_LINE_HORIZONTAL && !Glyph_p->Attributes.reverse) {
-            if (row > 0 && ((Row_p-1)->Glyphs_p[i].mark & TTYR_CORE_MARK_LINE_VERTICAL)) {
+        if (Glyph_p->mark & TK_CORE_MARK_LINE_HORIZONTAL && !Glyph_p->Attributes.reverse) {
+            if (row > 0 && ((Row_p-1)->Glyphs_p[i].mark & TK_CORE_MARK_LINE_VERTICAL)) {
                 Glyph_p->codepoint = 'v';
             }
         }
-        if (Glyph_p->mark & TTYR_CORE_MARK_LINE_HORIZONTAL && !Glyph_p->Attributes.reverse) {
-            if (View_p->rows>row+1 && ((Row_p+1)->Glyphs_p[i].mark & TTYR_CORE_MARK_LINE_VERTICAL)) {
+        if (Glyph_p->mark & TK_CORE_MARK_LINE_HORIZONTAL && !Glyph_p->Attributes.reverse) {
+            if (View_p->rows>row+1 && ((Row_p+1)->Glyphs_p[i].mark & TK_CORE_MARK_LINE_VERTICAL)) {
                 Glyph_p->codepoint = 'w';
             }
         }
-        if (Glyph_p->mark & TTYR_CORE_MARK_LINE_VERTICAL) {
+        if (Glyph_p->mark & TK_CORE_MARK_LINE_VERTICAL) {
             if (i < View_p->cols-1 && (Glyph_p+1)->Attributes.reverse) {
-                Glyph_p->mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+                Glyph_p->mark |= TK_CORE_MARK_LINE_GRAPHICS;
                 Glyph_p->codepoint = 'd';
             }
         }
-        if (Glyph_p->mark & TTYR_CORE_MARK_LINE_VERTICAL) {
+        if (Glyph_p->mark & TK_CORE_MARK_LINE_VERTICAL) {
             if (i > 0 && (Glyph_p-1)->Attributes.reverse) {
-                Glyph_p->mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+                Glyph_p->mark |= TK_CORE_MARK_LINE_GRAPHICS;
                 Glyph_p->codepoint = 'e';
             }
         }
-        if (Glyph_p->mark & TTYR_CORE_MARK_LINE_VERTICAL) {
+        if (Glyph_p->mark & TK_CORE_MARK_LINE_VERTICAL) {
             if (i > 0 && (Glyph_p-1)->Attributes.reverse && i < View_p->cols-1 && (Glyph_p+1)->Attributes.reverse) {
                 Glyph_p->Attributes.reverse = true;
                 Glyph_p->mark = 0;
@@ -263,10 +263,10 @@ static TTYR_CORE_RESULT tk_core_postProcessRow(
 
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_refreshGrid1Row(
+TK_CORE_RESULT tk_core_refreshGrid1Row(
     tk_core_Config *Config_p, nh_core_List *Tiles_p, tk_core_View *View_p, int row)
 {
     memset(View_p->Row.Glyphs_p, 0, sizeof(tk_core_Glyph)*View_p->cols);
@@ -284,7 +284,7 @@ TTYR_CORE_RESULT tk_core_refreshGrid1Row(
             &&  Tile_p->rowPosition  + Tile_p->rowSize > row
             &&  Tile_p->colPosition == col-offset)
             {
-                TTYR_CHECK(tk_core_draw(Config_p, Tile_p, View_p, row))
+                TK_CHECK(tk_core_draw(Config_p, Tile_p, View_p, row))
 
                 for (int i = 0; i < Tile_p->colSize; ++i) {
                     tk_core_Glyph *Glyph_p = View_p->Grid1_p[row].Glyphs_p+col+i;
@@ -302,12 +302,12 @@ TTYR_CORE_RESULT tk_core_refreshGrid1Row(
         }
     }
 
-    TTYR_CHECK(tk_core_postProcessRow(View_p, row))
+    TK_CHECK(tk_core_postProcessRow(View_p, row))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_refreshGrid1(
+TK_CORE_RESULT tk_core_refreshGrid1(
     tk_core_TTY *TTY_p) 
 {
     tk_core_View *View_p = TTY_p->Views.pp[0];
@@ -317,17 +317,17 @@ TTYR_CORE_RESULT tk_core_refreshGrid1(
     nh_core_List Tiles = tk_core_getTiles(TTY_p->Window_p->RootTile_p);
 
     for (int row = 0; row < View_p->rows; ++row) {
-        TTYR_CHECK(tk_core_refreshGrid1Row(&TTY_p->Config, &Tiles, View_p, row))
+        TK_CHECK(tk_core_refreshGrid1Row(&TTY_p->Config, &Tiles, View_p, row))
     }
 
     nh_core_freeList(&Tiles, false);
 
-    TTYR_CHECK(tk_core_forwardGrid1(&TTY_p->Config, View_p))
+    TK_CHECK(tk_core_forwardGrid1(&TTY_p->Config, View_p))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_refreshGrid2(
+TK_CORE_RESULT tk_core_refreshGrid2(
     tk_core_TTY *TTY_p)
 {
     tk_core_View *View_p = TTY_p->Views.pp[0];
@@ -337,14 +337,14 @@ TTYR_CORE_RESULT tk_core_refreshGrid2(
     }
  
     if (TTY_p->alt && TTY_p->ctrl) {
-        TTYR_CHECK(tk_core_drawMicroWindowMenu(View_p->Grid2_p))
+        TK_CHECK(tk_core_drawMicroWindowMenu(View_p->Grid2_p))
     }
 //    if (1) {
-//        TTYR_CHECK(tk_core_drawPrompt(View_p->Grid2_p))
+//        TK_CHECK(tk_core_drawPrompt(View_p->Grid2_p))
 //    }
 
-    TTYR_CHECK(tk_core_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
-    TTYR_CHECK(tk_core_forwardGrid2(View_p))
+    TK_CHECK(tk_core_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
+    TK_CHECK(tk_core_forwardGrid2(View_p))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

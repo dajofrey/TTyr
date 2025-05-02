@@ -17,10 +17,10 @@
 
 // LOG =============================================================================================
 
-//TTYR_CORE_RESULT tk_core_logTerminalMode(
+//TK_CORE_RESULT tk_core_logTerminalMode(
 //    tk_core_Shell *Shell_p, int mode)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    char *description_p = tk_core_getTTYModeDescription(mode);
 //
@@ -32,13 +32,13 @@
 //
 //    nh_core_sendLogMessage(node_p, NULL, message_p);
 //
-//TTYR_CORE_END(TTYR_CORE_SUCCESS)
+//TK_CORE_END(TK_CORE_SUCCESS)
 //}
 //
-//TTYR_CORE_RESULT tk_core_logCSI(
+//TK_CORE_RESULT tk_core_logCSI(
 //    tk_core_Shell *Shell_p, char type)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    const char *description_p = tk_core_getCSIDescription(type);
 //
@@ -50,27 +50,27 @@
 //
 //    nh_core_sendLogMessage(node_p, NULL, message_p);
 //
-//TTYR_CORE_END(TTYR_CORE_SUCCESS)
+//TK_CORE_END(TK_CORE_SUCCESS)
 //}
 
 // FLOW LOGGING ====================================================================================
 
-TTYR_CORE_RESULT _tk_core_logBegin(
+TK_CORE_RESULT _tk_core_logBegin(
     const char *file_p, const char *function_p)
 {
 //    if (!NH_CONFIG.Flags.Log.Flow.core) {return NH_SUCCESS;}
 //    return _nh_begin(file_p, function_p);
 }
 
-TTYR_CORE_RESULT _tk_core_logEnd(
+TK_CORE_RESULT _tk_core_logEnd(
     const char *file_p, const char *function_p)
 {
 //    if (!NH_CONFIG.Flags.Log.Flow.core) {return NH_SUCCESS;}
 //    return _nh_end(file_p, function_p);
 }
 
-TTYR_CORE_RESULT _tk_core_logDiagnosticEnd(
-    const char *file_p, const char *function_p, TTYR_CORE_RESULT result, int line)
+TK_CORE_RESULT _tk_core_logDiagnosticEnd(
+    const char *file_p, const char *function_p, TK_CORE_RESULT result, int line)
 {
 //    if (!NH_CONFIG.Flags.Log.Flow.core) {return result;}
 //    _nh_diagnosticEnd(file_p, function_p, NH_CORE_RESULTS_PP[result], line, result == NH_SUCCESS);

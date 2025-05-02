@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_CONFIG_H
-#define TTYR_TERMINAL_CONFIG_H
+#ifndef TK_TERMINAL_CONFIG_H
+#define TK_TERMINAL_CONFIG_H
 
 /**
  * TTýr - Terminal Emulator

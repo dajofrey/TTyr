@@ -148,18 +148,18 @@ static int tk_core_handleContextMenuTiling(
         // Handle tab append.
         case 0 :
             Event.trigger = NH_API_TRIGGER_PRESS;
-            Event.codepoint = TTYR_CORE_TILING_KEY;
+            Event.codepoint = TK_CORE_TILING_KEY;
             Event.state |= NH_API_MODIFIER_CONTROL;
             tk_core_handleTilingInput(Window_p, Event); 
 
             if (direction == 0) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_TOP_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_TOP_KEY;
             } else if (direction == 1) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_RIGHT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_RIGHT_KEY;
             } else if (direction == 2) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_BOTTOM_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_BOTTOM_KEY;
             } else if (direction == 3) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_LEFT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_LEFT_KEY;
             }
  
             Event.state = 0;
@@ -169,22 +169,22 @@ static int tk_core_handleContextMenuTiling(
         // Handle tab split.
         case 2 :
             Event.trigger = NH_API_TRIGGER_PRESS;
-            Event.codepoint = TTYR_CORE_TILING_KEY;
+            Event.codepoint = TK_CORE_TILING_KEY;
             Event.state |= NH_API_MODIFIER_CONTROL;
             tk_core_handleTilingInput(Window_p, Event); 
 
             Event.state = 0;
-            Event.codepoint = TTYR_CORE_SPLIT_KEY;
+            Event.codepoint = TK_CORE_SPLIT_KEY;
             tk_core_handleTilingInput(Window_p, Event); 
 
             if (direction == 0) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_TOP_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_TOP_KEY;
             } else if (direction == 1) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_RIGHT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_RIGHT_KEY;
             } else if (direction == 2) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_BOTTOM_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_BOTTOM_KEY;
             } else if (direction == 3) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_LEFT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_LEFT_KEY;
             }
  
             tk_core_handleTilingInput(Window_p, Event);
@@ -193,19 +193,19 @@ static int tk_core_handleContextMenuTiling(
         // Handle window append.
         case 1 :
             Event.trigger = NH_API_TRIGGER_PRESS;
-            Event.codepoint = TTYR_CORE_TILING_KEY;
+            Event.codepoint = TK_CORE_TILING_KEY;
             Event.state |= NH_API_MODIFIER_CONTROL;
             tk_core_handleTilingInput(Window_p, Event); 
             tk_core_handleTilingInput(Window_p, Event); 
 
             if (direction == 0) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_TOP_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_TOP_KEY;
             } else if (direction == 1) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_RIGHT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_RIGHT_KEY;
             } else if (direction == 2) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_BOTTOM_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_BOTTOM_KEY;
             } else if (direction == 3) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_LEFT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_LEFT_KEY;
             }
 
             Event.state = 0;
@@ -215,23 +215,23 @@ static int tk_core_handleContextMenuTiling(
         // Handle window split.
         case 3 :
             Event.trigger = NH_API_TRIGGER_PRESS;
-            Event.codepoint = TTYR_CORE_TILING_KEY;
+            Event.codepoint = TK_CORE_TILING_KEY;
             Event.state |= NH_API_MODIFIER_CONTROL;
             tk_core_handleTilingInput(Window_p, Event); 
             tk_core_handleTilingInput(Window_p, Event); 
 
-            Event.codepoint = TTYR_CORE_SPLIT_KEY;
+            Event.codepoint = TK_CORE_SPLIT_KEY;
             Event.state = 0;
             tk_core_handleTilingInput(Window_p, Event); 
 
             if (direction == 0) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_TOP_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_TOP_KEY;
             } else if (direction == 1) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_RIGHT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_RIGHT_KEY;
             } else if (direction == 2) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_BOTTOM_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_BOTTOM_KEY;
             } else if (direction == 3) {
-                Event.codepoint = TTYR_CORE_INSERT_TILE_LEFT_KEY;
+                Event.codepoint = TK_CORE_INSERT_TILE_LEFT_KEY;
             }
  
             tk_core_handleTilingInput(Window_p, Event);
@@ -247,7 +247,7 @@ static tk_core_ContextMenu *tk_core_parseContextMenu(
     NH_API_UTF32 **menu_pp, tk_core_ContextMenu *Parent_p)
 {
     tk_core_ContextMenu *Menu_p = (tk_core_ContextMenu*)nh_core_allocate(sizeof(tk_core_ContextMenu));
-    TTYR_CHECK_MEM_2(NULL, Menu_p)
+    TK_CHECK_MEM_2(NULL, Menu_p)
 
     Menu_p->Parent_p = Parent_p;
     Menu_p->active = false;
@@ -263,7 +263,7 @@ static tk_core_ContextMenu *tk_core_parseContextMenu(
         if (**menu_pp == '{' || (**menu_pp == ',' && curly)) {
             (*menu_pp)++;
             tk_core_ContextMenu *Child_p = tk_core_parseContextMenu(menu_pp, Menu_p);
-            TTYR_CHECK_NULL_2(NULL, Child_p)
+            TK_CHECK_NULL_2(NULL, Child_p)
             nh_core_appendToList(&Menu_p->Items, Child_p);
             curly = true;
             continue;
@@ -414,7 +414,7 @@ tk_core_ContextMenu *tk_core_createMouseMenu(
     int x, int y)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
-    tk_core_Program *Program_p = tk_core_getCurrentProgram(&TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
+    tk_core_Program *Program_p = tk_core_getCurrentProgram(&TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
 
     nh_encoding_UTF32String Menu = nh_encoding_initUTF32(128);
     nh_encoding_appendUTF32Codepoint(&Menu, '{');
@@ -432,7 +432,7 @@ tk_core_ContextMenu *tk_core_createMouseMenu(
     bool border = true;
 
     if (TTY_p->Config.Menu.program && TTY_p->Prototypes.size > 1) {
-        tk_core_Program *Program_p = tk_core_getCurrentProgram(&TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
+        tk_core_Program *Program_p = tk_core_getCurrentProgram(&TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
         NH_API_UTF32 apps_p[] = {PROGRAM_NAME '{'};
         nh_encoding_appendUTF32(&Menu, apps_p, sizeof(apps_p)/sizeof(apps_p[0]));
         int width = 0;
@@ -579,7 +579,7 @@ tk_core_ContextMenu *tk_core_createMouseMenu(
     }
 
     tk_core_ContextMenu *Menu_p = tk_core_parseContextMenu(&p, NULL);
-    TTYR_CHECK_NULL_2(NULL, Menu_p)
+    TK_CHECK_NULL_2(NULL, Menu_p)
 
     tk_core_computeContextMenuPosition(Menu_p, x, y, ((tk_core_View*)TTY_p->Views.pp[0])->cols, ((tk_core_View*)TTY_p->Views.pp[0])->rows);
 
@@ -588,10 +588,10 @@ tk_core_ContextMenu *tk_core_createMouseMenu(
     return Menu_p;
 }
 
-TTYR_CORE_RESULT tk_core_handleMouseMenuPress(
+TK_CORE_RESULT tk_core_handleMouseMenuPress(
     tk_core_ContextMenu *Root_p, tk_core_ContextMenu *Menu_p)
 {
-    if (!Menu_p->Parent_p || Menu_p->Name.length == 0) {return TTYR_CORE_SUCCESS;}
+    if (!Menu_p->Parent_p || Menu_p->Name.length == 0) {return TK_CORE_SUCCESS;}
 
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
 
@@ -601,7 +601,7 @@ TTYR_CORE_RESULT tk_core_handleMouseMenuPress(
         if (tiling == 1 || tiling == 3) { 
             tk_core_handleContextMenuTiling(tiling, TTY_p->Window_p->Tile_p, Root_p->cCol, Root_p->cRow);
         } else {
-            tk_core_handleContextMenuTiling(tiling, TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p, Root_p->cCol, Root_p->cRow);
+            tk_core_handleContextMenuTiling(tiling, TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p, Root_p->cCol, Root_p->cRow);
         }
         nh_api_KeyboardEvent Event;
         Event.trigger = NH_API_TRIGGER_PRESS;
@@ -612,11 +612,11 @@ TTYR_CORE_RESULT tk_core_handleMouseMenuPress(
     int select = tk_core_isContextMenuWindowOrTabSelect(Menu_p);
     if (select >= 0) {
         if (select < 9) {
-            TTYR_CHECK_NULL(tk_core_insertAndFocusWindow(TTY_p, select))
+            TK_CHECK_NULL(tk_core_insertAndFocusWindow(TTY_p, select))
         } else {
             ((tk_core_MacroTile*)TTY_p->Window_p->Tile_p->p)->current = select - 9; 
         }
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
 
     // Handle program switch if necessary.
@@ -626,17 +626,17 @@ TTYR_CORE_RESULT tk_core_handleMouseMenuPress(
         for (int i = 0; i < Menu_p->Parent_p->Items.size; ++i) {
             tk_core_ContextMenu *Prog_p = Menu_p->Parent_p->Items.pp[i];
             if (Prog_p->active) {
-                TTYR_CORE_MACRO_TAB(((tk_core_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p)->MicroWindow.current = i;
+                TK_CORE_MACRO_TAB(((tk_core_TTY*)nh_core_getWorkloadArg())->Window_p->Tile_p)->MicroWindow.current = i;
             } 
         }
     } else if (nh_encoding_compareUTF32(Menu_p->Name.p, close_p)) {
-        TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p->close = true;
+        TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p))->Tile_p->close = true;
     } else {
         // Handle command execution if necessary.
         for (int i = 0; i < Menu_p->Parent_p->Items.size; ++i) {
             tk_core_ContextMenu *Cmd_p = Menu_p->Parent_p->Items.pp[i];
             if (Cmd_p->active) {
-                tk_core_Program *Program_p = tk_core_getCurrentProgram(&TTYR_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
+                tk_core_Program *Program_p = tk_core_getCurrentProgram(&TK_CORE_MACRO_TAB(TTY_p->Window_p->Tile_p)->MicroWindow);
                 if (Program_p->Prototype_p->Callbacks.handleCommand_f) {
                     Program_p->command = i;
                     Program_p->Prototype_p->Callbacks.handleCommand_f(Program_p);
@@ -645,16 +645,16 @@ TTYR_CORE_RESULT tk_core_handleMouseMenuPress(
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // DRAW ============================================================================================
 
-TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
+TK_CORE_RESULT tk_core_drawContextMenuRecursively(
     tk_core_ContextMenu *Menu_p, tk_core_Row *Grid_p)
 {
     if (Menu_p == NULL || Menu_p->Items.size == 0 || Menu_p->hit == false && Menu_p->active == false) {
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
 
     int width = 0;
@@ -679,12 +679,12 @@ TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
             // Draw horizontal separator if required.
             if (Child_p->Name.length == 0) {
                 Grid_p[row].Glyphs_p[col].codepoint = 'q';
-                Grid_p[row].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+                Grid_p[row].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
             }
             // Draw vertical separator if required.
             else if (Child_p->Name.p[j] == 1) {
                 Grid_p[row].Glyphs_p[col].codepoint = 'x';
-                Grid_p[row].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+                Grid_p[row].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
             }
         }
     }
@@ -692,31 +692,31 @@ TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
     // Add basic outer lines.
     for (int row = Menu_p->Position.y, i = 0; row < Menu_p->Position.y+height; ++row, ++i) {
         Grid_p[row].Glyphs_p[Menu_p->Position.x-1].codepoint = 'x';
-        Grid_p[row].Glyphs_p[Menu_p->Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[row].Glyphs_p[Menu_p->Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         Grid_p[row].Glyphs_p[Menu_p->Position.x+width].codepoint = 'x';
-        Grid_p[row].Glyphs_p[Menu_p->Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[row].Glyphs_p[Menu_p->Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     }
 
     for (int col = Menu_p->Position.x-1, j = 0; col < Menu_p->Position.x+width+1; ++col, ++j) {
         Grid_p[Menu_p->Position.y-1].Glyphs_p[col].codepoint = 'q';
-        Grid_p[Menu_p->Position.y-1].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[Menu_p->Position.y-1].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         Grid_p[Menu_p->Position.y+height].Glyphs_p[col].codepoint = 'q';
-        Grid_p[Menu_p->Position.y+height].Glyphs_p[col].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+        Grid_p[Menu_p->Position.y+height].Glyphs_p[col].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     }
 
     Grid_p[Menu_p->Position.y-1].Glyphs_p[Menu_p->Position.x-1].codepoint = 'l';
-    Grid_p[Menu_p->Position.y-1].Glyphs_p[Menu_p->Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Menu_p->Position.y-1].Glyphs_p[Menu_p->Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Menu_p->Position.y-1].Glyphs_p[Menu_p->Position.x+width].codepoint = 'k';
-    Grid_p[Menu_p->Position.y-1].Glyphs_p[Menu_p->Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Menu_p->Position.y-1].Glyphs_p[Menu_p->Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Menu_p->Position.y+height].Glyphs_p[Menu_p->Position.x-1].codepoint = 'm';
-    Grid_p[Menu_p->Position.y+height].Glyphs_p[Menu_p->Position.x-1].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Menu_p->Position.y+height].Glyphs_p[Menu_p->Position.x-1].mark |= TK_CORE_MARK_LINE_GRAPHICS;
     Grid_p[Menu_p->Position.y+height].Glyphs_p[Menu_p->Position.x+width].codepoint = 'j';
-    Grid_p[Menu_p->Position.y+height].Glyphs_p[Menu_p->Position.x+width].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+    Grid_p[Menu_p->Position.y+height].Glyphs_p[Menu_p->Position.x+width].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 
     // Add horizontal outer-line separator |- piece.
     for (int row = Menu_p->Position.y; row < Menu_p->Position.y+height; ++row) {
         if (Grid_p[row].Glyphs_p[Menu_p->Position.x].codepoint == 'q' 
-        &&  Grid_p[row].Glyphs_p[Menu_p->Position.x].mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
+        &&  Grid_p[row].Glyphs_p[Menu_p->Position.x].mark & TK_CORE_MARK_LINE_GRAPHICS) {
             Grid_p[row].Glyphs_p[Menu_p->Position.x-1].codepoint = 't';
         }
     } 
@@ -724,7 +724,7 @@ TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
     // Add horizontal outer-line separator -| piece.
     for (int row = Menu_p->Position.y; row < Menu_p->Position.y+height; ++row) {
         if (Grid_p[row].Glyphs_p[Menu_p->Position.x+width-1].codepoint == 'q' 
-        &&  Grid_p[row].Glyphs_p[Menu_p->Position.x+width-1].mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
+        &&  Grid_p[row].Glyphs_p[Menu_p->Position.x+width-1].mark & TK_CORE_MARK_LINE_GRAPHICS) {
             Grid_p[row].Glyphs_p[Menu_p->Position.x+width].codepoint = 'u';
         }
     }
@@ -732,7 +732,7 @@ TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
     // Add vertical outer-line separator T piece.
     for (int col = Menu_p->Position.x; col < Menu_p->Position.x+width; ++col) {
         if (Grid_p[Menu_p->Position.y].Glyphs_p[col].codepoint == 'x' 
-        &&  Grid_p[Menu_p->Position.y].Glyphs_p[col].mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
+        &&  Grid_p[Menu_p->Position.y].Glyphs_p[col].mark & TK_CORE_MARK_LINE_GRAPHICS) {
             Grid_p[Menu_p->Position.y-1].Glyphs_p[col].codepoint = 'w';
         }
     }
@@ -740,7 +740,7 @@ TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
     // Add vertical outer-line separator bottom piece.
     for (int col = Menu_p->Position.x; col < Menu_p->Position.x+width; ++col) {
         if (Grid_p[Menu_p->Position.y+height-1].Glyphs_p[col].codepoint == 'x' 
-        &&  Grid_p[Menu_p->Position.y+height-1].Glyphs_p[col].mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
+        &&  Grid_p[Menu_p->Position.y+height-1].Glyphs_p[col].mark & TK_CORE_MARK_LINE_GRAPHICS) {
             Grid_p[Menu_p->Position.y+height].Glyphs_p[col].codepoint = 'v';
         }
     }
@@ -748,8 +748,8 @@ TTYR_CORE_RESULT tk_core_drawContextMenuRecursively(
     // Recursion.
     for (int i = 0; i < Menu_p->Items.size; ++i) {
         tk_core_ContextMenu *Child_p = Menu_p->Items.pp[i];
-        TTYR_CHECK(tk_core_drawContextMenuRecursively(Child_p, Grid_p))
+        TK_CHECK(tk_core_drawContextMenuRecursively(Child_p, Grid_p))
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

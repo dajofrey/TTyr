@@ -12,10 +12,10 @@
 
 // VERSION =========================================================================================
 
-int TTYR_CORE_VERSION_P[4] = {
-    TTYR_CORE_API_VERSION, 
-    TTYR_CORE_MAJOR_VERSION, 
-    TTYR_CORE_MINOR_VERSION,
-    TTYR_CORE_PATCH_VERSION,
+int TK_CORE_VERSION_P[4] = {
+    TK_CORE_API_VERSION, 
+    TK_CORE_MAJOR_VERSION, 
+    TK_CORE_MINOR_VERSION,
+    TK_CORE_PATCH_VERSION,
 };
 

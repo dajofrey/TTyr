@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TTY_MACRO_H
-#define TTYR_CORE_TTY_MACRO_H
+#ifndef TK_CORE_TTY_MACRO_H
+#define TK_CORE_TTY_MACRO_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -59,15 +59,15 @@
         void *TTY_p, int index
     );
     
-    TTYR_CORE_RESULT tk_core_destroyWindows(
+    TK_CORE_RESULT tk_core_destroyWindows(
         void *TTY_p
     );
 
-    TTYR_CORE_RESULT tk_core_updateMacroWindow(
+    TK_CORE_RESULT tk_core_updateMacroWindow(
         tk_core_MacroWindow *Window_p
     );
 
-    TTYR_CORE_RESULT tk_core_handleMacroWindowInput(
+    TK_CORE_RESULT tk_core_handleMacroWindowInput(
         tk_core_Config *Config_p, tk_core_MacroWindow *Tab_p, nh_api_WSIEvent Event 
     );
 
@@ -79,7 +79,7 @@
         tk_core_MacroTile *Tile_p
     );
 
-    TTYR_CORE_RESULT tk_core_drawTileRow(
+    TK_CORE_RESULT tk_core_drawTileRow(
         tk_core_Tile *Tile_p, tk_core_Row *Row_p, int row
     );
 
@@ -89,4 +89,4 @@
 
 /** @} */
 
-#endif // TTYR_CORE_TTY_MACRO_H
+#endif // TK_CORE_TTY_MACRO_H

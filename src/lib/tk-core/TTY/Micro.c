@@ -27,12 +27,12 @@ tk_core_Tile *tk_core_createMicroTile(
     tk_core_Tile *Parent_p, tk_core_Program *Program_p, int index)
 {
     tk_core_MicroTile *Tile_p = (tk_core_MicroTile*)nh_core_allocate(sizeof(tk_core_MicroTile));
-    TTYR_CHECK_MEM_2(NULL, Tile_p)
+    TK_CHECK_MEM_2(NULL, Tile_p)
 
     Tile_p->Program_p = Program_p == NULL || Parent_p == NULL ? 
-        Program_p : TTYR_CORE_MICRO_TILE(Parent_p)->Program_p;
+        Program_p : TK_CORE_MICRO_TILE(Parent_p)->Program_p;
  
-    return tk_core_createTile(Tile_p, TTYR_CORE_TILE_TYPE_MICRO, Parent_p, index);
+    return tk_core_createTile(Tile_p, TK_CORE_TILE_TYPE_MICRO, Parent_p, index);
 }
 
 void tk_core_destroyMicroTile(
@@ -44,7 +44,7 @@ void tk_core_destroyMicroTile(
     nh_core_free(Tile_p);
 }
 
-TTYR_CORE_RESULT tk_core_getMicroTiles(
+TK_CORE_RESULT tk_core_getMicroTiles(
     tk_core_MicroWindow *Window_p, nh_core_List *List_p)
 {
     *List_p = nh_core_initList(4);
@@ -55,7 +55,7 @@ TTYR_CORE_RESULT tk_core_getMicroTiles(
         nh_core_freeList(&List, false);
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // MICRO TABS ======================================================================================
@@ -64,10 +64,10 @@ static tk_core_MicroTab *tk_core_createMicroTab(
     tk_core_Interface *Prototype_p, bool once)
 {
     tk_core_MicroTab *Tab_p = (tk_core_MicroTab*)nh_core_allocate(sizeof(tk_core_MicroTab));
-    TTYR_CHECK_MEM_2(NULL, Tab_p)
+    TK_CHECK_MEM_2(NULL, Tab_p)
 
     tk_core_Tile *Tile_p = tk_core_createMicroTile(NULL, tk_core_createProgramInstance(Prototype_p, once), 0);
-    TTYR_CHECK_MEM_2(NULL, Tile_p)
+    TK_CHECK_MEM_2(NULL, Tile_p)
 
     Tab_p->RootTile_p  = Tile_p;
     Tab_p->LastFocus_p = Tile_p;
@@ -81,14 +81,14 @@ nh_core_List *tk_core_createMicroTabs(
     tk_core_TTY *TTY_p)
 {
     nh_core_List *Tabs_p = (nh_core_List*)nh_core_allocate(sizeof(nh_core_List));
-    TTYR_CHECK_MEM_2(NULL, Tabs_p)
+    TK_CHECK_MEM_2(NULL, Tabs_p)
 
     *Tabs_p = nh_core_initList(8); // Don't change size to TTY_p->Prototypes.size, it might not be initialized.
 
     for (int i = 0; i < TTY_p->Prototypes.size; ++i) {
         tk_core_Interface *Prototype_p = TTY_p->Prototypes.pp[i];
         tk_core_MicroTab *Tab_p = tk_core_createMicroTab(Prototype_p, false);
-        TTYR_CHECK_NULL_2(NULL, Tab_p)
+        TK_CHECK_NULL_2(NULL, Tab_p)
         nh_core_appendToList(Tabs_p, Tab_p);
     }
 
@@ -102,14 +102,14 @@ static void tk_core_freeMicroTab(
     nh_core_free(Tab_p);
 }
 
-TTYR_CORE_RESULT tk_core_appendMicroTab(
+TK_CORE_RESULT tk_core_appendMicroTab(
     tk_core_MicroWindow *Window_p, tk_core_Interface *Prototype_p, bool once)
 {
     tk_core_MicroTab *Tab_p = tk_core_createMicroTab(Prototype_p, once);
-    TTYR_CHECK_NULL(Tab_p)
+    TK_CHECK_NULL(Tab_p)
 
     nh_core_appendToList(Window_p->Tabs_p, Tab_p);
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // MICRO WINDOW ====================================================================================
@@ -125,7 +125,7 @@ tk_core_MicroWindow tk_core_initMicroWindow(
     return Window;
 }
 
-TTYR_CORE_RESULT tk_core_destroyMicroWindow(
+TK_CORE_RESULT tk_core_destroyMicroWindow(
     tk_core_MicroWindow *Window_p)
 {
     if (Window_p->Tabs_p) {
@@ -137,15 +137,15 @@ TTYR_CORE_RESULT tk_core_destroyMicroWindow(
         Window_p->Tabs_p = NULL;
     }
 
-    TTYR_CHECK(tk_core_destroyView(NULL, Window_p->View_p))
-    return TTYR_CORE_SUCCESS;
+    TK_CHECK(tk_core_destroyView(NULL, Window_p->View_p))
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_drawMicroWindow(
+TK_CORE_RESULT tk_core_drawMicroWindow(
     tk_core_Config *Config_p, tk_core_MicroWindow *Window_p, tk_core_Glyph *Glyphs_p, int cols,
     int rows, int row, bool standardIO)
 {
-    if (!Window_p->Tabs_p || Window_p->Tabs_p->size == 0) {return TTYR_CORE_SUCCESS;}
+    if (!Window_p->Tabs_p || Window_p->Tabs_p->size == 0) {return TK_CORE_SUCCESS;}
 
     Window_p->View_p->cols = cols;
     Window_p->View_p->rows = rows;
@@ -155,13 +155,13 @@ TTYR_CORE_RESULT tk_core_drawMicroWindow(
     tk_core_updateTiling(RootTile_p, Window_p->View_p->rows, Window_p->View_p->cols);
     nh_core_List Tiles = tk_core_getTiles(RootTile_p);
 
-    TTYR_CHECK(tk_core_updateView(NULL, Window_p->View_p, NULL, false))
-    TTYR_CHECK(tk_core_refreshGrid1Row(Config_p, &Tiles, Window_p->View_p, row))
+    TK_CHECK(tk_core_updateView(NULL, Window_p->View_p, NULL, false))
+    TK_CHECK(tk_core_refreshGrid1Row(Config_p, &Tiles, Window_p->View_p, row))
 
     memcpy(Glyphs_p, Window_p->View_p->Grid1_p[row].Glyphs_p, sizeof(tk_core_Glyph)*cols);
     nh_core_freeList(&Tiles, false);
  
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // CURRENT PROGRAM =================================================================================
@@ -172,5 +172,5 @@ tk_core_Program *tk_core_getCurrentProgram(
     tk_core_MicroTab *Tab_p = !Window_p->Tabs_p || Window_p->Tabs_p->size <= Window_p->current 
         ? NULL : Window_p->Tabs_p->pp[Window_p->current];
 
-    return !Tab_p ? NULL : TTYR_CORE_MICRO_TILE(Tab_p->Tile_p)->Program_p;
+    return !Tab_p ? NULL : TK_CORE_MICRO_TILE(Tab_p->Tile_p)->Program_p;
 }

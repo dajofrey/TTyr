@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_MICRO_H
-#define TTYR_CORE_MICRO_H
+#ifndef TK_CORE_MICRO_H
+#define TK_CORE_MICRO_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -56,11 +56,11 @@
         tk_core_TTY *TTY_p
     );
     
-    TTYR_CORE_RESULT tk_core_appendMicroTab(
+    TK_CORE_RESULT tk_core_appendMicroTab(
         tk_core_MicroWindow *Window_p, tk_core_Interface *Prototype_p, bool once
     );
 
-    TTYR_CORE_RESULT tk_core_getMicroTiles(
+    TK_CORE_RESULT tk_core_getMicroTiles(
         tk_core_MicroWindow *Window_p, nh_core_List *List_p
     );
 
@@ -68,11 +68,11 @@
         nh_core_List *MicroTabs_p
     );
 
-    TTYR_CORE_RESULT tk_core_destroyMicroWindow(
+    TK_CORE_RESULT tk_core_destroyMicroWindow(
         tk_core_MicroWindow *Window_p
     );
 
-    TTYR_CORE_RESULT tk_core_drawMicroWindow(
+    TK_CORE_RESULT tk_core_drawMicroWindow(
         tk_core_Config *Config_p, tk_core_MicroWindow *Window_p, tk_core_Glyph *Glyphs_p, int cols, int rows, int row, bool standardIO
     );
 
@@ -82,4 +82,4 @@
 
 /** @} */
 
-#endif // TTYR_CORE_MICRO_H
+#endif // TK_CORE_MICRO_H

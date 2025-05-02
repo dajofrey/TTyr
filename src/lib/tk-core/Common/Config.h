@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_CONFIG_H
-#define TTYR_CORE_CONFIG_H
+#ifndef TK_CORE_CONFIG_H
+#define TK_CORE_CONFIG_H
 
 #include "Includes.h"
 #include <stddef.h>

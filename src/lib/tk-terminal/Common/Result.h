@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_RESULT_H
-#define TTYR_TERMINAL_RESULT_H
+#ifndef TK_TERMINAL_RESULT_H
+#define TK_TERMINAL_RESULT_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -13,8 +13,8 @@
 
 /** @{ */
 
-    extern const char *TTYR_TERMINAL_RESULTS_PP[];
-    extern unsigned int TTYR_TERMINAL_RESULTS_PP_COUNT;
+    extern const char *TK_TERMINAL_RESULTS_PP[];
+    extern unsigned int TK_TERMINAL_RESULTS_PP_COUNT;
 
 /** @} */
 

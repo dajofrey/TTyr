@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_OPENGL_BOXES_H
-#define TTYR_TERMINAL_OPENGL_BOXES_H
+#ifndef TK_TERMINAL_OPENGL_BOXES_H
+#define TK_TERMINAL_OPENGL_BOXES_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -33,15 +33,15 @@
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxes(
+    TK_TERMINAL_RESULT tk_terminal_updateOpenGLBoxes(
         void *state_p, void *data_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBoxes(
+    TK_TERMINAL_RESULT tk_terminal_initOpenGLBoxes(
         tk_terminal_OpenGLBoxes *Boxes_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLBoxes(
+    TK_TERMINAL_RESULT tk_terminal_freeOpenGLBoxes(
         tk_terminal_OpenGLBoxes *Boxes_p
     );
 

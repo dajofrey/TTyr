@@ -1,5 +1,5 @@
-#ifndef TTYR_API_H
-#define TTYR_API_H
+#ifndef TK_API_H
+#define TK_API_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -28,11 +28,11 @@
  *  @{
  */
 
-    extern char TTYR_API_PATH_P[255];
+    extern char TK_API_PATH_P[255];
 
     void tk_api_initialize(
     );
 
 /** @} */
 
-#endif // TTYR_API_H
+#endif // TK_API_H

@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_VULKAN_PIPELINE_H
-#define TTYR_TERMINAL_VULKAN_PIPELINE_H
+#ifndef TK_TERMINAL_VULKAN_PIPELINE_H
+#define TK_TERMINAL_VULKAN_PIPELINE_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -20,10 +20,10 @@
  *  @{
  */
 
-    typedef enum TTYR_TERMINAL_VULKAN_PIPELINE {
-        TTYR_TERMINAL_VULKAN_PIPELINE_SDF, 
-       _TTYR_TERMINAL_VULKAN_PIPELINE_COUNT,     
-    } TTYR_TERMINAL_VULKAN_PIPELINE;
+    typedef enum TK_TERMINAL_VULKAN_PIPELINE {
+        TK_TERMINAL_VULKAN_PIPELINE_SDF, 
+       _TK_TERMINAL_VULKAN_PIPELINE_COUNT,     
+    } TK_TERMINAL_VULKAN_PIPELINE;
 
 /** @} */
 
@@ -31,7 +31,7 @@
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT tk_terminal_createVulkanPipelines(
+    TK_TERMINAL_RESULT tk_terminal_createVulkanPipelines(
         nh_gfx_VulkanDriver *Driver_p, nh_gfx_VulkanPipeline *Pipelines_p
     );
     

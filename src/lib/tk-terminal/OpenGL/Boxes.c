@@ -27,7 +27,7 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBoxesVertices(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLBoxesVertices(
     tk_terminal_OpenGLBoxes *Boxes_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     Boxes_p->VertexArray_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
@@ -45,10 +45,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBoxesVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glGenBuffers", nh_gfx_gluint(NULL, 1),
         Boxes_p->ColorBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxesVertices(
+static TK_TERMINAL_RESULT tk_terminal_updateOpenGLBoxesVertices(
     tk_terminal_Boxes *Boxes_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Boxes_p->OpenGL.VertexArray_p);
@@ -82,10 +82,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxesVertices(
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float) * 3),
         nh_gfx_glpointer(NULL, NULL));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxes(
+TK_TERMINAL_RESULT tk_terminal_updateOpenGLBoxes(
     void *state_p, void *data_p)
 {
     tk_terminal_Boxes *Boxes_p = data_p;
@@ -99,18 +99,18 @@ TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLBoxes(
 
     tk_terminal_updateOpenGLBoxesVertices(Boxes_p, State_p->Viewport_p->OpenGL.CommandBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_initOpenGLBoxes(
+TK_TERMINAL_RESULT tk_terminal_initOpenGLBoxes(
     tk_terminal_OpenGLBoxes *Boxes_p)
 {
     memset(Boxes_p, 0, sizeof(tk_terminal_OpenGLBoxes));
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLBoxes(
+TK_TERMINAL_RESULT tk_terminal_freeOpenGLBoxes(
     tk_terminal_OpenGLBoxes *Boxes_p)
 {
     nh_gfx_freeOpenGLData(Boxes_p->VertexArray_p);
@@ -118,5 +118,5 @@ TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLBoxes(
     nh_gfx_freeOpenGLData(Boxes_p->ColorBuffer_p);
     nh_gfx_freeOpenGLCommand(Boxes_p->BufferData_p);
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

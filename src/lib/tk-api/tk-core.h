@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_API_H
-#define TTYR_CORE_API_H
+#ifndef TK_CORE_API_H
+#define TK_CORE_API_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -33,32 +33,32 @@
     /**
      * Return values for functions.
      */
-    typedef enum TTYR_CORE_RESULT {
-        TTYR_CORE_SUCCESS, /**<Indicates that something worked as planned.*/ 
-        TTYR_CORE_ERROR_NULL_POINTER,         
-        TTYR_CORE_ERROR_BAD_STATE, 
-        TTYR_CORE_ERROR_MEMORY_ALLOCATION,
-        TTYR_CORE_ERROR_TERMINFO_DATA_CANNOT_BE_FOUND,
-        TTYR_CORE_ERROR_UNKNOWN_TERMINAL_TYPE,
-        TTYR_CORE_ERROR_TERMINAL_IS_HARDCOPY,
-        TTYR_CORE_ERROR_UNKNOWN_COMMAND,
-        TTYR_CORE_ERROR_INVALID_ARGUMENT,
-    } TTYR_CORE_RESULT;
+    typedef enum TK_CORE_RESULT {
+        TK_CORE_SUCCESS, /**<Indicates that something worked as planned.*/ 
+        TK_CORE_ERROR_NULL_POINTER,         
+        TK_CORE_ERROR_BAD_STATE, 
+        TK_CORE_ERROR_MEMORY_ALLOCATION,
+        TK_CORE_ERROR_TERMINFO_DATA_CANNOT_BE_FOUND,
+        TK_CORE_ERROR_UNKNOWN_TERMINAL_TYPE,
+        TK_CORE_ERROR_TERMINAL_IS_HARDCOPY,
+        TK_CORE_ERROR_UNKNOWN_COMMAND,
+        TK_CORE_ERROR_INVALID_ARGUMENT,
+    } TK_CORE_RESULT;
 
-    typedef enum TTYR_CORE_PROGRAM_E {
-        TTYR_CORE_PROGRAM_SHELL,
-        TTYR_CORE_PROGRAM_LOGGER,
-        TTYR_CORE_PROGRAM_EDITOR,
-        TTYR_CORE_PROGRAM_TAGGER,
-    } TTYR_CORE_PROGRAM_E;
+    typedef enum TK_CORE_PROGRAM_E {
+        TK_CORE_PROGRAM_SHELL,
+        TK_CORE_PROGRAM_LOGGER,
+        TK_CORE_PROGRAM_EDITOR,
+        TK_CORE_PROGRAM_TAGGER,
+    } TK_CORE_PROGRAM_E;
 
-    typedef enum TTYR_CORE_MARK_E {
-        TTYR_CORE_MARK_LINE_VERTICAL   = 1 << 0, // Internal use.
-        TTYR_CORE_MARK_LINE_HORIZONTAL = 1 << 1, // Internal use.
-        TTYR_CORE_MARK_LINE_GRAPHICS   = 1 << 2,
-        TTYR_CORE_MARK_ELEVATED        = 1 << 3,
-        TTYR_CORE_MARK_ACCENT          = 1 << 4,
-    } TTYR_CORE_MARK_E;
+    typedef enum TK_CORE_MARK_E {
+        TK_CORE_MARK_LINE_VERTICAL   = 1 << 0, // Internal use.
+        TK_CORE_MARK_LINE_HORIZONTAL = 1 << 1, // Internal use.
+        TK_CORE_MARK_LINE_GRAPHICS   = 1 << 2,
+        TK_CORE_MARK_ELEVATED        = 1 << 3,
+        TK_CORE_MARK_ACCENT          = 1 << 4,
+    } TK_CORE_MARK_E;
 
 // TYPEDEFS ========================================================================================
 
@@ -68,13 +68,13 @@
     typedef struct tk_core_Glyph tk_core_Glyph;
     
     typedef void *(*tk_core_init_f)(void *arg_p);
-    typedef TTYR_CORE_RESULT (*tk_core_draw_f)(tk_core_Program *Program_p, tk_core_Glyph *Glyphs_p, int width, int height, int row);
-    typedef TTYR_CORE_RESULT (*tk_core_drawTopbar_f)(tk_core_Program *Program_p, tk_core_Glyph *Glyphs_p, int width);
-    typedef TTYR_CORE_RESULT (*tk_core_getTitle_f)(tk_core_Program *Program_p, NH_API_UTF32 *title_p, int length);
-    typedef TTYR_CORE_RESULT (*tk_core_getCursorPosition_f)(tk_core_Program *Program_p, int *x_p, int *y_p);
-    typedef TTYR_CORE_RESULT (*tk_core_handleInput_f)(tk_core_Program *Program_p, nh_api_WSIEvent Event);
-    typedef TTYR_CORE_RESULT (*tk_core_update_f)(tk_core_Program *Program_p);
-    typedef TTYR_CORE_RESULT (*tk_core_handleCommand_f)(tk_core_Program *Program_p);
+    typedef TK_CORE_RESULT (*tk_core_draw_f)(tk_core_Program *Program_p, tk_core_Glyph *Glyphs_p, int width, int height, int row);
+    typedef TK_CORE_RESULT (*tk_core_drawTopbar_f)(tk_core_Program *Program_p, tk_core_Glyph *Glyphs_p, int width);
+    typedef TK_CORE_RESULT (*tk_core_getTitle_f)(tk_core_Program *Program_p, NH_API_UTF32 *title_p, int length);
+    typedef TK_CORE_RESULT (*tk_core_getCursorPosition_f)(tk_core_Program *Program_p, int *x_p, int *y_p);
+    typedef TK_CORE_RESULT (*tk_core_handleInput_f)(tk_core_Program *Program_p, nh_api_WSIEvent Event);
+    typedef TK_CORE_RESULT (*tk_core_update_f)(tk_core_Program *Program_p);
+    typedef TK_CORE_RESULT (*tk_core_handleCommand_f)(tk_core_Program *Program_p);
     typedef void (*tk_core_destroy_f)(void *p);
     typedef void (*tk_core_destroyPrototype_f)(tk_core_Interface *Prototype_p);
 
@@ -107,7 +107,7 @@
         tk_core_GlyphColor Foreground;
         tk_core_GlyphColor Background;
         NH_API_UTF32 codepoint; /* character code */
-        TTYR_CORE_MARK_E mark;
+        TK_CORE_MARK_E mark;
     } tk_core_Glyph;
     
     typedef struct tk_core_Row {
@@ -170,33 +170,33 @@
      *
      * @param Pointer to TTY. Must not be NULL.
      *
-     * @return TTYR_CORE_SUCCESS on success.
+     * @return TK_CORE_SUCCESS on success.
      */
-    TTYR_CORE_RESULT tk_api_closeTTY(
+    TK_CORE_RESULT tk_api_closeTTY(
         tk_core_TTY *TTY_p
     );
 
     /**
      * Todo.
      */
-    TTYR_CORE_RESULT tk_api_claimStandardIO(
+    TK_CORE_RESULT tk_api_claimStandardIO(
         tk_core_TTY *TTY_p
     );
     
     /**
      * Todo.
      */
-    TTYR_CORE_RESULT tk_api_unclaimStandardIO(
+    TK_CORE_RESULT tk_api_unclaimStandardIO(
         tk_core_TTY *TTY_p
     );
 
     /**
      * Todo.
      */
-    TTYR_CORE_RESULT tk_api_sendEvent(
+    TK_CORE_RESULT tk_api_sendEvent(
         tk_core_TTY *TTY_p, nh_api_WSIEvent Event
     );
 
 /** @} */
 
-#endif // TTYR_CORE_API_H
+#endif // TK_CORE_API_H

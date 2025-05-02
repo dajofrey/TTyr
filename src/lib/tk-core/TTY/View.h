@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_VIEW_H
-#define TTYR_CORE_VIEW_H
+#ifndef TK_CORE_VIEW_H
+#define TK_CORE_VIEW_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -53,15 +53,15 @@
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_getViewSize(
+    TK_CORE_RESULT tk_core_getViewSize(
         tk_core_View *View_p
     ); 
 
-    TTYR_CORE_RESULT tk_core_translateMousePosition(
+    TK_CORE_RESULT tk_core_translateMousePosition(
         tk_core_View *View_p, nh_api_MouseEvent Mouse, int *col_p, int *row_p
     );
 
-    TTYR_CORE_RESULT tk_core_updateView(
+    TK_CORE_RESULT tk_core_updateView(
         tk_core_Config *Config_p, tk_core_View *View_p, bool *updated_p, bool macro
     );
 
@@ -69,26 +69,26 @@
         tk_core_TTY *TTY_p, void *p, bool standardIO
     );
     
-    TTYR_CORE_RESULT tk_core_destroyView(
+    TK_CORE_RESULT tk_core_destroyView(
         tk_core_TTY *TTY_p, tk_core_View *View_p
     );
 
 // FORWARD FUNCTIONS
 // These functions forward specific TTY internal data to the view for rendering etc..
 
-    TTYR_CORE_RESULT tk_core_forwardCursor(
+    TK_CORE_RESULT tk_core_forwardCursor(
         tk_core_Config *Config_p, tk_core_View *View_p, int x, int y
     );
 
-    TTYR_CORE_RESULT tk_core_forwardGrid1(
+    TK_CORE_RESULT tk_core_forwardGrid1(
         tk_core_Config *Config_p, tk_core_View *View_p
     );
 
-    TTYR_CORE_RESULT tk_core_forwardGrid2(
+    TK_CORE_RESULT tk_core_forwardGrid2(
         tk_core_View *View_p
     );
 
-    TTYR_CORE_RESULT tk_core_forwardEvent(
+    TK_CORE_RESULT tk_core_forwardEvent(
         tk_core_View *View_p, nh_api_WSIEvent Event
     );
 

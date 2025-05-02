@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_SHELL_SOCKET_H
-#define TTYR_CORE_SHELL_SOCKET_H
+#ifndef TK_CORE_SHELL_SOCKET_H
+#define TK_CORE_SHELL_SOCKET_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -33,8 +33,8 @@
  *  @{
  */
 
-    typedef TTYR_CORE_RESULT (*tk_core_sendCommandToShell_f)(
-        int pid, TTYR_CORE_PROGRAM_E type 
+    typedef TK_CORE_RESULT (*tk_core_sendCommandToShell_f)(
+        int pid, TK_CORE_PROGRAM_E type 
     );
 
 /** @} */
@@ -43,7 +43,7 @@
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_createShellSocket(
+    TK_CORE_RESULT tk_core_createShellSocket(
         tk_core_ShellSocket *Socket_p, int pid
     );
 
@@ -51,7 +51,7 @@
         tk_core_ShellSocket *Socket_p, int pid
     );
 
-    TTYR_CORE_RESULT tk_core_handleShellSocket(
+    TK_CORE_RESULT tk_core_handleShellSocket(
         tk_core_ShellSocket *Socket_p
     );
 

@@ -28,7 +28,7 @@ static void tk_terminal_recordText(
 {
     GPU_p->Driver.Functions.vkCmdBindPipeline(
         *CommandBuffer_p, VK_PIPELINE_BIND_POINT_GRAPHICS, 
-        GPU_p->Term.Pipelines_p[TTYR_TERMINAL_VULKAN_PIPELINE_SDF].Pipeline
+        GPU_p->Term.Pipelines_p[TK_TERMINAL_VULKAN_PIPELINE_SDF].Pipeline
     );
     VkDeviceSize size_p[1] = {0};
 
@@ -38,7 +38,7 @@ static void tk_terminal_recordText(
     
     GPU_p->Driver.Functions.vkCmdBindDescriptorSets(
         *CommandBuffer_p, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        GPU_p->Term.Pipelines_p[TTYR_TERMINAL_VULKAN_PIPELINE_SDF].PipelineLayout,
+        GPU_p->Term.Pipelines_p[TK_TERMINAL_VULKAN_PIPELINE_SDF].PipelineLayout,
         0, 1, &Text_p->DescriptorSet.DescriptorSet, 0, VK_NULL_HANDLE
     );
 
@@ -51,7 +51,7 @@ static void tk_terminal_recordText(
     );
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
+TK_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
     tk_terminal_Graphics *Graphics_p)
 {
 //    tk_terminal_Config Config = tk_terminal_getConfig(NULL);
@@ -60,7 +60,7 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
 //        Graphics_p->State.Fonts.pp[Graphics_p->State.font], Config.fontSize
 //    );
 //
-//    TTYR_TERMINAL_CHECK(tk_terminal_updateVulkanText(
+//    TK_TERMINAL_CHECK(tk_terminal_updateVulkanText(
 //        Graphics_p->State.Viewport_p->Surface_p->Vulkan.GPU_p, FontInstance_p, &Graphics_p->MainData.Foreground.Vulkan, 
 //        &Graphics_p->MainData.Foreground.Vertices, &Graphics_p->MainData.Foreground.Indices
 //    ))
@@ -76,5 +76,5 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
 //
 //    nh_gfx_endRecording(Graphics_p->State.Viewport_p, false);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_EDITOR_H
-#define TTYR_CORE_EDITOR_H
+#ifndef TK_CORE_EDITOR_H
+#define TK_CORE_EDITOR_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_STANDARD_IO_H
-#define TTYR_CORE_STANDARD_IO_H
+#ifndef TK_CORE_STANDARD_IO_H
+#define TK_CORE_STANDARD_IO_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -19,27 +19,27 @@
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_getStandardOutputWindowSize(
+    TK_CORE_RESULT tk_core_getStandardOutputWindowSize(
         int *cols_p, int *rows_p
     );
     
-    TTYR_CORE_RESULT tk_core_readStandardInput(
+    TK_CORE_RESULT tk_core_readStandardInput(
         tk_core_TTY *TTY_p
     );
 
-    TTYR_CORE_RESULT tk_core_writeCursorToStandardOutput(
+    TK_CORE_RESULT tk_core_writeCursorToStandardOutput(
         int x, int y
     );
 
-    TTYR_CORE_RESULT tk_core_writeToStandardOutput(
+    TK_CORE_RESULT tk_core_writeToStandardOutput(
         tk_core_Row *Rows_p, int cols, int rows
     );
 
-    TTYR_CORE_RESULT tk_core_claimStandardIO(
+    TK_CORE_RESULT tk_core_claimStandardIO(
         tk_core_TTY *TTY_p
     );
     
-    TTYR_CORE_RESULT tk_core_unclaimStandardIO(
+    TK_CORE_RESULT tk_core_unclaimStandardIO(
         tk_core_TTY *TTY_p
     );
 

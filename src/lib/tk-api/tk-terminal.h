@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_API_H
-#define TTYR_TERMINAL_API_H
+#ifndef TK_TERMINAL_API_H
+#define TK_TERMINAL_API_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -35,19 +35,19 @@
     /**
      * Return values for functions.
      */
-    typedef enum TTYR_TERMINAL_RESULT
+    typedef enum TK_TERMINAL_RESULT
     {
-        TTYR_TERMINAL_SUCCESS, /**<Indicates that something worked as planned.*/
-        TTYR_TERMINAL_ERROR_NULL_POINTER,
-        TTYR_TERMINAL_ERROR_BAD_STATE,
-        TTYR_TERMINAL_ERROR_MEMORY_ALLOCATION,
-        TTYR_TERMINAL_ERROR_TERMINFO_DATA_CANNOT_BE_FOUND,
-        TTYR_TERMINAL_ERROR_UNKNOWN_TERMINAL_TYPE,
-        TTYR_TERMINAL_ERROR_TERMINAL_IS_HARDCOPY,
-        TTYR_TERMINAL_ERROR_UNKNOWN_COMMAND,
-        TTYR_TERMINAL_ERROR_INVALID_ARGUMENT,
+        TK_TERMINAL_SUCCESS, /**<Indicates that something worked as planned.*/
+        TK_TERMINAL_ERROR_NULL_POINTER,
+        TK_TERMINAL_ERROR_BAD_STATE,
+        TK_TERMINAL_ERROR_MEMORY_ALLOCATION,
+        TK_TERMINAL_ERROR_TERMINFO_DATA_CANNOT_BE_FOUND,
+        TK_TERMINAL_ERROR_UNKNOWN_TERMINAL_TYPE,
+        TK_TERMINAL_ERROR_TERMINAL_IS_HARDCOPY,
+        TK_TERMINAL_ERROR_UNKNOWN_COMMAND,
+        TK_TERMINAL_ERROR_INVALID_ARGUMENT,
 
-    } TTYR_TERMINAL_RESULT;
+    } TK_TERMINAL_RESULT;
 
 // TYPEDEFS ========================================================================================
 
@@ -76,12 +76,12 @@
      *
      * @param Terminal_p Pointer to terminal. Must not be NULL.
      * @param Viewport_p Pointer to viewport. Must not be NULL.
-     * @return @ref TTYR_TERMINAL_SUCCESS on success.
+     * @return @ref TK_TERMINAL_SUCCESS on success.
      */
-    TTYR_TERMINAL_RESULT tk_api_setViewport(
+    TK_TERMINAL_RESULT tk_api_setViewport(
         tk_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p
     );
 
 /** @} */
 
-#endif // TTYR_TERMINAL_API_H
+#endif // TK_TERMINAL_API_H

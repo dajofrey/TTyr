@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TERMINATE_H
-#define TTYR_CORE_TERMINATE_H
+#ifndef TK_CORE_TERMINATE_H
+#define TK_CORE_TERMINATE_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -17,7 +17,7 @@
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_terminate(
+    TK_CORE_RESULT tk_core_terminate(
     );
     
 /** @} */

@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TILING_H
-#define TTYR_CORE_TILING_H
+#ifndef TK_CORE_TILING_H
+#define TK_CORE_TILING_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -22,26 +22,26 @@ typedef struct tk_core_MacroWindow tk_core_MacroWindow;
  *  @{
  */
 
-    typedef enum TTYR_CORE_TILE_TYPE_E { 
-        TTYR_CORE_TILE_TYPE_MACRO,
-        TTYR_CORE_TILE_TYPE_MICRO,
-    } TTYR_CORE_TILE_TYPE_E;
+    typedef enum TK_CORE_TILE_TYPE_E { 
+        TK_CORE_TILE_TYPE_MACRO,
+        TK_CORE_TILE_TYPE_MICRO,
+    } TK_CORE_TILE_TYPE_E;
 
-    typedef enum TTYR_CORE_TILING_MODE_E { 
-        TTYR_CORE_TILING_MODE_MICRO,
-        TTYR_CORE_TILING_MODE_MACRO,
-    } TTYR_CORE_TILING_MODE_E;
+    typedef enum TK_CORE_TILING_MODE_E { 
+        TK_CORE_TILING_MODE_MICRO,
+        TK_CORE_TILING_MODE_MACRO,
+    } TK_CORE_TILING_MODE_E;
 
-    typedef enum TTYR_CORE_TILING_STAGE_E { 
-        TTYR_CORE_TILING_STAGE_DONE,
-        TTYR_CORE_TILING_STAGE_OVERVIEW,
-        TTYR_CORE_TILING_STAGE_INSERT,
-    } TTYR_CORE_TILING_STAGE_E;
+    typedef enum TK_CORE_TILING_STAGE_E { 
+        TK_CORE_TILING_STAGE_DONE,
+        TK_CORE_TILING_STAGE_OVERVIEW,
+        TK_CORE_TILING_STAGE_INSERT,
+    } TK_CORE_TILING_STAGE_E;
 
-    typedef enum TTYR_CORE_TILE_ORIENTATION { 
-        TTYR_CORE_TILE_ORIENTATION_VERTICAL,
-        TTYR_CORE_TILE_ORIENTATION_HORIZONTAL,
-    } TTYR_CORE_TILE_ORIENTATION;
+    typedef enum TK_CORE_TILE_ORIENTATION { 
+        TK_CORE_TILE_ORIENTATION_VERTICAL,
+        TK_CORE_TILE_ORIENTATION_HORIZONTAL,
+    } TK_CORE_TILE_ORIENTATION;
 
 /** @} */
 
@@ -50,14 +50,14 @@ typedef struct tk_core_MacroWindow tk_core_MacroWindow;
  */
 
     typedef struct tk_core_Tiling {
-        TTYR_CORE_TILING_MODE_E mode;
-        TTYR_CORE_TILING_STAGE_E stage;
+        TK_CORE_TILING_MODE_E mode;
+        TK_CORE_TILING_STAGE_E stage;
     } tk_core_Tiling;
 
     typedef struct tk_core_Tile {
-        TTYR_CORE_TILE_TYPE_E type;
+        TK_CORE_TILE_TYPE_E type;
         void *p;
-        TTYR_CORE_TILE_ORIENTATION orientation;
+        TK_CORE_TILE_ORIENTATION orientation;
         bool rightSeparator; 
         bool refresh;
         bool close;
@@ -75,10 +75,10 @@ typedef struct tk_core_MacroWindow tk_core_MacroWindow;
  */
 
     tk_core_Tile *tk_core_createTile(
-        void *p, TTYR_CORE_TILE_TYPE_E type, tk_core_Tile *Parent_p, int index
+        void *p, TK_CORE_TILE_TYPE_E type, tk_core_Tile *Parent_p, int index
     );
 
-    TTYR_CORE_RESULT tk_core_closeTile(
+    TK_CORE_RESULT tk_core_closeTile(
         tk_core_Tile *Tile_p, void *MicroTab_p
     );
 
@@ -86,15 +86,15 @@ typedef struct tk_core_MacroWindow tk_core_MacroWindow;
         tk_core_MacroWindow *Window_p, tk_core_Tile *Tile_p, int direction
     );
 
-    TTYR_CORE_RESULT tk_core_resetTiling(
+    TK_CORE_RESULT tk_core_resetTiling(
         tk_core_MacroWindow *Tab_p
     );
 
-    TTYR_CORE_RESULT tk_core_updateTiling(
+    TK_CORE_RESULT tk_core_updateTiling(
         tk_core_Tile *RootTile_p, int viewRows, int viewCols
     );
 
-    TTYR_CORE_RESULT tk_core_handleTilingInput(
+    TK_CORE_RESULT tk_core_handleTilingInput(
         tk_core_MacroWindow *Tab_p, nh_api_KeyboardEvent Event 
     );
 

@@ -174,7 +174,7 @@ tk_core_Color tk_terminal_getGlyphColor(
             if (Glyph_p->Background.custom) {
                 return Glyph_p->Background.Color;
             }
-            if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
+            if (Glyph_p->mark & TK_CORE_MARK_ACCENT) {
                 tk_core_Color Color = tk_terminal_getAccentColor(Config_p, col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
                 Color.r *= 0.3f;
                 Color.g *= 0.3f;
@@ -183,7 +183,7 @@ tk_core_Color tk_terminal_getGlyphColor(
             }
             return State_p->BackgroundGradient.Color;
         }
-        if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
+        if (Glyph_p->mark & TK_CORE_MARK_ACCENT) {
             return tk_terminal_getAccentColor(Config_p, col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
         }
         if (Glyph_p->Foreground.custom) {
@@ -195,7 +195,7 @@ tk_core_Color tk_terminal_getGlyphColor(
     // Background.
     if ((Glyph_p->Attributes.reverse && !(Glyph_p->Attributes.blink && State_p->Blink.on)) 
     || (!Glyph_p->Attributes.reverse &&   Glyph_p->Attributes.blink && State_p->Blink.on)) {
-        if (Glyph_p->mark & TTYR_CORE_MARK_ACCENT) {
+        if (Glyph_p->mark & TK_CORE_MARK_ACCENT) {
             return tk_terminal_getAccentColor(Config_p, col, row, Grid_p->cols, Grid_p->rows, State_p->AccentGradient.Color);
         }
         if (Glyph_p->Foreground.custom) {

@@ -52,7 +52,7 @@ static void *tk_terminal_initTerminal(
     Workload_p->module = -1;
 
     tk_terminal_Terminal *Terminal_p = (tk_terminal_Terminal*)nh_core_allocate(sizeof(tk_terminal_Terminal));
-    TTYR_TERMINAL_CHECK_MEM_2(NULL, Terminal_p)
+    TK_TERMINAL_CHECK_MEM_2(NULL, Terminal_p)
 
     memset(Terminal_p, 0, sizeof(tk_terminal_Terminal));
 
@@ -63,7 +63,7 @@ static void *tk_terminal_initTerminal(
     Terminal_p->TTY_p = ((tk_terminal_Args*)Workload_p->args_p)->TTY_p;
     Terminal_p->View_p = tk_core_createView(Terminal_p->TTY_p, Terminal_p, false);
 
-    TTYR_TERMINAL_CHECK_MEM_2(NULL, Terminal_p->View_p)
+    TK_TERMINAL_CHECK_MEM_2(NULL, Terminal_p->View_p)
 
     if (((tk_terminal_Args*)Workload_p->args_p)->namespace_p) {
         strcpy(Terminal_p->namespace_p, ((tk_terminal_Args*)Workload_p->args_p)->namespace_p);
@@ -71,10 +71,10 @@ static void *tk_terminal_initTerminal(
         sprintf(Terminal_p->namespace_p, "%p", Terminal_p);
     }
 
-    TTYR_TERMINAL_CHECK_2(NULL, tk_terminal_initGraphics(&Terminal_p->Config, &Terminal_p->Graphics))
+    TK_TERMINAL_CHECK_2(NULL, tk_terminal_initGraphics(&Terminal_p->Config, &Terminal_p->Graphics))
  
-    TTYR_TERMINAL_CHECK_2(NULL, tk_terminal_initGrid(&Terminal_p->Grid))
-    TTYR_TERMINAL_CHECK_2(NULL, tk_terminal_initGrid(&Terminal_p->ElevatedGrid))
+    TK_TERMINAL_CHECK_2(NULL, tk_terminal_initGrid(&Terminal_p->Grid))
+    TK_TERMINAL_CHECK_2(NULL, tk_terminal_initGrid(&Terminal_p->ElevatedGrid))
 
     return Terminal_p;
 }
@@ -97,7 +97,7 @@ static void tk_terminal_freeTerminal(
 // RUN LOOP ========================================================================================
 // The next functions comprise the top-level of the nhterminal run loop.
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateBoxes( 
+static TK_TERMINAL_RESULT tk_terminal_updateBoxes( 
     tk_terminal_Terminal *Terminal_p, nh_core_Array *NewBoxes_p, int fontSize)
 { 
     if (Terminal_p->Graphics.Boxes.Data.length > 0) { 
@@ -107,22 +107,22 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBoxes(
     for (int i = 0; i < NewBoxes_p->length; ++i) 
     { 
         tk_terminal_Box *Box_p = (tk_terminal_Box*)nh_core_incrementArray(&Terminal_p->Graphics.Boxes.Data);
-        TTYR_TERMINAL_CHECK_MEM(Box_p) 
+        TK_TERMINAL_CHECK_MEM(Box_p) 
         *Box_p = ((tk_terminal_Box*)NewBoxes_p->p)[i]; 
 
         if (Box_p->UpperLeft.x == Box_p->LowerRight.x && Box_p->UpperLeft.y == Box_p->UpperLeft.y) {
-            TTYR_TERMINAL_CHECK(tk_terminal_getOutlineVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, true, fontSize))
-            TTYR_TERMINAL_CHECK(tk_terminal_getOutlineVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, false, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_getOutlineVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, true, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_getOutlineVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, false, fontSize))
         } else { 
-            TTYR_TERMINAL_CHECK(tk_terminal_getBoxVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, true, fontSize))
-            TTYR_TERMINAL_CHECK(tk_terminal_getBoxVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, false, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_getBoxVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, true, fontSize))
+            TK_TERMINAL_CHECK(tk_terminal_getBoxVertices(&Terminal_p->Graphics.State, &Terminal_p->Grid, Box_p, false, fontSize))
         } 
     } 
 
-    return TTYR_TERMINAL_SUCCESS; 
+    return TK_TERMINAL_SUCCESS; 
 } 
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
+static TK_TERMINAL_RESULT tk_terminal_updateSize(
     tk_terminal_Terminal *Terminal_p)
 {
     nh_gfx_FontInstance *FontInstance_p = nh_gfx_claimFontInstance(
@@ -143,13 +143,13 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
         }
     }
 
-    if (failure) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+    if (failure) {return TK_TERMINAL_ERROR_BAD_STATE;}
     
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Text))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->ElevatedGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, NULL, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+    TK_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+    TK_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->ElevatedGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+    TK_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, NULL, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphics(
+    TK_TERMINAL_CHECK(tk_terminal_updateGraphics(
         &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
         &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
 
@@ -159,29 +159,29 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateSize(
     Terminal_p->View_p->Size = Terminal_p->Grid.Size;
     Terminal_p->View_p->TileSize = Terminal_p->Grid.TileSize;
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGraphics(
+    TK_TERMINAL_CHECK(tk_terminal_updateGraphics(
         &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
         &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateSizeIfRequired(
+static TK_TERMINAL_RESULT tk_terminal_updateSizeIfRequired(
     tk_terminal_Terminal *Terminal_p, bool *update_p)
 {
     if (Terminal_p->Graphics.State.Viewport_p->Settings.Size.width - (Terminal_p->Grid.borderPixel*2) == Terminal_p->Grid.Size.width
     &&  Terminal_p->Graphics.State.Viewport_p->Settings.Size.height - (Terminal_p->Grid.borderPixel*2) == Terminal_p->Grid.Size.height) {
-        return TTYR_TERMINAL_SUCCESS;
+        return TK_TERMINAL_SUCCESS;
     }
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateSize(Terminal_p))
+    TK_TERMINAL_CHECK(tk_terminal_updateSize(Terminal_p))
 
     *update_p = true;
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_handleEvent(
+static TK_TERMINAL_RESULT tk_terminal_handleEvent(
     tk_terminal_Terminal *Terminal_p, nh_api_WSIEvent *Event_p)
 {
     if (Event_p->type == NH_API_WSI_EVENT_MOUSE) {
@@ -190,7 +190,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleEvent(
 
             if (newFontSize < 10 || newFontSize > 60) {
                 // Out of bounds.
-                return TTYR_TERMINAL_SUCCESS;
+                return TK_TERMINAL_SUCCESS;
             }
 
             nh_core_overwriteGlobalConfigSettingInt(
@@ -201,7 +201,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleEvent(
                 Terminal_p->Graphics.State.Fonts.pp[Terminal_p->Graphics.State.font], 
                 newFontSize));
 
-            TTYR_TERMINAL_CHECK(tk_terminal_updateSize(Terminal_p))
+            TK_TERMINAL_CHECK(tk_terminal_updateSize(Terminal_p))
         }
         if (Event_p->Mouse.type == NH_API_MOUSE_LEFT && Event_p->Mouse.trigger == NH_API_TRIGGER_PRESS) {
             Terminal_p->leftMouse = true;
@@ -242,10 +242,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleEvent(
         Terminal_p->leftMouse = false;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
+static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
     tk_terminal_Terminal *Terminal_p, bool *update_p)
 {
     nh_core_Array *Array_p = NULL;
@@ -271,9 +271,9 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
                 continue;
             }
             if (Update_p->cursor) {
-                TTYR_TERMINAL_CHECK(tk_terminal_updateTile(
+                TK_TERMINAL_CHECK(tk_terminal_updateTile(
                     &Terminal_p->Grid, &Terminal_p->Graphics.State, Update_p, update_p, Terminal_p->Config.fontSize))
-            } else if (Update_p->Glyph.mark & TTYR_CORE_MARK_ELEVATED) {
+            } else if (Update_p->Glyph.mark & TK_CORE_MARK_ELEVATED) {
                 Terminal_p->ElevatedGrid.Updates_pp[Update_p->row][Update_p->col] = *Update_p;
                 Terminal_p->ElevatedGrid.updates_pp[Update_p->row][Update_p->col] = true;
             } else {
@@ -288,20 +288,20 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
     for (int row = 0; row < Terminal_p->Grid.rows; ++row) {
         for (int col = 0; col < Terminal_p->Grid.cols; ++col) {
             if (Terminal_p->Grid.updates_pp[row][col] == false) {continue;}
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(
                 &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Grid.Updates_pp[row][col],
                 update_p, Terminal_p->Config.fontSize))
             // update background grid tile if necessarry
             if (row == 0 && Terminal_p->Grid.Updates_pp[row][col].Glyph.codepoint == 'x') {
                 if (!Terminal_p->TTY_p->Config.Topbar.on) {continue;}
-                TTYR_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+                TK_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
             }
         }
     }
     for (int row = 0; row < Terminal_p->ElevatedGrid.rows; ++row) {
         for (int col = 0; col < Terminal_p->ElevatedGrid.cols; ++col) {
             if (Terminal_p->ElevatedGrid.updates_pp[row][col] == false) {continue;}
-            TTYR_TERMINAL_CHECK(tk_terminal_updateTile(
+            TK_TERMINAL_CHECK(tk_terminal_updateTile(
                 &Terminal_p->ElevatedGrid, &Terminal_p->Graphics.State, &Terminal_p->ElevatedGrid.Updates_pp[row][col],
                 update_p, Terminal_p->Config.fontSize))
         }
@@ -313,7 +313,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
 
         if (!Array_p) {break;}
 
-        TTYR_TERMINAL_CHECK(tk_terminal_updateBoxes(Terminal_p, Array_p, Terminal_p->Config.fontSize))
+        TK_TERMINAL_CHECK(tk_terminal_updateBoxes(Terminal_p, Array_p, Terminal_p->Config.fontSize))
 
     } while (Array_p);
 
@@ -323,25 +323,25 @@ static TTYR_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
 
         if (!Event_p) {break;}
 
-        TTYR_TERMINAL_CHECK(tk_terminal_handleEvent(Terminal_p, Event_p))
+        TK_TERMINAL_CHECK(tk_terminal_handleEvent(Terminal_p, Event_p))
 
     } while (Event_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 static NH_SIGNAL tk_terminal_runTerminal(
     void *args_p) 
 {
-    TTYR_TERMINAL_CHECK_NULL_2(NH_SIGNAL_ERROR, args_p)
+    TK_TERMINAL_CHECK_NULL_2(NH_SIGNAL_ERROR, args_p)
     tk_terminal_Terminal *Terminal_p = args_p;
 
     if (!Terminal_p->Graphics.State.Viewport_p) {return NH_SIGNAL_IDLE;}
 
     bool update = false;
 
-    TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateSizeIfRequired(Terminal_p, &update))
-    TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_handleInputIfRequired(Terminal_p, &update))
+    TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateSizeIfRequired(Terminal_p, &update))
+    TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_handleInputIfRequired(Terminal_p, &update))
     if (tk_terminal_updateBlinkOrGradient(&Terminal_p->Config, &Terminal_p->Graphics.State)) {
         update = true;
     }
@@ -351,10 +351,10 @@ static NH_SIGNAL tk_terminal_runTerminal(
     Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.b = Terminal_p->Graphics.State.AccentGradient.Color.b;
  
     if (update) {
-        TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateGraphics(
+        TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateGraphics(
             &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
             &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
-        TTYR_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_renderGraphics(&Terminal_p->Config, &Terminal_p->Graphics, 
+        TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_renderGraphics(&Terminal_p->Config, &Terminal_p->Graphics, 
             &Terminal_p->Grid, &Terminal_p->ElevatedGrid, &Terminal_p->BackdropGrid))
         return NH_SIGNAL_OK;
     }
@@ -365,9 +365,9 @@ static NH_SIGNAL tk_terminal_runTerminal(
 // COMMANDS ========================================================================================
 // The next functions are executed by tk_terminal_cmd_* functions.
 
-typedef enum TTYR_TERMINAL_COMMAND_E {
-    TTYR_TERMINAL_COMMAND_SET_VIEWPORT,
-} TTYR_TERMINAL_COMMAND_E;
+typedef enum TK_TERMINAL_COMMAND_E {
+    TK_TERMINAL_COMMAND_SET_VIEWPORT,
+} TK_TERMINAL_COMMAND_E;
 
 /**
  * Here, most commands that came in through the API are handled.
@@ -379,7 +379,7 @@ static NH_SIGNAL tk_terminal_runTerminalCommand(
 
     switch (Command_p->type)
     {
-        case TTYR_TERMINAL_COMMAND_SET_VIEWPORT :
+        case TK_TERMINAL_COMMAND_SET_VIEWPORT :
             if (nh_gfx_claimViewport(Command_p->p, NH_GFX_VIEWPORT_OWNER_TERMINAL, Terminal_p) != NH_API_SUCCESS) {
                 return NH_SIGNAL_ERROR;
             }
@@ -407,10 +407,10 @@ tk_terminal_Terminal *tk_terminal_openTerminal(
     return Terminal_p;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_cmd_setViewport(
+TK_TERMINAL_RESULT tk_terminal_cmd_setViewport(
     tk_terminal_Terminal *Terminal_p, nh_gfx_Viewport *Viewport_p)
 {
-    nh_core_executeWorkloadCommand(Terminal_p, TTYR_TERMINAL_COMMAND_SET_VIEWPORT, Viewport_p, 0);
+    nh_core_executeWorkloadCommand(Terminal_p, TK_TERMINAL_COMMAND_SET_VIEWPORT, Viewport_p, 0);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

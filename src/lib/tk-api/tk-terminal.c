@@ -28,7 +28,7 @@ static bool tk_api_add() {
         return false;
     }
     if (!added) {
-        Loader_p->addModule_f(name_p, TTYR_API_PATH_P, dependencies_pp, 1);
+        Loader_p->addModule_f(name_p, TK_API_PATH_P, dependencies_pp, 1);
         added = true;
     }
     return added;
@@ -44,12 +44,12 @@ tk_terminal_Terminal *tk_api_openTerminal(
     return openTerminal_f ? openTerminal_f(config_p, TTY_p) : NULL;
 }
 
-TTYR_TERMINAL_RESULT tk_api_setViewport(
+TK_TERMINAL_RESULT tk_api_setViewport(
     tk_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p)
 {
-    typedef TTYR_TERMINAL_RESULT (*tk_terminal_cmd_setViewport_f)(tk_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p); 
-    if (!tk_api_add()) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+    typedef TK_TERMINAL_RESULT (*tk_terminal_cmd_setViewport_f)(tk_terminal_Terminal *Terminal_p, nh_api_Viewport *Viewport_p); 
+    if (!tk_api_add()) {return TK_TERMINAL_ERROR_BAD_STATE;}
     nh_core_Loader *Loader_p = nh_api_getLoader();
     tk_terminal_cmd_setViewport_f setViewport_f = !Loader_p || !Terminal_p || !Viewport_p ? NULL : Loader_p->loadExternalSymbol_f(name_p, "tk_terminal_cmd_setViewport");
-    return setViewport_f ? setViewport_f(Terminal_p, Viewport_p) : TTYR_TERMINAL_ERROR_NULL_POINTER;
+    return setViewport_f ? setViewport_f(Terminal_p, Viewport_p) : TK_TERMINAL_ERROR_NULL_POINTER;
 }

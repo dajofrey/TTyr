@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_FILE_EDITOR_H
-#define TTYR_CORE_FILE_EDITOR_H
+#ifndef TK_CORE_FILE_EDITOR_H
+#define TK_CORE_FILE_EDITOR_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -47,7 +47,7 @@
     tk_core_FileEditor tk_core_initFileEditor(
     );
 
-    TTYR_CORE_RESULT tk_core_freeFileEditor(
+    TK_CORE_RESULT tk_core_freeFileEditor(
         tk_core_FileEditor *FileEditor_p
     );
 
@@ -55,19 +55,19 @@
         tk_core_Program *Program_p, tk_core_TreeListingNode *Node_p, bool readOnly
     );
 
-    TTYR_CORE_RESULT tk_core_closeFile(
+    TK_CORE_RESULT tk_core_closeFile(
         tk_core_FileEditor *Editor_p, tk_core_File *File_p
     );
 
-    TTYR_CORE_RESULT tk_core_cycleThroughFiles(
+    TK_CORE_RESULT tk_core_cycleThroughFiles(
         tk_core_Program *Program_p, NH_API_UTF32 c
     );
 
-    TTYR_CORE_RESULT tk_core_handleFileEditorInput(
+    TK_CORE_RESULT tk_core_handleFileEditorInput(
         tk_core_Program *Program_p, NH_API_UTF32 c
     );
 
-    TTYR_CORE_RESULT tk_core_drawFileEditorRow(
+    TK_CORE_RESULT tk_core_drawFileEditorRow(
         tk_core_Program *Program_p, tk_core_Glyph *Glyphs_p, int width, int height, int row
     );
 

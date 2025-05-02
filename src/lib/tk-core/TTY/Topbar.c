@@ -51,7 +51,7 @@ tk_core_Topbar tk_core_initTopbar()
     return Topbar;
 }
 
-TTYR_CORE_RESULT tk_core_freeTopbar(
+TK_CORE_RESULT tk_core_freeTopbar(
     tk_core_Topbar *Topbar_p)
 {
     for (int i = 0; i < Topbar_p->History.length; ++i) {
@@ -63,25 +63,25 @@ TTYR_CORE_RESULT tk_core_freeTopbar(
 
     *Topbar_p = tk_core_initTopbar(NULL);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_getTopbarCursor(
+TK_CORE_RESULT tk_core_getTopbarCursor(
     tk_core_Topbar *Topbar_p, int *x_p, int *y_p, bool topTile)
 {
     *x_p = Topbar_p->cursorX;
     *y_p = 1;
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // COMMAND =========================================================================================
 
-static TTYR_CORE_RESULT tk_core_appendToCommand(
+static TK_CORE_RESULT tk_core_appendToCommand(
     tk_core_Topbar *Topbar_p, NH_API_UTF32 *str_p, int length)
 {
     nh_encoding_appendUTF32(&Topbar_p->Command, str_p, length);
     Topbar_p->cursorX += length;
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 static void tk_core_clearCommand(
@@ -94,13 +94,13 @@ static void tk_core_clearCommand(
 
 // CONSOLE STATE ===================================================================================
 
-static TTYR_CORE_RESULT tk_core_resetTopbar(
+static TK_CORE_RESULT tk_core_resetTopbar(
     tk_core_Topbar *Topbar_p)
 {
     Topbar_p->state = -1;
     Topbar_p->hasFocus = false;
     tk_core_clearCommand(Topbar_p);
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 void tk_core_toggleTopbar(
@@ -147,7 +147,7 @@ void tk_core_toggleTopbar(
 //    return -1;
 //}
 //
-//static TTYR_CORE_RESULT tk_core_executeProgramSwitchCommand(
+//static TK_CORE_RESULT tk_core_executeProgramSwitchCommand(
 //    tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p)
 //{
 //    int program = Topbar_p->Command.length > 0 ?
@@ -156,10 +156,10 @@ void tk_core_toggleTopbar(
 //    if (program >= 0)
 //    {
 //        Window_p->current = program;
-//        TTYR_CHECK(tk_core_resetTopbar(Topbar_p))
+//        TK_CHECK(tk_core_resetTopbar(Topbar_p))
 //    }
 //
-//    return TTYR_CORE_SUCCESS;
+//    return TK_CORE_SUCCESS;
 //}
 
 // PROGRAM COMMAND ==================================================================================
@@ -184,7 +184,7 @@ static int tk_core_matchProgramCommands(
     return index;
 }
 
-static TTYR_CORE_RESULT tk_core_getArguments(
+static TK_CORE_RESULT tk_core_getArguments(
     tk_core_Topbar *Topbar_p, nh_core_List *Arguments_p)
 {
     *Arguments_p = nh_core_initList(8);
@@ -201,7 +201,7 @@ static TTYR_CORE_RESULT tk_core_getArguments(
         }
         if (!Argument_p && Topbar_p->Command.p[i] != ' ') {
             Argument_p = (nh_encoding_UTF32String*)nh_core_allocate(sizeof(nh_encoding_UTF32String));
-            TTYR_CHECK_MEM(Argument_p)
+            TK_CHECK_MEM(Argument_p)
             *Argument_p = nh_encoding_initUTF32(64);
         }
         if (Argument_p) {
@@ -211,10 +211,10 @@ static TTYR_CORE_RESULT tk_core_getArguments(
 
     if (Argument_p) {nh_core_appendToList(Arguments_p, Argument_p);}
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_executeProgramCommand(
+static TK_CORE_RESULT tk_core_executeProgramCommand(
     tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p)
 {
     tk_core_Program *Program_p = tk_core_getCurrentProgram(Window_p);
@@ -222,18 +222,18 @@ static TTYR_CORE_RESULT tk_core_executeProgramCommand(
     if (Program_p->Prototype_p->Callbacks.handleCommand_f != NULL) 
     {
         nh_core_List Arguments = nh_core_initList(8);
-        TTYR_CHECK(tk_core_getArguments(Topbar_p, &Arguments))
+        TK_CHECK(tk_core_getArguments(Topbar_p, &Arguments))
 
         Program_p->command = Topbar_p->Suggestions.commandIndex;
-        TTYR_CORE_RESULT result = Program_p->Prototype_p->Callbacks.handleCommand_f(Program_p);
+        TK_CORE_RESULT result = Program_p->Prototype_p->Callbacks.handleCommand_f(Program_p);
 
         switch (result)
         {
-            case TTYR_CORE_ERROR_UNKNOWN_COMMAND :
-                TTYR_CHECK(tk_core_setDefaultMessage(Topbar_p, TTYR_CORE_MESSAGE_MISC_UNKNOWN_COMMAND))
+            case TK_CORE_ERROR_UNKNOWN_COMMAND :
+                TK_CHECK(tk_core_setDefaultMessage(Topbar_p, TK_CORE_MESSAGE_MISC_UNKNOWN_COMMAND))
                 break;
-             case TTYR_CORE_ERROR_INVALID_ARGUMENT :
-                TTYR_CHECK(tk_core_setDefaultMessage(Topbar_p, TTYR_CORE_MESSAGE_MISC_INVALID_ARGUMENT))
+             case TK_CORE_ERROR_INVALID_ARGUMENT :
+                TK_CHECK(tk_core_setDefaultMessage(Topbar_p, TK_CORE_MESSAGE_MISC_INVALID_ARGUMENT))
                 break;
         }
 
@@ -243,39 +243,39 @@ static TTYR_CORE_RESULT tk_core_executeProgramCommand(
         nh_core_freeList(&Arguments, true);
     }
     else {
-        TTYR_CHECK(tk_core_setDefaultMessage(Topbar_p, TTYR_CORE_MESSAGE_MISC_UNKNOWN_COMMAND))
+        TK_CHECK(tk_core_setDefaultMessage(Topbar_p, TK_CORE_MESSAGE_MISC_UNKNOWN_COMMAND))
     }
 
-    TTYR_CHECK(tk_core_resetTopbar(Topbar_p))
+    TK_CHECK(tk_core_resetTopbar(Topbar_p))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // INPUT ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_handleTopbarMouseInput(
+TK_CORE_RESULT tk_core_handleTopbarMouseInput(
     tk_core_Tile *Tile_p, nh_api_MouseEvent Event)
 {
     if (Event.trigger == NH_API_TRIGGER_PRESS && Event.Position.x-1 < 9 && Event.Position.x > 0) {
         ((tk_core_MacroTile*)Tile_p->p)->current = Event.Position.x-1;
     }
-//    if (Event.trigger == NH_API_TRIGGER_PRESS && Event.Position.x == TTYR_CORE_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
-//        TTYR_CORE_MICRO_TAB(TTYR_CORE_MACRO_TAB(Tile_p))->Tile_p->close = true;
+//    if (Event.trigger == NH_API_TRIGGER_PRESS && Event.Position.x == TK_CORE_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
+//        TK_CORE_MICRO_TAB(TK_CORE_MACRO_TAB(Tile_p))->Tile_p->close = true;
 //    }
-//    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x == TTYR_CORE_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
-//        TTYR_CORE_MACRO_TAB(Tile_p)->Topbar.quitHover = true;
+//    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x == TK_CORE_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
+//        TK_CORE_MACRO_TAB(Tile_p)->Topbar.quitHover = true;
 //    }
-//    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x != TTYR_CORE_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
-//        TTYR_CORE_MACRO_TAB(Tile_p)->Topbar.quitHover = false;
+//    if (Event.trigger == NH_API_TRIGGER_MOVE && Event.Position.x != TK_CORE_MACRO_TAB(Tile_p)->Topbar.quitPosition) {
+//        TK_CORE_MACRO_TAB(Tile_p)->Topbar.quitHover = false;
 //    }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_handleTopbarKeyboardInput(
+TK_CORE_RESULT tk_core_handleTopbarKeyboardInput(
     tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p, nh_api_KeyboardEvent Event)
 {
-    if (Event.trigger != NH_API_TRIGGER_PRESS) {return TTYR_CORE_SUCCESS;}
+    if (Event.trigger != NH_API_TRIGGER_PRESS) {return TK_CORE_SUCCESS;}
 
     NH_API_UTF32 c = Event.codepoint;
 
@@ -287,7 +287,7 @@ TTYR_CORE_RESULT tk_core_handleTopbarKeyboardInput(
                 return tk_core_executeProgramCommand(Topbar_p, Window_p);
             }
             else {
-//                TTYR_CHECK(tk_core_executeProgramSwitchCommand(Topbar_p, Window_p))
+//                TK_CHECK(tk_core_executeProgramSwitchCommand(Topbar_p, Window_p))
             }
 
         case '\x1b':
@@ -299,15 +299,15 @@ TTYR_CORE_RESULT tk_core_handleTopbarKeyboardInput(
                 nh_encoding_removeUTF32Tail(&Topbar_p->Command, 1);
                 Topbar_p->cursorX -= 1;
             }
-            return TTYR_CORE_SUCCESS;
+            return TK_CORE_SUCCESS;
     }
     
-    TTYR_CHECK(tk_core_appendToCommand(Topbar_p, &c, 1))
+    TK_CHECK(tk_core_appendToCommand(Topbar_p, &c, 1))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_handleTopbarInput(
+TK_CORE_RESULT tk_core_handleTopbarInput(
     tk_core_Tile *Tile_p, nh_api_WSIEvent Event)
 {
     tk_core_MacroTile *MacroTile_p = Tile_p->p;
@@ -322,7 +322,7 @@ TTYR_CORE_RESULT tk_core_handleTopbarInput(
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // DRAW ============================================================================================
@@ -334,8 +334,8 @@ static tk_core_Glyph tk_core_getGlyphHelper(
     memset(&Glyph, 0, sizeof(tk_core_Glyph));
     Glyph.Attributes.reverse = true;
     Glyph.codepoint = codepoint;
-    Glyph.mark |= TTYR_CORE_MARK_LINE_HORIZONTAL;
-    Glyph.mark |= TTYR_CORE_MARK_ACCENT;
+    Glyph.mark |= TK_CORE_MARK_LINE_HORIZONTAL;
+    Glyph.mark |= TK_CORE_MARK_ACCENT;
     return Glyph;
 }
 
@@ -354,7 +354,7 @@ static int tk_core_drawTopbarCommand(
     *cols_p = *cols_p - length;
     *Glyphs_pp = (*Glyphs_pp) + length;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 //static void tk_core_setNextCommandSuggestionIndex(
@@ -385,7 +385,7 @@ static int tk_core_drawTopbarCommand(
 //    Topbar_p->Suggestions.programIndex++;
 //}
 //
-//static TTYR_CORE_RESULT tk_core_drawTopbarCommandSuggestion(
+//static TK_CORE_RESULT tk_core_drawTopbarCommandSuggestion(
 //    tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p, tk_core_Glyph *Glyphs_p, int cols)
 //{
 //    tk_core_Program *Program_p = tk_core_getCurrentProgram(Window_p);
@@ -398,7 +398,7 @@ static int tk_core_drawTopbarCommand(
 //        Glyphs_p[5] = tk_core_getGlyphHelper('o');
 //        Glyphs_p[6] = tk_core_getGlyphHelper('n');
 //        Glyphs_p[7] = tk_core_getGlyphHelper('e');
-//        return TTYR_CORE_SUCCESS;
+//        return TK_CORE_SUCCESS;
 //    }
 //
 //    Glyphs_p += 4;
@@ -410,10 +410,10 @@ static int tk_core_drawTopbarCommand(
 //            Program_p->Prototype_p->CommandNames_p[Topbar_p->Suggestions.commandIndex].p[i]);
 //    }
 //
-//    return TTYR_CORE_SUCCESS;
+//    return TK_CORE_SUCCESS;
 //}
 //
-//static TTYR_CORE_RESULT tk_core_drawTopbarProgramSuggestion(
+//static TK_CORE_RESULT tk_core_drawTopbarProgramSuggestion(
 //    tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p, tk_core_Glyph *Glyphs_p, int cols)
 //{
 //    Glyphs_p[2] = tk_core_getGlyphHelper(':');
@@ -424,12 +424,12 @@ static int tk_core_drawTopbarCommand(
 //        Glyphs_p[5] = tk_core_getGlyphHelper('o');
 //        Glyphs_p[6] = tk_core_getGlyphHelper('n');
 //        Glyphs_p[7] = tk_core_getGlyphHelper('e');
-//        return TTYR_CORE_SUCCESS;
+//        return TK_CORE_SUCCESS;
 //    }
 //
 //    tk_core_Interface *Prototype_p = 
 //        ((tk_core_MicroTab*)Window_p->Tabs_p->pp[Topbar_p->Suggestions.programIndex])->Prototype_p;
-//    TTYR_CHECK_NULL(Prototype_p)
+//    TK_CHECK_NULL(Prototype_p)
 //
 //    Glyphs_p += 4;
 //    cols -= 4;
@@ -438,10 +438,10 @@ static int tk_core_drawTopbarCommand(
 //        Glyphs_p[i] = tk_core_getGlyphHelper(Prototype_p->Name.p[i]);
 //    }
 //
-//    return TTYR_CORE_SUCCESS;
+//    return TK_CORE_SUCCESS;
 //}
 //
-//static TTYR_CORE_RESULT tk_core_setSuggestionIndex(
+//static TK_CORE_RESULT tk_core_setSuggestionIndex(
 //    tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p, bool command)
 //{
 //    tk_core_Interface *Prototype_p = tk_core_getCurrentProgram(Window_p)->Prototype_p;
@@ -472,7 +472,7 @@ static int tk_core_drawTopbarCommand(
 //        else {
 //            Prototype_p = 
 //                ((tk_core_MicroTab*)Window_p->Tabs_p->pp[Topbar_p->Suggestions.programIndex])->Prototype_p;
-//            TTYR_CHECK_NULL(Prototype_p)
+//            TK_CHECK_NULL(Prototype_p)
 //        }
 //        if (match && Topbar_p->Command.length != Prototype_p->Name.length) {
 //            match = false;
@@ -486,7 +486,7 @@ static int tk_core_drawTopbarCommand(
 //
 //    // If perfect match, we don't need a new index.
 //    if (match) {
-//        return TTYR_CORE_SUCCESS;
+//        return TK_CORE_SUCCESS;
 //    }
 //
 //    // Find semi match or none.
@@ -525,7 +525,7 @@ static int tk_core_drawTopbarCommand(
 //        } else {
 //            Prototype_p = 
 //                ((tk_core_MicroTab*)Window_p->Tabs_p->pp[Topbar_p->Suggestions.programIndex])->Prototype_p;
-//            TTYR_CHECK_NULL(Prototype_p)
+//            TK_CHECK_NULL(Prototype_p)
 //            for (int i = 0; i < Topbar_p->Command.length && i < Prototype_p->Name.length; ++i) {
 //                if (Topbar_p->Command.p[i] != Prototype_p->Name.p[i]) {
 //                    match = false;
@@ -539,10 +539,10 @@ static int tk_core_drawTopbarCommand(
 //        }
 //    }
 //
-//    return TTYR_CORE_SUCCESS;
+//    return TK_CORE_SUCCESS;
 //}
 //
-//static TTYR_CORE_RESULT tk_core_drawTopbarSuggestion(
+//static TK_CORE_RESULT tk_core_drawTopbarSuggestion(
 //    tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p, tk_core_Glyph *Glyphs_p, int cols)
 //{
 //    if (Topbar_p->Suggestions.update) {
@@ -561,17 +561,17 @@ static int tk_core_drawTopbarCommand(
 //	return tk_core_drawTopbarProgramSuggestion(Topbar_p, Window_p, Glyphs_p, cols);
 //    }
 //
-//    return TTYR_CORE_ERROR_BAD_STATE;
+//    return TK_CORE_ERROR_BAD_STATE;
 //}
 
-static TTYR_CORE_RESULT tk_core_drawTopbarMessage(
+static TK_CORE_RESULT tk_core_drawTopbarMessage(
     tk_core_Config *Config_p, tk_core_Topbar *Topbar_p, tk_core_MicroWindow *Window_p, tk_core_Glyph *Glyphs_p, int cols)
 {
     if (Config_p->Topbar.on && Topbar_p->Message.Text.length == 0) {
         tk_core_Program *Program_p = tk_core_getCurrentProgram(Window_p);
-        if (!Program_p || !Program_p->Prototype_p) {return TTYR_CORE_SUCCESS;}
+        if (!Program_p || !Program_p->Prototype_p) {return TK_CORE_SUCCESS;}
         if (Program_p->Prototype_p->Callbacks.drawTopbar_f) {
-            TTYR_CHECK(Program_p->Prototype_p->Callbacks.drawTopbar_f(Program_p, Glyphs_p, cols))
+            TK_CHECK(Program_p->Prototype_p->Callbacks.drawTopbar_f(Program_p, Glyphs_p, cols))
         } else {
             for (int i = 0; i < cols && Program_p->Prototype_p->name_p[i] != 0; ++i) {
                 Glyphs_p[i] = tk_core_getGlyphHelper(Program_p->Prototype_p->name_p[i]);
@@ -583,14 +583,14 @@ static TTYR_CORE_RESULT tk_core_drawTopbarMessage(
         }
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_drawTopbarText(
+static TK_CORE_RESULT tk_core_drawTopbarText(
     tk_core_Config *Config_p, tk_core_Tile *Tile_p, tk_core_Glyph *Glyphs_p, int cols)
 {
-    tk_core_Topbar *Topbar_p = &TTYR_CORE_MACRO_TAB(Tile_p)->Topbar;
-    tk_core_MicroWindow *MicroWindow_p = &TTYR_CORE_MACRO_TAB(Tile_p)->MicroWindow;
+    tk_core_Topbar *Topbar_p = &TK_CORE_MACRO_TAB(Tile_p)->Topbar;
+    tk_core_MicroWindow *MicroWindow_p = &TK_CORE_MACRO_TAB(Tile_p)->MicroWindow;
 
     if (!Topbar_p->hasFocus) 
     {
@@ -600,20 +600,20 @@ static TTYR_CORE_RESULT tk_core_drawTopbarText(
         NH_API_UTF32 t2_p[15] = {' ', '(', 'M', 'A', 'C', 'R', 'O', ' ', 'T', 'I', 'L', 'I', 'N', 'G', ')'};
 
         tk_core_MacroWindow *MacroWindow_p = TTY_p->Window_p;
-        if (MacroWindow_p->Tiling.stage == TTYR_CORE_TILING_STAGE_DONE) {
+        if (MacroWindow_p->Tiling.stage == TK_CORE_TILING_STAGE_DONE) {
             tk_core_clearMessage(Topbar_p);
         }
 
-        TTYR_CHECK(tk_core_drawTopbarMessage(Config_p, Topbar_p, MicroWindow_p, Glyphs_p, cols))
+        TK_CHECK(tk_core_drawTopbarMessage(Config_p, Topbar_p, MicroWindow_p, Glyphs_p, cols))
 
         if (Config_p->Topbar.on) {
-            tk_core_Topbar *TopbarCompare_p = &TTYR_CORE_MACRO_TAB(MacroWindow_p->Tile_p)->Topbar;
-            if (MacroWindow_p->Tiling.stage != TTYR_CORE_TILING_STAGE_DONE && TopbarCompare_p == Topbar_p) {
-//                if (MacroWindow_p->Tiling.mode == TTYR_CORE_TILING_MODE_MICRO) {
+            tk_core_Topbar *TopbarCompare_p = &TK_CORE_MACRO_TAB(MacroWindow_p->Tile_p)->Topbar;
+            if (MacroWindow_p->Tiling.stage != TK_CORE_TILING_STAGE_DONE && TopbarCompare_p == Topbar_p) {
+//                if (MacroWindow_p->Tiling.mode == TK_CORE_TILING_MODE_MICRO) {
 //                    for (int i = cols-15, j = 0; j < 15; ++i, ++j) {
 //                        Glyphs_p[i].codepoint = t1_p[j];
 //                    }
-//                } else if (MacroWindow_p->Tiling.mode == TTYR_CORE_TILING_MODE_MACRO) {
+//                } else if (MacroWindow_p->Tiling.mode == TK_CORE_TILING_MODE_MACRO) {
 //                    for (int i = cols-15, j = 0; j < 15; ++i, ++j) {
 //                        Glyphs_p[i].codepoint = t2_p[j];
 //                    }
@@ -623,18 +623,18 @@ static TTYR_CORE_RESULT tk_core_drawTopbarText(
 //                    Glyphs_p[i+1].codepoint = 0x25a1;
 //                }
 //                Topbar_p->quitPosition = cols-2;
-//                Glyphs_p[TTYR_CORE_MACRO_TILE(Tile_p)->current+1].codepoint = 0x25a0;
+//                Glyphs_p[TK_CORE_MACRO_TILE(Tile_p)->current+1].codepoint = 0x25a0;
 //                Glyphs_p[Topbar_p->quitPosition].codepoint = Topbar_p->quitHover ? 0x25cf : 0x25cb;
             }
         }
-        return TTYR_CORE_SUCCESS;
+        return TK_CORE_SUCCESS;
     }
 
 //    if (Topbar_p->Command.length > 0) {
-//        TTYR_CHECK(tk_core_drawTopbarCommand(Topbar_p, &Glyphs_p, &cols))
+//        TK_CHECK(tk_core_drawTopbarCommand(Topbar_p, &Glyphs_p, &cols))
 //    }
 //
-//    TTYR_CHECK(tk_core_drawTopbarSuggestion(Topbar_p, MicroWindow_p, Glyphs_p, cols))
+//    TK_CHECK(tk_core_drawTopbarSuggestion(Topbar_p, MicroWindow_p, Glyphs_p, cols))
 //
 //    NH_API_UTF32 cmd_p[14]  = {' ', '(', 'E', 'X', 'E', 'C', 'U', 'T', 'E', ' ', 'C', 'M', 'D', ')'};
 //    NH_API_UTF32 prog_p[14] = {' ', '(', 'S', 'W', 'I', 'T', 'C', 'H', ' ', 'P', 'R', 'O', 'G', ')'};
@@ -650,10 +650,10 @@ static TTYR_CORE_RESULT tk_core_drawTopbarText(
 //        }
 //    }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_drawTopbarRow(
+TK_CORE_RESULT tk_core_drawTopbarRow(
     tk_core_Tile *Tile_p, tk_core_Glyph *Glyphs_p, int cols, int row, bool standardIO)
 {
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -663,19 +663,19 @@ TTYR_CORE_RESULT tk_core_drawTopbarRow(
         if (!Tile_p && !standardIO) {
             Glyphs_p[i].codepoint = 'q';
             Glyphs_p[i].Attributes.reverse = false;
-            Glyphs_p[i].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+            Glyphs_p[i].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         }
     }
 
     if (Tile_p) {
-        TTYR_CHECK(tk_core_drawTopbarText(&TTY_p->Config, Tile_p, Glyphs_p, cols))
+        TK_CHECK(tk_core_drawTopbarText(&TTY_p->Config, Tile_p, Glyphs_p, cols))
     }
 
     for (int i = 0; i < cols && !(TTY_p->Config.Topbar.on); ++i) {
         if (Glyphs_p[i].codepoint == ' ' || Glyphs_p[i].codepoint == 0) {
             Glyphs_p[i] = tk_core_getGlyphHelper('q');
             Glyphs_p[i].Attributes.reverse = false;
-            Glyphs_p[i].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+            Glyphs_p[i].mark |= TK_CORE_MARK_LINE_GRAPHICS;
         }
     }
 
@@ -683,19 +683,19 @@ TTYR_CORE_RESULT tk_core_drawTopbarRow(
 //        for (int i = 1, j = 1; i <= tk_core_getConfig().tabs; ++i, j+=2) {
 //            Glyphs_p[cols-(i+j)].codepoint = 'p';
 //            Glyphs_p[cols-(i+j+1)].codepoint = 'p';
-//            if (tk_core_getConfig().tabs - TTYR_CORE_MACRO_TILE(Tile_p)->current == i) {
+//            if (tk_core_getConfig().tabs - TK_CORE_MACRO_TILE(Tile_p)->current == i) {
 //                Glyphs_p[cols-(i+j)].codepoint = 'z';
 //                Glyphs_p[cols-(i+j+1)].codepoint = 'z';
 //            }
 //        }
 //    }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // UPDATE ==========================================================================================
 
-TTYR_CORE_RESULT tk_core_updateTopbar(
+TK_CORE_RESULT tk_core_updateTopbar(
     tk_core_Topbar *Topbar_p)
 {
     nh_core_SystemTime Now = nh_core_getSystemTime();
@@ -708,5 +708,5 @@ TTYR_CORE_RESULT tk_core_updateTopbar(
         Topbar_p->refresh = true;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

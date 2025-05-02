@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_FILE_H
-#define TTYR_CORE_FILE_H
+#ifndef TK_CORE_FILE_H
+#define TK_CORE_FILE_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -26,11 +26,11 @@ typedef struct tk_core_FileEditorView tk_core_FileEditorView;
  *  @{
  */
 
-    typedef enum TTYR_CORE_FILE {
-        TTYR_CORE_FILE_UNDEFINED,
-        TTYR_CORE_FILE_TEXT,
-        TTYR_CORE_FILE_CHANGES,
-    } TTYR_CORE_FILE;
+    typedef enum TK_CORE_FILE {
+        TK_CORE_FILE_UNDEFINED,
+        TK_CORE_FILE_TEXT,
+        TK_CORE_FILE_CHANGES,
+    } TK_CORE_FILE;
 
 /** @} */
 
@@ -41,7 +41,7 @@ typedef struct tk_core_FileEditorView tk_core_FileEditorView;
 
     typedef struct tk_core_File {
         tk_core_TreeListingNode *Node_p;
-        TTYR_CORE_FILE type;
+        TK_CORE_FILE type;
         void *handle_p;
         bool readOnly;
     } tk_core_File;
@@ -70,11 +70,11 @@ typedef struct tk_core_FileEditorView tk_core_FileEditorView;
         tk_core_File *File_p
     );
     
-    TTYR_CORE_RESULT tk_core_createFileViews(
+    TK_CORE_RESULT tk_core_createFileViews(
         tk_core_FileEditorView *View_p, tk_core_File *File_p
     );
     
-    TTYR_CORE_RESULT tk_core_destroyFileViews(
+    TK_CORE_RESULT tk_core_destroyFileViews(
         tk_core_FileEditorView *View_p, tk_core_File *File_p
     );
     
@@ -86,36 +86,36 @@ typedef struct tk_core_FileEditorView tk_core_FileEditorView;
         tk_core_Program *Program_p, tk_core_File *File_p
     );
     
-    TTYR_CORE_RESULT tk_core_updateFileViews(
+    TK_CORE_RESULT tk_core_updateFileViews(
         tk_core_EditorView *View_p
     );
     
-    TTYR_CORE_FILE tk_core_getFileType(
+    TK_CORE_FILE tk_core_getFileType(
         nh_encoding_UTF32String *Path_p
     );
 
-    TTYR_CORE_RESULT tk_core_renderFile(
+    TK_CORE_RESULT tk_core_renderFile(
         tk_core_File *File_p
     );
     
-    TTYR_CORE_RESULT tk_core_writeFile(
+    TK_CORE_RESULT tk_core_writeFile(
         tk_core_File *File_p
     );
     
-    TTYR_CORE_RESULT tk_core_clearFileSearch(
+    TK_CORE_RESULT tk_core_clearFileSearch(
         tk_core_File *File_p
     );
     
-    TTYR_CORE_RESULT tk_core_searchFile(
+    TK_CORE_RESULT tk_core_searchFile(
         tk_core_File *File_p, NH_API_UTF32 *str_p, int length
     );
     
-    TTYR_CORE_RESULT tk_core_handleFileInput(
+    TK_CORE_RESULT tk_core_handleFileInput(
         tk_core_Program *Program_p, tk_core_File *File_p, NH_API_UTF32 c, bool insertMode, 
         bool *refresh_p
     );
 
-    TTYR_CORE_RESULT tk_core_drawFileRow(
+    TK_CORE_RESULT tk_core_drawFileRow(
         tk_core_Program *Program_p, tk_core_File *File_p, tk_core_FileView *View_p, tk_core_Glyph *Glyphs_p,
         int row
     );

@@ -17,8 +17,8 @@
 
 // DEBUG ===========================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_terminate()
+TK_TERMINAL_RESULT tk_terminal_terminate()
 {
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 

@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_MENU_H
-#define TTYR_CORE_MENU_H
+#ifndef TK_CORE_MENU_H
+#define TK_CORE_MENU_H
 
 /**
  * TTýr - Terminal Emulator
@@ -17,11 +17,11 @@ typedef struct tk_core_Menu {
     int width, height;
 } tk_core_Menu;
 
-TTYR_CORE_RESULT tk_core_drawPrompt(
+TK_CORE_RESULT tk_core_drawPrompt(
     tk_core_Row *Grid_p
 );
 
-TTYR_CORE_RESULT tk_core_drawMicroWindowMenu(
+TK_CORE_RESULT tk_core_drawMicroWindowMenu(
     tk_core_Row *Grid_p
 );
 

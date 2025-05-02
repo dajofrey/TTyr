@@ -32,7 +32,7 @@
 
 // HELPER ==========================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_getInternalMonospaceFonts(
+static TK_TERMINAL_RESULT tk_terminal_getInternalMonospaceFonts(
     nh_core_List *Fonts_p)
 {
     nh_gfx_FontStyle Style;
@@ -42,11 +42,11 @@ static TTYR_TERMINAL_RESULT tk_terminal_getInternalMonospaceFonts(
     Family.generic_p[NH_GFX_GENERIC_FONT_FAMILY_MONOSPACE] = true;
 
     *Fonts_p = nh_gfx_getFonts(Family, Style, true);
-    if (Fonts_p->size <= 0) {return TTYR_TERMINAL_ERROR_BAD_STATE;}
+    if (Fonts_p->size <= 0) {return TK_TERMINAL_ERROR_BAD_STATE;}
 
     nh_gfx_freeFontStyle(&Style);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 static tk_terminal_GraphicsAction tk_terminal_initGraphicsAction()
@@ -59,7 +59,7 @@ static tk_terminal_GraphicsAction tk_terminal_initGraphicsAction()
 
 // INIT/FREE =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_initGraphicsData(
+static TK_TERMINAL_RESULT tk_terminal_initGraphicsData(
     tk_terminal_GraphicsData *Data_p)
 {
     Data_p->Foreground.Action = tk_terminal_initGraphicsAction();
@@ -82,15 +82,15 @@ static TTYR_TERMINAL_RESULT tk_terminal_initGraphicsData(
 
     tk_terminal_initOpenGLBackground(&Data_p->Background.OpenGL);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_initGraphicsState(
+static TK_TERMINAL_RESULT tk_terminal_initGraphicsState(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p)
 {
     memset(State_p, 0, sizeof(tk_terminal_GraphicsState));
 
-    TTYR_TERMINAL_CHECK(tk_terminal_getInternalMonospaceFonts(&State_p->Fonts))
+    TK_TERMINAL_CHECK(tk_terminal_getInternalMonospaceFonts(&State_p->Fonts))
 
     State_p->Map = nh_core_createHashMap();
     State_p->Glyphs = nh_core_initList(128);
@@ -105,18 +105,18 @@ static TTYR_TERMINAL_RESULT tk_terminal_initGraphicsState(
 
     State_p->Blink.LastBlink = nh_core_getSystemTime();
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_initGraphics(
+TK_TERMINAL_RESULT tk_terminal_initGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p)
 {
     memset(Graphics_p, 0, sizeof(tk_terminal_Graphics));
 
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsState(Config_p, &Graphics_p->State))
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->MainData))
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->ElevatedData))
-    TTYR_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->BackdropData))
+    TK_TERMINAL_CHECK(tk_terminal_initGraphicsState(Config_p, &Graphics_p->State))
+    TK_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->MainData))
+    TK_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->ElevatedData))
+    TK_TERMINAL_CHECK(tk_terminal_initGraphicsData(&Graphics_p->BackdropData))
  
     Graphics_p->Dim.Action = tk_terminal_initGraphicsAction();
     Graphics_p->Dim.Vertices = nh_core_initArray(sizeof(float), 255);
@@ -128,10 +128,10 @@ TTYR_TERMINAL_RESULT tk_terminal_initGraphics(
 
     tk_terminal_initOpenGLBoxes(&Graphics_p->Boxes.OpenGL);
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_freeGraphicsData(
+static TK_TERMINAL_RESULT tk_terminal_freeGraphicsData(
     tk_terminal_GraphicsData *Data_p)
 {
     nh_core_freeArray(&Data_p->Foreground.Vertices);
@@ -152,15 +152,15 @@ static TTYR_TERMINAL_RESULT tk_terminal_freeGraphicsData(
  
     tk_terminal_freeOpenGLBackground(&Data_p->Background.OpenGL);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_freeGraphics(
+TK_TERMINAL_RESULT tk_terminal_freeGraphics(
     tk_terminal_Graphics *Graphics_p)
 {
-    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->MainData))
-    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->ElevatedData))
-    TTYR_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->BackdropData))
+    TK_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->MainData))
+    TK_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->ElevatedData))
+    TK_TERMINAL_CHECK(tk_terminal_freeGraphicsData(&Graphics_p->BackdropData))
 
     nh_core_freeArray(&Graphics_p->Dim.Vertices);
     nh_core_freeArray(&Graphics_p->Dim.Colors);
@@ -174,7 +174,7 @@ TTYR_TERMINAL_RESULT tk_terminal_freeGraphics(
 
     nh_core_freeHashMap(Graphics_p->State.Map);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 // RANGES ==========================================================================================
@@ -187,7 +187,7 @@ static int tk_terminal_getCurrentAttributeRangeForLineGraphics(
     for (int row = *row_p; row < Grid_p->rows; ++row) {
         for (int col = *col_p; col < Grid_p->cols; ++col) {
             tk_core_Glyph Glyph = ((tk_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
-            if (!(Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS)) {
+            if (!(Glyph.mark & TK_CORE_MARK_LINE_GRAPHICS)) {
                 continue;
             }
             if (tk_terminal_compareForegroundAttributes(Current_p, &Glyph)) {
@@ -216,7 +216,7 @@ static int tk_terminal_getCurrentAttributeRange(
     for (int row = *row_p; row < Grid_p->rows; ++row) {
         for (int col = *col_p; col < Grid_p->cols; ++col) {
             tk_core_Glyph Glyph = ((tk_terminal_Tile*)((nh_core_List*)Grid_p->Rows.pp[row])->pp[col])->Glyph;
-            if (foreground && (!Glyph.codepoint || Glyph.codepoint == ' ' || Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS)) {
+            if (foreground && (!Glyph.codepoint || Glyph.codepoint == ' ' || Glyph.mark & TK_CORE_MARK_LINE_GRAPHICS)) {
                 continue;
             }
             if (!foreground && (!Glyph.Background.custom && !Glyph.Attributes.reverse && !Glyph.Attributes.blink)) {
@@ -243,14 +243,14 @@ static int tk_terminal_getCurrentAttributeRange(
     return total;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_computeRangeForLineGraphics(
+static TK_TERMINAL_RESULT tk_terminal_computeRangeForLineGraphics(
     tk_terminal_GraphicsData *Data_p, tk_terminal_Grid *Grid_p)
 {
     nh_core_freeArray(&Data_p->Foreground.Ranges2);
     Data_p->Foreground.Ranges2 = nh_core_initArray(sizeof(tk_terminal_AttributeRange), 64);
 
     if (Grid_p->rows <= 0 || Grid_p->Rows.size == 0) {
-        return TTYR_TERMINAL_SUCCESS;
+        return TK_TERMINAL_SUCCESS;
     }
 
     int total = 0;
@@ -276,10 +276,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_computeRangeForLineGraphics(
         Glyph = NextGlyph;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_computeRange(
+static TK_TERMINAL_RESULT tk_terminal_computeRange(
     tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p, tk_terminal_Grid *Grid_p, 
     bool foreground)
 {
@@ -292,7 +292,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_computeRange(
     }
 
     if (Grid_p->rows <= 0 || Grid_p->Rows.size == 0) {
-        return TTYR_TERMINAL_SUCCESS;
+        return TK_TERMINAL_SUCCESS;
     }
 
     int total = 0;
@@ -320,12 +320,12 @@ static TTYR_TERMINAL_RESULT tk_terminal_computeRange(
         Glyph = NextGlyph;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 // UPDATE ==========================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateForegroundData(
+static TK_TERMINAL_RESULT tk_terminal_updateForegroundData(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p,
     tk_terminal_GraphicsForeground *Foreground_p, int shift)
 {
@@ -353,7 +353,7 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateForegroundData(
             tk_terminal_Tile *Tile_p = Row_p->pp[j];
             if (!Tile_p || !Tile_p->Glyph.codepoint || Tile_p->Glyph.codepoint == ' ') {continue;}
 
-            if (Tile_p->Glyph.mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
+            if (Tile_p->Glyph.mark & TK_CORE_MARK_LINE_GRAPHICS) {
                 nh_core_appendToArray(&Vertices2, Tile_p->Foreground.vertices_p, 24);
                 uint32_t indices_p[12] = {
                     offset1, offset1 + 1, offset1 + 2, offset1, offset1 + 2, offset1 + 3,
@@ -393,10 +393,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateForegroundData(
     Foreground_p->Colors = Colors;
     Foreground_p->Colors2 = Colors2;
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateBackgroundData(
+static TK_TERMINAL_RESULT tk_terminal_updateBackgroundData(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p,
     tk_terminal_GraphicsBackground *Background_p, int shift)
 {
@@ -431,10 +431,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBackgroundData(
         }
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateBoxesData(
+static TK_TERMINAL_RESULT tk_terminal_updateBoxesData(
     tk_terminal_Graphics *Graphics_p, tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p)
 {
     nh_core_freeArray(&Graphics_p->Boxes.Vertices);
@@ -451,10 +451,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBoxesData(
         // add color data
         tk_terminal_Tile *Tile_p = tk_terminal_getTile(Grid_p, Box_p->UpperLeft.y, Box_p->UpperLeft.x);
         Tile_p->Glyph.Attributes.reverse = true;
-        Tile_p->Glyph.mark |= TTYR_CORE_MARK_ACCENT;
+        Tile_p->Glyph.mark |= TK_CORE_MARK_ACCENT;
         tk_core_Color Color = tk_terminal_getGlyphColor(Config_p, &Graphics_p->State, &Tile_p->Glyph, false, Box_p->UpperLeft.x+2, Box_p->UpperLeft.y+1, Grid_p);
         Tile_p->Glyph.Attributes.reverse = false;
-        Tile_p->Glyph.mark &= TTYR_CORE_MARK_ACCENT;
+        Tile_p->Glyph.mark &= TK_CORE_MARK_ACCENT;
         for (int v = 0; v < 12; ++v) {
             nh_core_appendToArray(&Graphics_p->Boxes.Colors, &Color.r, 1);
             nh_core_appendToArray(&Graphics_p->Boxes.Colors, &Color.g, 1);
@@ -462,10 +462,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateBoxesData(
         }
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateDimData(
+static TK_TERMINAL_RESULT tk_terminal_updateDimData(
     tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_terminal_Dim *Dim_p)
 {
     nh_core_freeArray(&Dim_p->Vertices);
@@ -507,40 +507,40 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateDimData(
     Dim_p->Vertices = Vertices;
     Dim_p->Colors = Colors;
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateGridGraphics(
+static TK_TERMINAL_RESULT tk_terminal_updateGridGraphics(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p,
     tk_terminal_Grid *Grid_p, int offset)
 {
-    TTYR_TERMINAL_CHECK(tk_terminal_updateForegroundData(Config_p, State_p, Grid_p, &Data_p->Foreground, offset))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateBackgroundData(Config_p, State_p, Grid_p, &Data_p->Background, offset))
+    TK_TERMINAL_CHECK(tk_terminal_updateForegroundData(Config_p, State_p, Grid_p, &Data_p->Foreground, offset))
+    TK_TERMINAL_CHECK(tk_terminal_updateBackgroundData(Config_p, State_p, Grid_p, &Data_p->Background, offset))
 
-    TTYR_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, true))
-    TTYR_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, false))
-    TTYR_TERMINAL_CHECK(tk_terminal_computeRangeForLineGraphics(Data_p, Grid_p))
+    TK_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, true))
+    TK_TERMINAL_CHECK(tk_terminal_computeRange(State_p, Data_p, Grid_p, false))
+    TK_TERMINAL_CHECK(tk_terminal_computeRangeForLineGraphics(Data_p, Grid_p))
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateGraphics(
+TK_TERMINAL_RESULT tk_terminal_updateGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
     tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn)
 {
     int shift = titlebarOn ? 1 : 3;
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
+    TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->MainData, Grid_p, shift))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
+    TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->ElevatedData, ElevatedGrid_p, shift))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
+    TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateDimData(&Graphics_p->State, Grid_p, &Graphics_p->Dim))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateBoxesData(Graphics_p, Config_p, Grid_p))
+    TK_TERMINAL_CHECK(tk_terminal_updateDimData(&Graphics_p->State, Grid_p, &Graphics_p->Dim))
+    TK_TERMINAL_CHECK(tk_terminal_updateBoxesData(Graphics_p, Config_p, Grid_p))
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
  
 bool tk_terminal_updateBlinkOrGradient(
@@ -585,7 +585,7 @@ bool tk_terminal_updateBlinkOrGradient(
 
 // VIEWPORT ========================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_handleViewportChange(
+TK_TERMINAL_RESULT tk_terminal_handleViewportChange(
     tk_terminal_Graphics *Graphics_p, nh_gfx_Viewport *Viewport_p)
 {
     // Check if it's the initial call.
@@ -600,7 +600,7 @@ TTYR_TERMINAL_RESULT tk_terminal_handleViewportChange(
             case NH_API_GRAPHICS_BACKEND_OPENGL :
                 break;
             default :
-                return TTYR_TERMINAL_ERROR_BAD_STATE;
+                return TK_TERMINAL_ERROR_BAD_STATE;
         }
     }
 
@@ -610,26 +610,26 @@ TTYR_TERMINAL_RESULT tk_terminal_handleViewportChange(
 
     Graphics_p->State.Viewport_p = Viewport_p;
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
 // RENDER ==========================================================================================
 
-TTYR_TERMINAL_RESULT tk_terminal_renderGraphics(
+TK_TERMINAL_RESULT tk_terminal_renderGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
     tk_terminal_Grid *ElevatedGrid_p, tk_terminal_Grid *BackdropGrid_p)
 {
     switch (Graphics_p->State.Viewport_p->Surface_p->api)
     {
         case NH_API_GRAPHICS_BACKEND_VULKAN :
-//            TTYR_TERMINAL_CHECK(tk_terminal_renderUsingVulkan(Graphics_p))
+//            TK_TERMINAL_CHECK(tk_terminal_renderUsingVulkan(Graphics_p))
             break;
        case NH_API_GRAPHICS_BACKEND_OPENGL :
-            TTYR_TERMINAL_CHECK(tk_terminal_renderUsingOpenGL(Config_p, Graphics_p, Grid_p, BackdropGrid_p))
+            TK_TERMINAL_CHECK(tk_terminal_renderUsingOpenGL(Config_p, Graphics_p, Grid_p, BackdropGrid_p))
             break;
         default :
-            return TTYR_TERMINAL_ERROR_BAD_STATE;
+            return TK_TERMINAL_ERROR_BAD_STATE;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

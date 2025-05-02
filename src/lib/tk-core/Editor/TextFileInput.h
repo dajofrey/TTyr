@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TEXT_FILE_INPUT_H
-#define TTYR_CORE_TEXT_FILE_INPUT_H
+#ifndef TK_CORE_TEXT_FILE_INPUT_H
+#define TK_CORE_TEXT_FILE_INPUT_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -20,7 +20,7 @@
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_handleTextFileInput(
+    TK_CORE_RESULT tk_core_handleTextFileInput(
         nh_core_List *Views_p, tk_core_File *File_p, NH_API_UTF32 c, bool insertMode,  
         bool *refresh_p
     );

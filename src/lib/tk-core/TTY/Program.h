@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_PROGRAM_H
-#define TTYR_CORE_PROGRAM_H
+#ifndef TK_CORE_PROGRAM_H
+#define TK_CORE_PROGRAM_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -20,7 +20,7 @@ typedef struct tk_core_TTY tk_core_TTY;
  *  @{
  */
 
-    TTYR_CORE_RESULT tk_core_addProgram(
+    TK_CORE_RESULT tk_core_addProgram(
         tk_core_TTY *TTY_p, tk_core_Interface *Prototype_p, bool once
     );
 
@@ -28,7 +28,7 @@ typedef struct tk_core_TTY tk_core_TTY;
         tk_core_Interface *Prototype_p, bool once
     );
 
-    TTYR_CORE_RESULT tk_core_destroyProgramInstance(
+    TK_CORE_RESULT tk_core_destroyProgramInstance(
         tk_core_Program *Program_p
     );
 

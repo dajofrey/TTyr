@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_GRID_H
-#define TTYR_TERMINAL_GRID_H
+#ifndef TK_TERMINAL_GRID_H
+#define TK_TERMINAL_GRID_H
 
 #include "../Common/Includes.h"
 #include "../Common/Config.h"
@@ -57,19 +57,19 @@ tk_terminal_Tile *tk_terminal_getTile(
     tk_terminal_Grid *Grid_p, int row, int col
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_initGrid(
+TK_TERMINAL_RESULT tk_terminal_initGrid(
     tk_terminal_Grid *Grid_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_freeGrid(
+TK_TERMINAL_RESULT tk_terminal_freeGrid(
     tk_terminal_Grid *Grid_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
+TK_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
     tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_updateGrid(
+TK_TERMINAL_RESULT tk_terminal_updateGrid(
     tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, void *state_p, nh_gfx_Text *Text_p
 );
 
@@ -81,7 +81,7 @@ bool tk_terminal_compareForegroundAttributes(
     tk_core_Glyph *Glyph1_p, tk_core_Glyph *Glyph2_p
 );
 
-TTYR_TERMINAL_RESULT tk_terminal_updateTile(
+TK_TERMINAL_RESULT tk_terminal_updateTile(
     tk_terminal_Grid *Grid_p, void *state_p, tk_terminal_TileUpdate *Update_p, bool *update_p, int fontSize
 );
 

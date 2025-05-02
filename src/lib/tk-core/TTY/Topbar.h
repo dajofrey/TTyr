@@ -1,5 +1,5 @@
-#ifndef TTYR_CORE_TOPBAR_H
-#define TTYR_CORE_TOPBAR_H
+#ifndef TK_CORE_TOPBAR_H
+#define TK_CORE_TOPBAR_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -60,7 +60,7 @@ typedef struct tk_core_MicroWindow tk_core_MicroWindow;
     tk_core_Topbar tk_core_initTopbar(
     );
 
-    TTYR_CORE_RESULT tk_core_freeTopbar(
+    TK_CORE_RESULT tk_core_freeTopbar(
         tk_core_Topbar *Topbar_p
     );
 
@@ -68,19 +68,19 @@ typedef struct tk_core_MicroWindow tk_core_MicroWindow;
         tk_core_Topbar *Topbar_p
     );
 
-    TTYR_CORE_RESULT tk_core_getTopbarCursor(
+    TK_CORE_RESULT tk_core_getTopbarCursor(
         tk_core_Topbar *Topbar_p, int *x_p, int *y_p, bool topTile
     );
 
-    TTYR_CORE_RESULT tk_core_handleTopbarInput(
+    TK_CORE_RESULT tk_core_handleTopbarInput(
         tk_core_Tile *Tile_p, nh_api_WSIEvent Event 
     );
 
-    TTYR_CORE_RESULT tk_core_drawTopbarRow(
+    TK_CORE_RESULT tk_core_drawTopbarRow(
         tk_core_Tile *Tile_p, tk_core_Glyph *Glyphs_p, int cols, int row, bool standardIO
     );
 
-    TTYR_CORE_RESULT tk_core_updateTopbar(
+    TK_CORE_RESULT tk_core_updateTopbar(
         tk_core_Topbar *Topbar_p
     );
 

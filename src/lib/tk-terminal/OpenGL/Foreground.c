@@ -29,7 +29,7 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLForegroundPrograms(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLForegroundPrograms(
     tk_terminal_OpenGLForeground *Foreground_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     static const char* vsSource_p =
@@ -142,10 +142,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLForegroundPrograms(
 
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glLinkProgram", &Foreground_p->Program2_p->Result);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLFontTexture(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLFontTexture(
     tk_terminal_OpenGLForeground *Foreground_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     Foreground_p->Texture_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
@@ -168,10 +168,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLFontTexture(
         nh_gfx_glenum(NULL, GL_TEXTURE_2D), nh_gfx_glenum(NULL, GL_TEXTURE_MIN_FILTER),
         nh_gfx_glenum(NULL, GL_LINEAR));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLForegroundVertices(
+static TK_TERMINAL_RESULT tk_terminal_initOpenGLForegroundVertices(
     tk_terminal_OpenGLForeground *Foreground_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     Foreground_p->VertexArray_p = nh_gfx_disableOpenGLDataAutoFree(nh_gfx_gluint(NULL, 0));
@@ -220,10 +220,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_initOpenGLForegroundVertices(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindBuffer",
         nh_gfx_glenum(NULL, GL_ARRAY_BUFFER), Foreground_p->ColorBuffer2_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundFont(
+static TK_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundFont(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, 
     tk_terminal_GraphicsForeground *Foreground_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
@@ -240,10 +240,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundFont(
         nh_gfx_glint(NULL, 0), nh_gfx_glenum(NULL, GL_RED), nh_gfx_glenum(NULL, GL_UNSIGNED_BYTE),
         nh_gfx_glchar(NULL, NULL, 0, (GLchar**)&FontInstance_p->Font_p->Atlas.data_p));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundVertices(
+static TK_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundVertices(
     tk_terminal_GraphicsForeground *Foreground_p, nh_gfx_OpenGLCommandBuffer *CommandBuffer_p)
 {
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glBindVertexArray", Foreground_p->OpenGL.VertexArray_p);
@@ -325,10 +325,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForegroundVertices(
         nh_gfx_glboolean(NULL, GL_FALSE), nh_gfx_glsizei(NULL, sizeof(float)*3), 
         nh_gfx_glpointer(NULL, NULL));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForeground(
+TK_TERMINAL_RESULT tk_terminal_updateOpenGLForeground(
     void *Config_p, void *state_p, void *data_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
@@ -350,18 +350,18 @@ TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLForeground(
     tk_terminal_updateOpenGLForegroundVertices(
         &Data_p->Foreground, State_p->Viewport_p->OpenGL.CommandBuffer_p);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_initOpenGLForeground(
+TK_TERMINAL_RESULT tk_terminal_initOpenGLForeground(
     tk_terminal_OpenGLForeground *Foreground_p)
 {
     memset(Foreground_p, 0, sizeof(tk_terminal_OpenGLForeground));
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLForeground(
+TK_TERMINAL_RESULT tk_terminal_freeOpenGLForeground(
     tk_terminal_OpenGLForeground *Foreground_p)
 {
     nh_gfx_freeOpenGLCommand(Foreground_p->VertexShader_p);
@@ -382,5 +382,5 @@ TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLForeground(
     nh_gfx_freeOpenGLData(Foreground_p->ColorBuffer_p);
     nh_gfx_freeOpenGLData(Foreground_p->ColorBuffer2_p);
  
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

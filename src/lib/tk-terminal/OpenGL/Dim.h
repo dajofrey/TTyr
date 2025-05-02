@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_OPENGL_DIM_H
-#define TTYR_TERMINAL_OPENGL_DIM_H
+#ifndef TK_TERMINAL_OPENGL_DIM_H
+#define TK_TERMINAL_OPENGL_DIM_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -41,15 +41,15 @@ typedef struct tk_terminal_Graphics tk_terminal_Graphics;
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT tk_terminal_updateOpenGLDim(
+    TK_TERMINAL_RESULT tk_terminal_updateOpenGLDim(
         void *state_p, void *data_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_initOpenGLDim(
+    TK_TERMINAL_RESULT tk_terminal_initOpenGLDim(
         tk_terminal_OpenGLDim *Dim_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_freeOpenGLDim(
+    TK_TERMINAL_RESULT tk_terminal_freeOpenGLDim(
         tk_terminal_OpenGLDim *Dim_p
     );
 

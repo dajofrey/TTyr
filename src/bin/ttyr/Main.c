@@ -115,7 +115,7 @@ int main(int argc, char **argv_pp)
         Viewport_p = nh_api_createViewport(Surface_p, NULL, NULL);
         if (!Viewport_p) {return 1;}
 
-        if (tk_api_setViewport(Terminal_p, Viewport_p) != TTYR_TERMINAL_SUCCESS) {
+        if (tk_api_setViewport(Terminal_p, Viewport_p) != TK_TERMINAL_SUCCESS) {
             return 1;
         }
         

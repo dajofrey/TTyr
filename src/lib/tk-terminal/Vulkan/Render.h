@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_VULKAN_RENDER_H
-#define TTYR_TERMINAL_VULKAN_RENDER_H
+#ifndef TK_TERMINAL_VULKAN_RENDER_H
+#define TK_TERMINAL_VULKAN_RENDER_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -18,7 +18,7 @@
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
+    TK_TERMINAL_RESULT tk_terminal_renderUsingVulkan(
         tk_terminal_Graphics *Graphics_p
     );
 

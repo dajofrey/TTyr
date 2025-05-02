@@ -21,7 +21,7 @@
 
 // FUNCTIONS =======================================================================================
 
-static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLDim(
+static TK_TERMINAL_RESULT tk_terminal_drawOpenGLDim(
     tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p)
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p;
@@ -32,10 +32,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLDim(
     nh_gfx_addOpenGLCommand(CommandBuffer_p, "glDrawArrays", 
         nh_gfx_glenum(NULL, GL_TRIANGLES), nh_gfx_glint(NULL, 0), nh_gfx_glsizei(NULL, 6));
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLBackground(
+static TK_TERMINAL_RESULT tk_terminal_drawOpenGLBackground(
     tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p)
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
@@ -52,10 +52,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLBackground(
         offset += Range_p->indices;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLForeground(
+static TK_TERMINAL_RESULT tk_terminal_drawOpenGLForeground(
     tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p)
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = State_p->Viewport_p->OpenGL.CommandBuffer_p;
@@ -84,10 +84,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLForeground(
         offset += Range_p->indices;
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLElevatedBackground(
+static TK_TERMINAL_RESULT tk_terminal_drawOpenGLElevatedBackground(
     tk_terminal_Graphics *Graphics_p, tk_terminal_GraphicsData *BackdropData_p, tk_terminal_GraphicsData *MainData_p,
     tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *Grid_p)
 {
@@ -112,10 +112,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLElevatedBackground(
         tk_terminal_drawOpenGLDim(Graphics_p, Grid_p);
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLInactiveCursor(
+static TK_TERMINAL_RESULT tk_terminal_drawOpenGLInactiveCursor(
     tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p)
 {
     nh_gfx_OpenGLCommandBuffer *CommandBuffer_p = Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p;
@@ -145,10 +145,10 @@ static TTYR_TERMINAL_RESULT tk_terminal_drawOpenGLInactiveCursor(
         tk_terminal_drawOpenGLDim(Graphics_p, Grid_p);
     }
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }
 
-TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
+TK_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BackdropGrid_p)
 {
     bool blockUntilRender = Graphics_p->MainData.Background.Action.init || Graphics_p->MainData.Foreground.Action.init;
@@ -165,10 +165,10 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
        nh_gfx_glsizei(NULL, BackdropGrid_p->Size.width),
        nh_gfx_glsizei(NULL, BackdropGrid_p->Size.height));
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->BackdropData))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->BackdropData))
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->BackdropData))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->BackdropData))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->BackdropData))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->BackdropData))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->BackdropData))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->BackdropData))
 
 // clear except borders
 
@@ -227,10 +227,10 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
         nh_gfx_glenum(NULL, GL_SRC_ALPHA),
         nh_gfx_glenum(NULL, GL_ONE_MINUS_SRC_ALPHA));
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLDim(&Graphics_p->State, &Graphics_p->Dim))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLDim(&Graphics_p->State, &Graphics_p->Dim))
  
     if (Config_p->style > 0) {
-        TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLDim(Graphics_p, Grid_p))
+        TK_TERMINAL_CHECK(tk_terminal_drawOpenGLDim(Graphics_p, Grid_p))
     }
 
     nh_gfx_addOpenGLCommand(
@@ -238,16 +238,16 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
         "glDisable", 
         nh_gfx_glenum(NULL, GL_DEPTH_TEST));
  
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->MainData))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->MainData))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->MainData))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->MainData))
 
     nh_gfx_addOpenGLCommand(
         Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
         "glDisable", 
         nh_gfx_glenum(NULL, GL_DEPTH_TEST));
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLBoxes(&Graphics_p->State, &Graphics_p->Boxes))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLInactiveCursor(Graphics_p, Grid_p))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLBoxes(&Graphics_p->State, &Graphics_p->Boxes))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLInactiveCursor(Graphics_p, Grid_p))
 
     nh_gfx_addOpenGLCommand(
         Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
@@ -265,12 +265,12 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
         nh_gfx_glsizei(NULL, Grid_p->Size.width),
         nh_gfx_glsizei(NULL, Grid_p->Size.height));
  
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->MainData))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->MainData))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->MainData))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->MainData))
 
 // draw elevated grid
 
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLElevatedBackground(Graphics_p, &Graphics_p->BackdropData, &Graphics_p->MainData, BackdropGrid_p, Grid_p))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLElevatedBackground(Graphics_p, &Graphics_p->BackdropData, &Graphics_p->MainData, BackdropGrid_p, Grid_p))
 
     nh_gfx_addOpenGLCommand(
         Graphics_p->State.Viewport_p->OpenGL.CommandBuffer_p,
@@ -288,13 +288,13 @@ TTYR_TERMINAL_RESULT tk_terminal_renderUsingOpenGL(
         nh_gfx_glsizei(NULL, Grid_p->Size.width),
         nh_gfx_glsizei(NULL, Grid_p->Size.height));
  
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->ElevatedData))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->ElevatedData))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLBackground(&Graphics_p->State, &Graphics_p->ElevatedData))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLBackground(&Graphics_p->State, &Graphics_p->ElevatedData))
 
-    TTYR_TERMINAL_CHECK(tk_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->ElevatedData))
-    TTYR_TERMINAL_CHECK(tk_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->ElevatedData))
+    TK_TERMINAL_CHECK(tk_terminal_updateOpenGLForeground(Config_p, &Graphics_p->State, &Graphics_p->ElevatedData))
+    TK_TERMINAL_CHECK(tk_terminal_drawOpenGLForeground(&Graphics_p->State, &Graphics_p->ElevatedData))
  
     nh_gfx_endRecording(Graphics_p->State.Viewport_p, blockUntilRender);
 
-    return TTYR_TERMINAL_SUCCESS;
+    return TK_TERMINAL_SUCCESS;
 }

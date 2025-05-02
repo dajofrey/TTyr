@@ -34,10 +34,10 @@
 
 //// INPUT ===========================================================================================
 //
-//TTYR_CORE_RESULT tk_core_handleSideBarHit(
+//TK_CORE_RESULT tk_core_handleSideBarHit(
 //    NH_API_MOUSE_E mouse, int row)
 //{
-//TTYR_CORE_BEGIN()
+//TK_CORE_BEGIN()
 //
 //    tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
 //
@@ -46,11 +46,11 @@
 //            tk_core_insertAndFocusWindow(TTY_p, row);
 //            break;
 //        case NH_API_MOUSE_RIGHT :
-//            TTYR_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->current = row;
+//            TK_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->current = row;
 //            break;
 //    }
 //    
-//TTYR_CORE_DIAGNOSTIC_END(TTYR_CORE_SUCCESS)
+//TK_CORE_DIAGNOSTIC_END(TK_CORE_SUCCESS)
 //}
 
 // INPUT =========================================================================================== 
@@ -81,18 +81,18 @@ void tk_core_checkTitlebar(
 
 // DRAW ============================================================================================
 
-TTYR_CORE_RESULT tk_core_drawTitlebar(
+TK_CORE_RESULT tk_core_drawTitlebar(
     tk_core_TTY *TTY_p)
 {
     tk_core_View *View_p = TTY_p->Views.pp[0];
     tk_core_Row *Row_p = &(View_p->Grid1_p[View_p->rows]);
     int cols = View_p->cols;
-    if (TTY_p->Config.Titlebar.on == false) {return TTYR_CORE_SUCCESS;}
+    if (TTY_p->Config.Titlebar.on == false) {return TK_CORE_SUCCESS;}
 
     // Set titlebar color.
     for (int i = 0; i < cols ; ++i) {
-        Row_p->Glyphs_p[i].mark |= TTYR_CORE_MARK_ACCENT;
-        Row_p->Glyphs_p[i].mark |= TTYR_CORE_MARK_ACCENT;
+        Row_p->Glyphs_p[i].mark |= TK_CORE_MARK_ACCENT;
+        Row_p->Glyphs_p[i].mark |= TK_CORE_MARK_ACCENT;
     }
 
 //    for (int i = 1; tk_core_getConfig().Topbar.on == 1 && i < (Config.windows+1) && i < cols ; ++i) {
@@ -106,7 +106,7 @@ TTYR_CORE_RESULT tk_core_drawTitlebar(
 //    for (int i = 1, j = 1; tk_core_getConfig().Topbar.on == 0 && i < (Config.windows+1) && i < cols ; ++i, j+=3) {
 //        for (int k = j; k < j+2; ++k) {
 //            Row_p->Glyphs_p[k].codepoint = 'f';
-//            Row_p->Glyphs_p[k].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//            Row_p->Glyphs_p[k].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //            Row_p->update_p[k] = true;
 //            if (nh_core_getListIndex(&TTY_p->Windows, TTY_p->Window_p) == i-1) {
 //                Row_p->Glyphs_p[k].codepoint = 'o';
@@ -123,7 +123,7 @@ TTYR_CORE_RESULT tk_core_drawTitlebar(
 //
 //    for (int i = 0; i < strlen(rightSide_p); ++i) {
 //        if (rightSide_p[i] == 'x') {
-//            Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//            Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //        }
 //        Row_p->Glyphs_p[(cols-strlen(rightSide_p))+i-3].codepoint = rightSide_p[i];
 //        Row_p->update_p[(cols-strlen(rightSide_p))+i-3] = 1;
@@ -134,7 +134,7 @@ TTYR_CORE_RESULT tk_core_drawTitlebar(
 //
 //    for (int i = 0; i < strlen(ram_p); ++i) {
 //        if (ram_p[i] == 'x') {
-//            Row_p->Glyphs_p[Config.windows+2+i].mark |= TTYR_CORE_MARK_LINE_GRAPHICS;
+//            Row_p->Glyphs_p[Config.windows+2+i].mark |= TK_CORE_MARK_LINE_GRAPHICS;
 //        }
 //        Row_p->Glyphs_p[Config.windows+2+i].codepoint = ram_p[i];
 //        Row_p->update_p[Config.windows+2+i] = 1;
@@ -167,5 +167,5 @@ TTYR_CORE_RESULT tk_core_drawTitlebar(
     TTY_p->Titlebar.RAM = NH_SYSTEM.RAM;
     TTY_p->Titlebar.Time = NH_SYSTEM.LocalTime;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }

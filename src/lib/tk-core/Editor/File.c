@@ -53,18 +53,18 @@ tk_core_FileView tk_core_initFileView(
     return View;
 }
 
-TTYR_CORE_RESULT tk_core_createFileViews(
+TK_CORE_RESULT tk_core_createFileViews(
     tk_core_FileEditorView *View_p, tk_core_File *File_p)
 {
     tk_core_FileView *FileView_p = (tk_core_FileView*)nh_core_allocate(sizeof(tk_core_FileView));
-    TTYR_CHECK_MEM(FileView_p)
+    TK_CHECK_MEM(FileView_p)
     *FileView_p = tk_core_initFileView(File_p);
     nh_core_appendToList(&View_p->FileViews, FileView_p);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_destroyFileViews(
+TK_CORE_RESULT tk_core_destroyFileViews(
     tk_core_FileEditorView *View_p, tk_core_File *File_p)
 {
     tk_core_FileView *FileView_p = NULL;
@@ -75,7 +75,7 @@ TTYR_CORE_RESULT tk_core_destroyFileViews(
     }
     if (FileView_p) {nh_core_removeFromList2(&View_p->FileViews, true, FileView_p);}
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 tk_core_FileView *tk_core_getFileView(
@@ -88,7 +88,7 @@ tk_core_FileView *tk_core_getFileView(
     return NULL;
 }
 
-TTYR_CORE_RESULT tk_core_updateFileViews(
+TK_CORE_RESULT tk_core_updateFileViews(
     tk_core_EditorView *View_p)
 {
     int oddLeftOver, fileWidth = View_p->FileEditor.width;
@@ -109,19 +109,19 @@ TTYR_CORE_RESULT tk_core_updateFileViews(
         FileView_p->height = View_p->height;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // TYPE ============================================================================================
 
-TTYR_CORE_FILE tk_core_getFileType(
+TK_CORE_FILE tk_core_getFileType(
     nh_encoding_UTF32String *Path_p)
 {
-    TTYR_CORE_FILE type = TTYR_CORE_FILE_TEXT;
+    TK_CORE_FILE type = TK_CORE_FILE_TEXT;
     nh_encoding_UTF8String Path = nh_encoding_encodeUTF8(Path_p->p, Path_p->length);
 
     if (strstr(Path.p, "netzhaut/CHANGES")) {
-        type = TTYR_CORE_FILE_CHANGES;
+        type = TK_CORE_FILE_CHANGES;
     }
 
     nh_encoding_freeUTF8(&Path);
@@ -131,112 +131,112 @@ TTYR_CORE_FILE tk_core_getFileType(
 
 // RENDER ==========================================================================================
 
-TTYR_CORE_RESULT tk_core_renderFile(
+TK_CORE_RESULT tk_core_renderFile(
     tk_core_File *File_p)
 {
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
+        case TK_CORE_FILE_TEXT :
             for (int i = 0; i < ((tk_core_TextFile*)File_p->handle_p)->Lines.size; ++i) {
-                TTYR_CHECK(tk_core_renderTextFileLine(File_p->handle_p, i))
+                TK_CHECK(tk_core_renderTextFileLine(File_p->handle_p, i))
             }
             break;
-        case TTYR_CORE_FILE_CHANGES :
+        case TK_CORE_FILE_CHANGES :
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // WRITE ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_writeFile(
+TK_CORE_RESULT tk_core_writeFile(
     tk_core_File *File_p)
 {
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
-            TTYR_CHECK(tk_core_writeTextFile(File_p->handle_p, &File_p->Node_p->Path))
+        case TK_CORE_FILE_TEXT :
+            TK_CHECK(tk_core_writeTextFile(File_p->handle_p, &File_p->Node_p->Path))
             break;
-        case TTYR_CORE_FILE_CHANGES :
+        case TK_CORE_FILE_CHANGES :
             break;
     }
 
-    TTYR_CHECK(tk_core_setCustomSuffixMessage(
-        NULL, TTYR_CORE_MESSAGE_EDITOR_FILE_SAVED, File_p->Node_p->Path.p, File_p->Node_p->Path.length
+    TK_CHECK(tk_core_setCustomSuffixMessage(
+        NULL, TK_CORE_MESSAGE_EDITOR_FILE_SAVED, File_p->Node_p->Path.p, File_p->Node_p->Path.length
     ))
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // SEARCH ==========================================================================================
 
-TTYR_CORE_RESULT tk_core_clearFileSearch(
+TK_CORE_RESULT tk_core_clearFileSearch(
     tk_core_File *File_p)
 {
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
+        case TK_CORE_FILE_TEXT :
             tk_core_clearTextFileSearch(File_p->handle_p);
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_searchFile(
+TK_CORE_RESULT tk_core_searchFile(
     tk_core_File *File_p, NH_API_UTF32 *str_p, int length)
 {
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
-            TTYR_CHECK(tk_core_searchTextFile(File_p->handle_p, str_p, length))
+        case TK_CORE_FILE_TEXT :
+            TK_CHECK(tk_core_searchTextFile(File_p->handle_p, str_p, length))
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // INPUT ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_handleFileInput(
+TK_CORE_RESULT tk_core_handleFileInput(
     tk_core_Program *Program_p, tk_core_File *File_p, NH_API_UTF32 c, bool insertMode, 
     bool *refresh_p)
 {
     if (File_p->readOnly) {
         *refresh_p = true;
-        TTYR_CHECK(tk_core_setDefaultMessage(NULL, TTYR_CORE_MESSAGE_EDITOR_READ_ONLY))
+        TK_CHECK(tk_core_setDefaultMessage(NULL, TK_CORE_MESSAGE_EDITOR_READ_ONLY))
     }
 
     nh_core_List FileViews = ((tk_core_Editor*)Program_p->handle_p)->View.FileEditor.FileViews;
 
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
-            TTYR_CHECK(tk_core_handleTextFileInput(&FileViews, File_p, c, insertMode, refresh_p))
+        case TK_CORE_FILE_TEXT :
+            TK_CHECK(tk_core_handleTextFileInput(&FileViews, File_p, c, insertMode, refresh_p))
             break;    
-        case TTYR_CORE_FILE_CHANGES :
+        case TK_CORE_FILE_CHANGES :
             break;    
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // DRAW ============================================================================================
 
-TTYR_CORE_RESULT tk_core_drawFileRow(
+TK_CORE_RESULT tk_core_drawFileRow(
     tk_core_Program *Program_p, tk_core_File *File_p, tk_core_FileView *View_p, tk_core_Glyph *Glyphs_p, 
     int row)
 {
     switch (File_p->type)
     {
-        case TTYR_CORE_FILE_TEXT :
+        case TK_CORE_FILE_TEXT :
             tk_core_drawTextFileLine(Program_p, File_p->handle_p, View_p, Glyphs_p, row);
             break;
-        case TTYR_CORE_FILE_CHANGES :
+        case TK_CORE_FILE_CHANGES :
             break;
     }
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 

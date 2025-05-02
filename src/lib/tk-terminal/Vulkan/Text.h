@@ -1,5 +1,5 @@
-#ifndef TTYR_TERMINAL_VULKAN_TEXT_H
-#define TTYR_TERMINAL_VULKAN_TEXT_H
+#ifndef TK_TERMINAL_VULKAN_TEXT_H
+#define TK_TERMINAL_VULKAN_TEXT_H
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
@@ -38,11 +38,11 @@
  *  @{
  */
 
-    TTYR_TERMINAL_RESULT tk_terminal_initVulkanText(
+    TK_TERMINAL_RESULT tk_terminal_initVulkanText(
         nh_gfx_VulkanGPU *GPU_p, tk_terminal_VulkanText *Text_p
     );
 
-    TTYR_TERMINAL_RESULT tk_terminal_updateVulkanText(
+    TK_TERMINAL_RESULT tk_terminal_updateVulkanText(
         nh_gfx_VulkanGPU *GPU_p, nh_gfx_FontInstance *FontInstance_p, tk_terminal_VulkanText *Text_p, nh_core_Array *Vertices_p, 
         nh_core_Array *Indices_p
     );

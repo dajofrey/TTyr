@@ -43,7 +43,7 @@
 
 // WINDOW SIZE =====================================================================================
 
-static TTYR_CORE_RESULT tk_core_getMaxCursorPosition(
+static TK_CORE_RESULT tk_core_getMaxCursorPosition(
     short unsigned int *rows, short unsigned int *cols) 
 {
 #ifdef __unix__
@@ -52,7 +52,7 @@ static TTYR_CORE_RESULT tk_core_getMaxCursorPosition(
     unsigned int i = 0;
   
     if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
   
     while (i < sizeof(buf) - 1) {
@@ -63,18 +63,18 @@ static TTYR_CORE_RESULT tk_core_getMaxCursorPosition(
     buf[i] = '\0';
   
     if (buf[0] != '\x1b' || buf[1] != '[') {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
     if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
   
 #endif
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_getStandardOutputWindowSize(
+TK_CORE_RESULT tk_core_getStandardOutputWindowSize(
     int *cols_p, int *rows_p)
 {
 #ifdef __unix__
@@ -83,9 +83,9 @@ TTYR_CORE_RESULT tk_core_getStandardOutputWindowSize(
   
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) {
-            return TTYR_CORE_ERROR_BAD_STATE;
+            return TK_CORE_ERROR_BAD_STATE;
         }
-        TTYR_CHECK(tk_core_getMaxCursorPosition(&ws.ws_row, &ws.ws_col))
+        TK_CHECK(tk_core_getMaxCursorPosition(&ws.ws_row, &ws.ws_col))
     } 
 
     *cols_p = ws.ws_col;
@@ -93,12 +93,12 @@ TTYR_CORE_RESULT tk_core_getStandardOutputWindowSize(
 
 #endif
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // KEYS ============================================================================================
 
-static TTYR_CORE_RESULT tk_core_readLinuxStandardInput(
+static TK_CORE_RESULT tk_core_readLinuxStandardInput(
     NH_API_UTF32 codepoints_p[4], int *count_p)
 {
 #ifdef __unix__
@@ -112,7 +112,7 @@ static TTYR_CORE_RESULT tk_core_readLinuxStandardInput(
     timeout.tv_usec = 1;
   
     int rv = select(fileno(stdin) + 1, &set, NULL, NULL, &timeout);
-    if (rv == -1 || rv == 0) {return TTYR_CORE_SUCCESS;}
+    if (rv == -1 || rv == 0) {return TK_CORE_SUCCESS;}
 
     char p[4];
     int nread = read(STDIN_FILENO, p, 4);
@@ -126,10 +126,10 @@ static TTYR_CORE_RESULT tk_core_readLinuxStandardInput(
 
 #endif
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_readStandardInput(
+TK_CORE_RESULT tk_core_readStandardInput(
     tk_core_TTY *TTY_p)
 {
     int count = 0;
@@ -140,7 +140,7 @@ TTYR_CORE_RESULT tk_core_readStandardInput(
     NH_API_UTF32 codepoints_p[4];
 
 #ifdef __unix__
-    TTYR_CHECK(tk_core_readLinuxStandardInput(codepoints_p, &count))
+    TK_CHECK(tk_core_readLinuxStandardInput(codepoints_p, &count))
 #endif
 
     for (int i = 0; i < count; ++i) {
@@ -152,12 +152,12 @@ TTYR_CORE_RESULT tk_core_readStandardInput(
 
     }  while (count);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // WRITE ===========================================================================================
 
-TTYR_CORE_RESULT tk_core_writeCursorToStandardOutput(
+TK_CORE_RESULT tk_core_writeCursorToStandardOutput(
     int x, int y)
 {
     nh_core_String String = nh_core_initString(255);
@@ -176,10 +176,10 @@ TTYR_CORE_RESULT tk_core_writeCursorToStandardOutput(
 
     nh_core_freeString(&String);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_writeToStandardOutput(
+TK_CORE_RESULT tk_core_writeToStandardOutput(
     tk_core_Row *Rows_p, int cols, int rows)
 {
     nh_core_String String = nh_core_initString(255);
@@ -246,7 +246,7 @@ TTYR_CORE_RESULT tk_core_writeToStandardOutput(
             int length = nh_encoding_encodeUTF8Single(Rows_p[row].Glyphs_p[col].codepoint, codepoint_p);
 
             // If the glyph is used for line graphics, we need to wrap the codepoint up.
-            if (Rows_p[row].Glyphs_p[col].mark & TTYR_CORE_MARK_LINE_GRAPHICS) {
+            if (Rows_p[row].Glyphs_p[col].mark & TK_CORE_MARK_LINE_GRAPHICS) {
                 nh_core_appendToString(&String, "\e(0", 3);
                 nh_core_appendToString(&String, codepoint_p, length);
                 nh_core_appendToString(&String, "\e(B", 3);
@@ -265,12 +265,12 @@ TTYR_CORE_RESULT tk_core_writeToStandardOutput(
 
     nh_core_freeString(&String);
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // RAW MODE ========================================================================================
  
-static TTYR_CORE_RESULT tk_core_enterRawMode(
+static TK_CORE_RESULT tk_core_enterRawMode(
     tk_core_View *View_p) 
 {
 #ifdef __unix__
@@ -279,7 +279,7 @@ static TTYR_CORE_RESULT tk_core_enterRawMode(
     write(STDOUT_FILENO, "\033[?1049h\033[2J\033[H", 15);
 
     if (tcgetattr(STDIN_FILENO, &View_p->Termios) == -1) {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
   
     struct termios raw = View_p->Termios;
@@ -292,21 +292,21 @@ static TTYR_CORE_RESULT tk_core_enterRawMode(
     raw.c_cc[VTIME] = 1;
   
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) {
-        return TTYR_CORE_ERROR_BAD_STATE;
+        return TK_CORE_ERROR_BAD_STATE;
     }
 
 #endif
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-static TTYR_CORE_RESULT tk_core_exitRawMode(
+static TK_CORE_RESULT tk_core_exitRawMode(
     tk_core_View *View_p) 
 {
 #ifdef __unix__
 
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &View_p->Termios) == -1) {
-         return TTYR_CORE_ERROR_BAD_STATE;
+         return TK_CORE_ERROR_BAD_STATE;
     }
 
     // Make cursor reappear just in case.
@@ -317,22 +317,22 @@ static TTYR_CORE_RESULT tk_core_exitRawMode(
 
 #endif
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 // CLAIM STDOUT ====================================================================================
 
 static bool claimed = false;
 
-TTYR_CORE_RESULT tk_core_claimStandardIO(
+TK_CORE_RESULT tk_core_claimStandardIO(
     tk_core_TTY *TTY_p)
 {
-    if (claimed) {return TTYR_CORE_ERROR_BAD_STATE;}
+    if (claimed) {return TK_CORE_ERROR_BAD_STATE;}
 
     tk_core_View *View_p = tk_core_createView(TTY_p, NULL, true);
-    TTYR_CHECK_NULL(View_p)
+    TK_CHECK_NULL(View_p)
 
-    TTYR_CORE_RESULT error = tk_core_enterRawMode(View_p);
+    TK_CORE_RESULT error = tk_core_enterRawMode(View_p);
     if (error) {
         tk_core_destroyView(TTY_p, View_p);
         return error;
@@ -340,13 +340,13 @@ TTYR_CORE_RESULT tk_core_claimStandardIO(
 
     claimed = true;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
-TTYR_CORE_RESULT tk_core_unclaimStandardIO(
+TK_CORE_RESULT tk_core_unclaimStandardIO(
     tk_core_TTY *TTY_p)
 {
-    if (!claimed) {return TTYR_CORE_ERROR_BAD_STATE;}
+    if (!claimed) {return TK_CORE_ERROR_BAD_STATE;}
 
     tk_core_View *View_p = NULL;
     for (int i = 0; i < TTY_p->Views.size; ++i) {
@@ -355,14 +355,14 @@ TTYR_CORE_RESULT tk_core_unclaimStandardIO(
         View_p = NULL;
     }
 
-    TTYR_CHECK_NULL(View_p)
+    TK_CHECK_NULL(View_p)
 
-    TTYR_CHECK(tk_core_exitRawMode(View_p))
+    TK_CHECK(tk_core_exitRawMode(View_p))
     tk_core_destroyView(TTY_p, View_p);
 
     claimed = false;
 
-    return TTYR_CORE_SUCCESS;
+    return TK_CORE_SUCCESS;
 }
 
 bool tk_core_claimsStandardIO(
