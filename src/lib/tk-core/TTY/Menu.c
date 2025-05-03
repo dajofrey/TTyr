@@ -43,17 +43,17 @@ TK_CORE_RESULT tk_core_drawMicroWindowMenu(
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
     tk_core_View *View_p = TTY_p->Views.pp[0];
 
+    // Get menu height.
+    int height = TK_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->MacroTabs.size;
+    if (height <= 0) {return TK_CORE_SUCCESS;}
+
     nh_api_PixelPosition Position;
     Position.x = TTY_p->Window_p->Tile_p->colPosition+TTY_p->Window_p->Tile_p->colSize/2;
-    Position.y = TTY_p->Window_p->Tile_p->rowPosition+TTY_p->Window_p->Tile_p->rowSize/2;
+    Position.y = TTY_p->Window_p->Tile_p->rowPosition+TTY_p->Window_p->Tile_p->rowSize/2-height/2;
 
     if (TTY_p->Config.Titlebar.on) {
         Position.x+=2;
     }
-
-    // Get menu height.
-    int height = TK_CORE_MACRO_TILE(TTY_p->Window_p->Tile_p)->MacroTabs.size;
-    if (height <= 0) {return TK_CORE_SUCCESS;}
 
     // Get menu width.
     int width = 0;
