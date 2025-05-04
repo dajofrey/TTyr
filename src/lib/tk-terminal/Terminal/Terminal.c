@@ -147,7 +147,7 @@ static TK_TERMINAL_RESULT tk_terminal_updateSize(
     
     TK_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Text))
     TK_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->ElevatedGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
-    TK_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, NULL, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+    TK_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
 
     TK_TERMINAL_CHECK(tk_terminal_updateGraphics(
         &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
@@ -261,9 +261,7 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
     do {
         Array_p = (nh_core_Array*)nh_core_incrementRingBufferMarker(
             &Terminal_p->View_p->Forward.Tiles, &Terminal_p->View_p->Forward.Tiles.Marker);
-
         if (!Array_p) {break;}
-
         for (int i = 0; i < Array_p->length; ++i) {
             tk_terminal_TileUpdate *Update_p = ((tk_terminal_TileUpdate*)Array_p->p)+i;
             if (Update_p->row >= Terminal_p->Grid.rows || Update_p->col >= Terminal_p->Grid.cols) {
@@ -281,7 +279,6 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
                 Terminal_p->Grid.updates_pp[Update_p->row][Update_p->col] = true;
             }
         }
-
     } while (Array_p);
 
     // Update tiles.
@@ -291,13 +288,25 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
             TK_TERMINAL_CHECK(tk_terminal_updateTile(
                 &Terminal_p->Grid, &Terminal_p->Graphics.State, &Terminal_p->Grid.Updates_pp[row][col],
                 update_p, Terminal_p->Config.fontSize))
-            // update background grid tile if necessarry
-            if (row == 0 && Terminal_p->Grid.Updates_pp[row][col].Glyph.codepoint == 'x') {
-                if (!Terminal_p->TTY_p->Config.Topbar.on) {continue;}
-                TK_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, &Terminal_p->Grid, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
+            // update backdrop grid tile if necessarry
+            if (row == 0 && Terminal_p->TTY_p->Config.Topbar.on && !Terminal_p->TTY_p->Config.Titlebar.on) {
+                tk_terminal_TileUpdate Update = Terminal_p->Grid.Updates_pp[row][col];
+                Update.row = 2;
+                Update.col += 1;
+                if (Update.Glyph.codepoint == 'x') {
+                    TK_TERMINAL_CHECK(tk_terminal_updateTile(
+                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, update_p, Terminal_p->Config.fontSize))
+                } else {
+                    Update.Glyph.codepoint = 0;
+                    Update.Glyph.mark = TK_CORE_MARK_ACCENT | TK_CORE_MARK_LINE_GRAPHICS;
+                    Update.Glyph.Attributes.reverse = true;
+                    TK_TERMINAL_CHECK(tk_terminal_updateTile(
+                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, update_p, Terminal_p->Config.fontSize))
+                } 
             }
         }
     }
+
     for (int row = 0; row < Terminal_p->ElevatedGrid.rows; ++row) {
         for (int col = 0; col < Terminal_p->ElevatedGrid.cols; ++col) {
             if (Terminal_p->ElevatedGrid.updates_pp[row][col] == false) {continue;}
@@ -310,21 +319,15 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
     do {
         Array_p = (nh_core_Array*)nh_core_incrementRingBufferMarker(
             &Terminal_p->View_p->Forward.Boxes, &Terminal_p->View_p->Forward.Boxes.Marker);
-
         if (!Array_p) {break;}
-
         TK_TERMINAL_CHECK(tk_terminal_updateBoxes(Terminal_p, Array_p, Terminal_p->Config.fontSize))
-
     } while (Array_p);
 
     do {
         Event_p = (nh_api_WSIEvent*)nh_core_incrementRingBufferMarker(
             &Terminal_p->View_p->Forward.Events, &Terminal_p->View_p->Forward.Events.Marker);
-
         if (!Event_p) {break;}
-
         TK_TERMINAL_CHECK(tk_terminal_handleEvent(Terminal_p, Event_p))
-
     } while (Event_p);
 
     return TK_TERMINAL_SUCCESS;

@@ -282,7 +282,6 @@ TK_CORE_RESULT tk_core_forwardGrid1(
         return tk_core_writeToStandardOutput(View_p->Grid1_p, View_p->cols, View_p->rows);
     }
 
-    // Write to nhterminal.
     nh_core_Array *Boxes_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
     nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
@@ -304,14 +303,12 @@ TK_CORE_RESULT tk_core_forwardGrid1(
     for (int row = 0; row < View_p->rows; ++row) {
         for (int col = 0; col < View_p->cols; ++col) {
             if (!(View_p->Grid1_p[row].update_p[col])) {continue;}
-
             tk_terminal_TileUpdate Update;
             Update.row = Config_p->Titlebar.on ? row+1 : row;
             Update.col = col;
             Update.Glyph = View_p->Grid1_p[row].Glyphs_p[col];
             Update.cursor = false;
             nh_core_appendToArray(Array_p, &Update, 1);
-
             View_p->Grid1_p[row].update_p[col] = false;
         }
     }
@@ -367,7 +364,6 @@ TK_CORE_RESULT tk_core_forwardGrid1(
 TK_CORE_RESULT tk_core_forwardGrid2(
     tk_core_View *View_p)
 {
-    // Write to nhterminal.
     nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
 

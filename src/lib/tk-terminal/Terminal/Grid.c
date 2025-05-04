@@ -127,6 +127,12 @@ tk_terminal_Tile *tk_terminal_getTile(
     return Cols_p->pp[col];
 }
 
+tk_terminal_Tile *tk_terminal_getTileUnsafe(
+    tk_terminal_Grid *Grid_p, int row, int col)
+{
+    return ((nh_core_List*)Grid_p->Rows.pp[row])->pp[col];
+}
+
 bool tk_terminal_compareBackgroundAttributes(
     tk_core_Glyph *Glyph1_p, tk_core_Glyph *Glyph2_p)
 {
@@ -242,7 +248,7 @@ static TK_TERMINAL_RESULT tk_terminal_updateTileVertices(
         ))
     } else {
         TK_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
-            State_p, Grid_p, Glyph_p, col, row, Tile_p->Background.vertices_p, 0, 0, fontSize
+            State_p, Grid_p, Glyph_p, col, row, Tile_p->Background.vertices_p, fontSize
         ))
     }
 
@@ -328,7 +334,7 @@ TK_TERMINAL_RESULT tk_terminal_updateTile(
 }
 
 TK_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
-    tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p)
+    tk_terminal_Config *Config_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p)
 {
     tk_terminal_GraphicsState *State_p = state_p;
 
@@ -362,17 +368,14 @@ TK_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
         for (int col = 0; col < BackdropGrid_p->cols; ++col) {
             tk_terminal_Tile *Tile_p = tk_terminal_getTile(BackdropGrid_p, row, col);
             TK_TERMINAL_CHECK_NULL(Tile_p)
-            Tile_p->Glyph.mark |= TK_CORE_MARK_ACCENT | TK_CORE_MARK_LINE_GRAPHICS;
+            Tile_p->Glyph.mark = TK_CORE_MARK_ACCENT | TK_CORE_MARK_LINE_GRAPHICS;
             Tile_p->Glyph.Attributes.reverse = true;
             TK_TERMINAL_CHECK(tk_terminal_getBackgroundVertices(
-                State_p, BackdropGrid_p, &Tile_p->Glyph, col, row, Tile_p->Background.vertices_p, borderColsPixelOffset, borderRowsPixelOffset, Config_p->fontSize
+                State_p, BackdropGrid_p, &Tile_p->Glyph, col, row, Tile_p->Background.vertices_p, Config_p->fontSize
             ))
-            if (row == 2 && Grid_p) {
-                tk_terminal_Tile *GridTile_p = tk_terminal_getTile(Grid_p, 0, col);
-                if (!GridTile_p || GridTile_p->Glyph.codepoint != 'x') {continue;}
-                Tile_p->Glyph.codepoint = 'x';
-                TK_TERMINAL_CHECK(tk_terminal_getForegroundVerticesForLineGraphics(
-                    State_p, BackdropGrid_p, Tile_p->Glyph.codepoint, col+1, row, 0.9, Tile_p->Foreground.vertices_p, 20, borderColsPixelOffset, borderRowsPixelOffset
+            if (row == 2 && Tile_p->Glyph.codepoint == 'x') {
+                TK_TERMINAL_CHECK(tk_terminal_getForegroundVertices(
+                    State_p, BackdropGrid_p, &Tile_p->Glyph, col, row, Tile_p->Foreground.vertices_p, Config_p->fontSize 
                 ))
             }
         }

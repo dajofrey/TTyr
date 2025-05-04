@@ -57,6 +57,10 @@ tk_terminal_Tile *tk_terminal_getTile(
     tk_terminal_Grid *Grid_p, int row, int col
 );
 
+tk_terminal_Tile *tk_terminal_getTileUnsafe(
+    tk_terminal_Grid *Grid_p, int row, int col
+);
+
 TK_TERMINAL_RESULT tk_terminal_initGrid(
     tk_terminal_Grid *Grid_p
 );
@@ -66,7 +70,7 @@ TK_TERMINAL_RESULT tk_terminal_freeGrid(
 );
 
 TK_TERMINAL_RESULT tk_terminal_updateBackdropGrid(
-    tk_terminal_Config *Config_p, tk_terminal_Grid *Grid_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p
+    tk_terminal_Config *Config_p, tk_terminal_Grid *BackdropGrid_p, void *state_p, nh_gfx_Text *Text_p
 );
 
 TK_TERMINAL_RESULT tk_terminal_updateGrid(
