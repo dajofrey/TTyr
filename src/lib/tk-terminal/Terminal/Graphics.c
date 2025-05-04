@@ -59,6 +59,51 @@ static tk_terminal_GraphicsAction tk_terminal_initGraphicsAction()
 
 // INIT/FREE =======================================================================================
 
+static TK_TERMINAL_RESULT tk_terminal_createDimData(
+    tk_terminal_Dim *Dim_p)
+{
+    nh_core_freeArray(&Dim_p->Vertices);
+    nh_core_freeArray(&Dim_p->Colors);
+
+    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 255);
+    nh_core_Array Colors = nh_core_initArray(sizeof(float), 255);
+
+    float z = 0.45f; // or whatever z-layer you want for dimming
+    
+    float vertices[] = {
+        // x, y, z
+        -1.0f, -1.0f, z,
+         1.0f, -1.0f, z,
+         1.0f,  1.0f, z,
+        -1.0f, -1.0f, z,
+         1.0f,  1.0f, z,
+        -1.0f,  1.0f, z
+    };
+
+    float quadColors[24] = {
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f,
+    
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f,
+        0.0f, 0.0f, 0.0f, 0.7f
+    };
+
+    for (int i = 0; i < 18; ++i) {
+        nh_core_appendToArray(&Vertices, &vertices[i], 1);
+    }
+
+    for (int i = 0; i < 24; ++i) {
+        nh_core_appendToArray(&Colors, &quadColors[i], 1);
+    }
+
+    Dim_p->Vertices = Vertices;
+    Dim_p->Colors = Colors;
+
+    return TK_TERMINAL_SUCCESS;
+}
+
 static TK_TERMINAL_RESULT tk_terminal_initGraphicsData(
     tk_terminal_GraphicsData *Data_p)
 {
@@ -121,6 +166,8 @@ TK_TERMINAL_RESULT tk_terminal_initGraphics(
     Graphics_p->Dim.Action = tk_terminal_initGraphicsAction();
     Graphics_p->Dim.Vertices = nh_core_initArray(sizeof(float), 255);
     Graphics_p->Dim.Colors = nh_core_initArray(sizeof(float), 255);
+
+    tk_terminal_createDimData(&Graphics_p->Dim);
     tk_terminal_initOpenGLDim(&Graphics_p->Dim.OpenGL);
 
     Graphics_p->Boxes.Action = tk_terminal_initGraphicsAction();
@@ -465,51 +512,6 @@ static TK_TERMINAL_RESULT tk_terminal_updateBoxesData(
     return TK_TERMINAL_SUCCESS;
 }
 
-static TK_TERMINAL_RESULT tk_terminal_updateDimData(
-    tk_terminal_GraphicsState *State_p, tk_terminal_Grid *Grid_p, tk_terminal_Dim *Dim_p)
-{
-    nh_core_freeArray(&Dim_p->Vertices);
-    nh_core_freeArray(&Dim_p->Colors);
-
-    nh_core_Array Vertices = nh_core_initArray(sizeof(float), 255);
-    nh_core_Array Colors = nh_core_initArray(sizeof(float), 255);
-
-    float z = 0.45f; // or whatever z-layer you want for dimming
-    
-    float vertices[] = {
-        // x, y, z
-        -1.0f, -1.0f, z,
-         1.0f, -1.0f, z,
-         1.0f,  1.0f, z,
-        -1.0f, -1.0f, z,
-         1.0f,  1.0f, z,
-        -1.0f,  1.0f, z
-    };
-
-    float quadColors[24] = {
-        0.0f, 0.0f, 0.0f, 0.7f,
-        0.0f, 0.0f, 0.0f, 0.7f,
-        0.0f, 0.0f, 0.0f, 0.7f,
-    
-        0.0f, 0.0f, 0.0f, 0.7f,
-        0.0f, 0.0f, 0.0f, 0.7f,
-        0.0f, 0.0f, 0.0f, 0.7f
-    };
-
-    for (int i = 0; i < 18; ++i) {
-        nh_core_appendToArray(&Vertices, &vertices[i], 1);
-    }
-
-    for (int i = 0; i < 24; ++i) {
-        nh_core_appendToArray(&Colors, &quadColors[i], 1);
-    }
-
-    Dim_p->Vertices = Vertices;
-    Dim_p->Colors = Colors;
-
-    return TK_TERMINAL_SUCCESS;
-}
-
 static TK_TERMINAL_RESULT tk_terminal_updateGridGraphics(
     tk_terminal_Config *Config_p, tk_terminal_GraphicsState *State_p, tk_terminal_GraphicsData *Data_p,
     tk_terminal_Grid *Grid_p, int offset)
@@ -526,19 +528,26 @@ static TK_TERMINAL_RESULT tk_terminal_updateGridGraphics(
 
 TK_TERMINAL_RESULT tk_terminal_updateGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn)
+    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn, bool updateBackdrop)
 {
     int shift = titlebarOn ? 1 : 3;
 
     TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->MainData, Grid_p, shift))
-    TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
-        Config_p, &Graphics_p->State, &Graphics_p->ElevatedData, ElevatedGrid_p, shift))
-    TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
-        Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
 
-    TK_TERMINAL_CHECK(tk_terminal_updateDimData(&Graphics_p->State, Grid_p, &Graphics_p->Dim))
-    TK_TERMINAL_CHECK(tk_terminal_updateBoxesData(Graphics_p, Config_p, Grid_p))
+    if (Graphics_p->Boxes.Data.length > 0) {
+        TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
+            Config_p, &Graphics_p->State, &Graphics_p->ElevatedData, ElevatedGrid_p, shift))
+    }
+
+    if (updateBackdrop) {
+        TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
+            Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
+    }
+
+    if (Graphics_p->Boxes.Data.length > 0) {
+        TK_TERMINAL_CHECK(tk_terminal_updateBoxesData(Graphics_p, Config_p, Grid_p))
+    }
 
     return TK_TERMINAL_SUCCESS;
 }

@@ -149,10 +149,6 @@ static TK_TERMINAL_RESULT tk_terminal_updateSize(
     TK_TERMINAL_CHECK(tk_terminal_updateGrid(&Terminal_p->Config, &Terminal_p->ElevatedGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
     TK_TERMINAL_CHECK(tk_terminal_updateBackdropGrid(&Terminal_p->Config, &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Terminal_p->Text))
 
-    TK_TERMINAL_CHECK(tk_terminal_updateGraphics(
-        &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
-        &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
-
     // Update view size, subtract gap tiles.
     Terminal_p->View_p->cols = Terminal_p->Grid.cols-1;
     Terminal_p->View_p->rows = Terminal_p->Grid.rows-1;
@@ -161,7 +157,7 @@ static TK_TERMINAL_RESULT tk_terminal_updateSize(
 
     TK_TERMINAL_CHECK(tk_terminal_updateGraphics(
         &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
-        &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
+        &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on, true))
 
     return TK_TERMINAL_SUCCESS;
 }
@@ -246,7 +242,7 @@ static TK_TERMINAL_RESULT tk_terminal_handleEvent(
 }
 
 static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
-    tk_terminal_Terminal *Terminal_p, bool *update_p)
+    tk_terminal_Terminal *Terminal_p, bool *update_p, bool *updateBackdrop_p)
 {
     nh_core_Array *Array_p = NULL;
     nh_api_WSIEvent *Event_p = NULL;
@@ -295,13 +291,13 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
                 Update.col += 1;
                 if (Update.Glyph.codepoint == 'x') {
                     TK_TERMINAL_CHECK(tk_terminal_updateTile(
-                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, update_p, Terminal_p->Config.fontSize))
+                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, updateBackdrop_p, Terminal_p->Config.fontSize))
                 } else {
                     Update.Glyph.codepoint = 0;
                     Update.Glyph.mark = TK_CORE_MARK_ACCENT | TK_CORE_MARK_LINE_GRAPHICS;
                     Update.Glyph.Attributes.reverse = true;
                     TK_TERMINAL_CHECK(tk_terminal_updateTile(
-                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, update_p, Terminal_p->Config.fontSize))
+                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, updateBackdrop_p, Terminal_p->Config.fontSize))
                 } 
             }
         }
@@ -342,9 +338,10 @@ static NH_SIGNAL tk_terminal_runTerminal(
     if (!Terminal_p->Graphics.State.Viewport_p) {return NH_SIGNAL_IDLE;}
 
     bool update = false;
+    bool updateBackdrop = false;
 
     TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateSizeIfRequired(Terminal_p, &update))
-    TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_handleInputIfRequired(Terminal_p, &update))
+    TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_handleInputIfRequired(Terminal_p, &update, &updateBackdrop))
     if (tk_terminal_updateBlinkOrGradient(&Terminal_p->Config, &Terminal_p->Graphics.State)) {
         update = true;
     }
@@ -353,10 +350,10 @@ static NH_SIGNAL tk_terminal_runTerminal(
     Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.g = Terminal_p->Graphics.State.AccentGradient.Color.g;
     Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.b = Terminal_p->Graphics.State.AccentGradient.Color.b;
  
-    if (update) {
+    if (update || updateBackdrop) {
         TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateGraphics(
             &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
-            &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
+            &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on, updateBackdrop))
         TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_renderGraphics(&Terminal_p->Config, &Terminal_p->Graphics, 
             &Terminal_p->Grid, &Terminal_p->ElevatedGrid, &Terminal_p->BackdropGrid))
         return NH_SIGNAL_OK;

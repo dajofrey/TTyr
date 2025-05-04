@@ -129,7 +129,7 @@ TK_TERMINAL_RESULT tk_terminal_handleViewportChange(
 
 TK_TERMINAL_RESULT tk_terminal_updateGraphics( 
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn
+    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn, bool backdrop
 ); 
 
 TK_TERMINAL_RESULT tk_terminal_renderGraphics(
