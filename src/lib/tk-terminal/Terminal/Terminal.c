@@ -1,7 +1,7 @@
 // LICENSE NOTICE ==================================================================================
 
 /**
- * TTýr - Terminal Emulator
+ * Termoskanne - Terminal Emulator
  * Copyright (C) 2022  Dajo Frey
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
@@ -45,7 +45,7 @@ static void *tk_terminal_initTerminal(
     nh_core_Workload *Workload_p)
 {
     static char *name_p = "Terminal Emulator";
-    static char *path_p = "nhterminal/Terminal/Terminal.c";
+    static char *path_p = "tk-terminal/Terminal/Terminal.c";
 
     Workload_p->name_p = name_p;
     Workload_p->path_p = path_p;
@@ -155,9 +155,12 @@ static TK_TERMINAL_RESULT tk_terminal_updateSize(
     Terminal_p->View_p->Size = Terminal_p->Grid.Size;
     Terminal_p->View_p->TileSize = Terminal_p->Grid.TileSize;
 
+    Terminal_p->Graphics.BackdropData.update = true;
+    Terminal_p->Graphics.ElevatedData.update = true;
+
     TK_TERMINAL_CHECK(tk_terminal_updateGraphics(
         &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
-        &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on, true))
+        &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
 
     return TK_TERMINAL_SUCCESS;
 }
@@ -242,7 +245,7 @@ static TK_TERMINAL_RESULT tk_terminal_handleEvent(
 }
 
 static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
-    tk_terminal_Terminal *Terminal_p, bool *update_p, bool *updateBackdrop_p)
+    tk_terminal_Terminal *Terminal_p, bool *update_p)
 {
     nh_core_Array *Array_p = NULL;
     nh_api_WSIEvent *Event_p = NULL;
@@ -289,16 +292,21 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
                 tk_terminal_TileUpdate Update = Terminal_p->Grid.Updates_pp[row][col];
                 Update.row = 2;
                 Update.col += 1;
+                bool updateBackdrop = false;
                 if (Update.Glyph.codepoint == 'x') {
                     TK_TERMINAL_CHECK(tk_terminal_updateTile(
-                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, updateBackdrop_p, Terminal_p->Config.fontSize))
+                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, &updateBackdrop, Terminal_p->Config.fontSize))
                 } else {
                     Update.Glyph.codepoint = 0;
                     Update.Glyph.mark = TK_CORE_MARK_ACCENT | TK_CORE_MARK_LINE_GRAPHICS;
                     Update.Glyph.Attributes.reverse = true;
                     TK_TERMINAL_CHECK(tk_terminal_updateTile(
-                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, updateBackdrop_p, Terminal_p->Config.fontSize))
-                } 
+                        &Terminal_p->BackdropGrid, &Terminal_p->Graphics.State, &Update, &updateBackdrop, Terminal_p->Config.fontSize))
+                }
+                if (updateBackdrop) {
+                    Terminal_p->Graphics.BackdropData.update = true;
+                    *update_p = true;
+                }
             }
         }
     }
@@ -306,9 +314,14 @@ static TK_TERMINAL_RESULT tk_terminal_handleInputIfRequired(
     for (int row = 0; row < Terminal_p->ElevatedGrid.rows; ++row) {
         for (int col = 0; col < Terminal_p->ElevatedGrid.cols; ++col) {
             if (Terminal_p->ElevatedGrid.updates_pp[row][col] == false) {continue;}
+            bool update = false;
             TK_TERMINAL_CHECK(tk_terminal_updateTile(
                 &Terminal_p->ElevatedGrid, &Terminal_p->Graphics.State, &Terminal_p->ElevatedGrid.Updates_pp[row][col],
-                update_p, Terminal_p->Config.fontSize))
+                &update, Terminal_p->Config.fontSize))
+            if (update) {
+                *update_p = true;
+                Terminal_p->Graphics.ElevatedData.update = true;
+            }
         }
     }
 
@@ -338,10 +351,9 @@ static NH_SIGNAL tk_terminal_runTerminal(
     if (!Terminal_p->Graphics.State.Viewport_p) {return NH_SIGNAL_IDLE;}
 
     bool update = false;
-    bool updateBackdrop = false;
 
     TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateSizeIfRequired(Terminal_p, &update))
-    TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_handleInputIfRequired(Terminal_p, &update, &updateBackdrop))
+    TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_handleInputIfRequired(Terminal_p, &update))
     if (tk_terminal_updateBlinkOrGradient(&Terminal_p->Config, &Terminal_p->Graphics.State)) {
         update = true;
     }
@@ -350,10 +362,10 @@ static NH_SIGNAL tk_terminal_runTerminal(
     Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.g = Terminal_p->Graphics.State.AccentGradient.Color.g;
     Terminal_p->Graphics.State.Viewport_p->Settings.BorderColor.b = Terminal_p->Graphics.State.AccentGradient.Color.b;
  
-    if (update || updateBackdrop) {
+    if (update) {
         TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_updateGraphics(
             &Terminal_p->Config, &Terminal_p->Graphics, &Terminal_p->Grid, &Terminal_p->BackdropGrid, 
-            &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on, updateBackdrop))
+            &Terminal_p->ElevatedGrid, Terminal_p->TTY_p->Config.Titlebar.on))
         TK_TERMINAL_CHECK_2(NH_SIGNAL_ERROR, tk_terminal_renderGraphics(&Terminal_p->Config, &Terminal_p->Graphics, 
             &Terminal_p->Grid, &Terminal_p->ElevatedGrid, &Terminal_p->BackdropGrid))
         return NH_SIGNAL_OK;

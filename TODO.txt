@@ -1,0 +1,6 @@
+make windows resizable
+improve performance (less redrawing, less regenerating)
+get name of child program from shell and display that instead of path
+fix backdrop alignment issues
+fix inactive cursor issues
+fix copy/paste

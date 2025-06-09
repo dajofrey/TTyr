@@ -1,8 +1,6 @@
 #ifndef TK_CORE_VIEW_H
 #define TK_CORE_VIEW_H
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
 /**
  * TTýr - Terminal Emulator
  * Copyright (C) 2022  Dajo Frey
@@ -16,8 +14,6 @@
 
 #ifdef __unix__
     #include <termios.h>
-#endif
-
 #endif
 
 /** @addtogroup lib_nhtty_structs
@@ -86,6 +82,10 @@
 
     TK_CORE_RESULT tk_core_forwardGrid2(
         tk_core_View *View_p
+    );
+
+    TK_CORE_RESULT tk_core_forwardBoxes(
+        tk_core_Config *Config_p, tk_core_View *View_p
     );
 
     TK_CORE_RESULT tk_core_forwardEvent(

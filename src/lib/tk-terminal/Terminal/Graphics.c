@@ -127,6 +127,8 @@ static TK_TERMINAL_RESULT tk_terminal_initGraphicsData(
 
     tk_terminal_initOpenGLBackground(&Data_p->Background.OpenGL);
 
+    Data_p->update = false;
+
     return TK_TERMINAL_SUCCESS;
 }
 
@@ -528,21 +530,27 @@ static TK_TERMINAL_RESULT tk_terminal_updateGridGraphics(
 
 TK_TERMINAL_RESULT tk_terminal_updateGraphics(
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn, bool updateBackdrop)
+    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn)
 {
     int shift = titlebarOn ? 1 : 3;
+
+    if (Config_p->style == 3) {
+        shift = 1;
+    }
 
     TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
         Config_p, &Graphics_p->State, &Graphics_p->MainData, Grid_p, shift))
 
-    if (Graphics_p->Boxes.Data.length > 0) {
+    if (Graphics_p->ElevatedData.update) {
         TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
             Config_p, &Graphics_p->State, &Graphics_p->ElevatedData, ElevatedGrid_p, shift))
+        Graphics_p->ElevatedData.update = false;
     }
 
-    if (updateBackdrop) {
+    if (Graphics_p->BackdropData.update) {
         TK_TERMINAL_CHECK(tk_terminal_updateGridGraphics( 
             Config_p, &Graphics_p->State, &Graphics_p->BackdropData, BackdropGrid_p, 0)) 
+        Graphics_p->BackdropData.update = false;
     }
 
     if (Graphics_p->Boxes.Data.length > 0) {

@@ -1,7 +1,7 @@
 // LICENSE NOTICE ==================================================================================
 
 /**
- * TTýr - Terminal Emulator
+ * Termoskanne - Terminal Emulator
  * Copyright (C) 2022  Dajo Frey
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
@@ -282,10 +282,8 @@ TK_CORE_RESULT tk_core_forwardGrid1(
         return tk_core_writeToStandardOutput(View_p->Grid1_p, View_p->cols, View_p->rows);
     }
 
-    nh_core_Array *Boxes_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
     nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
     nh_core_freeArray(Array_p);
-    nh_core_freeArray(Boxes_p);
 
     if (Config_p->Titlebar.on) {
         for (int col = 0; col < View_p->cols; ++col) {
@@ -312,6 +310,36 @@ TK_CORE_RESULT tk_core_forwardGrid1(
             View_p->Grid1_p[row].update_p[col] = false;
         }
     }
+
+    return TK_CORE_SUCCESS;
+}
+
+TK_CORE_RESULT tk_core_forwardGrid2(
+    tk_core_View *View_p)
+{
+    nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
+    nh_core_freeArray(Array_p);
+
+    for (int row = 0; row < View_p->rows; ++row) {
+        for (int col = 0; col < View_p->cols; ++col) {
+            tk_terminal_TileUpdate Update;
+            Update.row = row;
+            Update.col = col;
+            Update.Glyph = View_p->Grid2_p[row].Glyphs_p[col];
+            Update.Glyph.mark |= TK_CORE_MARK_ELEVATED | TK_CORE_MARK_ACCENT;
+            Update.cursor = false;
+            nh_core_appendToArray(Array_p, &Update, 1);
+        }
+    }
+
+    return TK_CORE_SUCCESS;
+}
+
+TK_CORE_RESULT tk_core_forwardBoxes(
+    tk_core_Config *Config_p, tk_core_View *View_p)
+{
+    nh_core_Array *Boxes_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Boxes);
+    nh_core_freeArray(Boxes_p);
 
     // Forward boxes: Tab menu.
     tk_core_TTY *TTY_p = nh_core_getWorkloadArg();
@@ -357,27 +385,6 @@ TK_CORE_RESULT tk_core_forwardGrid1(
         nh_core_freeList(&MicroTiles, false);
     }
     nh_core_freeList(&MacroTiles, false);
-
-    return TK_CORE_SUCCESS;
-}
-
-TK_CORE_RESULT tk_core_forwardGrid2(
-    tk_core_View *View_p)
-{
-    nh_core_Array *Array_p = (nh_core_Array*)nh_core_advanceRingBuffer(&View_p->Forward.Tiles);
-    nh_core_freeArray(Array_p);
-
-    for (int row = 0; row < View_p->rows; ++row) {
-        for (int col = 0; col < View_p->cols; ++col) {
-            tk_terminal_TileUpdate Update;
-            Update.row = row;
-            Update.col = col;
-            Update.Glyph = View_p->Grid2_p[row].Glyphs_p[col];
-            Update.Glyph.mark |= TK_CORE_MARK_ELEVATED | TK_CORE_MARK_ACCENT;
-            Update.cursor = false;
-            nh_core_appendToArray(Array_p, &Update, 1);
-        }
-    }
 
     return TK_CORE_SUCCESS;
 }

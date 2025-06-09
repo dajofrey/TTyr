@@ -1,7 +1,7 @@
 // LICENSE NOTICE ==================================================================================
 
 /**
- * TTýr - Terminal Emulator
+ * Termoskanne - Terminal Emulator
  * Copyright (C) 2022  Dajo Frey
  * Published under GNU LGPL. See TTyr/LICENSE.LGPL file.
  */
@@ -339,12 +339,14 @@ TK_CORE_RESULT tk_core_refreshGrid2(
     if (TTY_p->alt && TTY_p->ctrl) {
         TK_CHECK(tk_core_drawMicroWindowMenu(View_p->Grid2_p))
     }
+
 //    if (1) {
 //        TK_CHECK(tk_core_drawPrompt(View_p->Grid2_p))
 //    }
 
     TK_CHECK(tk_core_drawContextMenuRecursively(TTY_p->Window_p->MouseMenu_p, View_p->Grid2_p))
     TK_CHECK(tk_core_forwardGrid2(View_p))
+    TK_CHECK(tk_core_forwardBoxes(&TTY_p->Config, View_p))
 
     return TK_CORE_SUCCESS;
 }

@@ -81,6 +81,7 @@ typedef struct tk_terminal_GraphicsGradient {
 typedef struct tk_terminal_GraphicsData {
     tk_terminal_GraphicsForeground Foreground;
     tk_terminal_GraphicsBackground Background;
+    bool update;
 } tk_terminal_GraphicsData;
 
 /**
@@ -129,7 +130,7 @@ TK_TERMINAL_RESULT tk_terminal_handleViewportChange(
 
 TK_TERMINAL_RESULT tk_terminal_updateGraphics( 
     tk_terminal_Config *Config_p, tk_terminal_Graphics *Graphics_p, tk_terminal_Grid *Grid_p,
-    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn, bool backdrop
+    tk_terminal_Grid *BackdropGrid_p, tk_terminal_Grid *ElevatedGrid_p, bool titlebarOn
 ); 
 
 TK_TERMINAL_RESULT tk_terminal_renderGraphics(
